@@ -1,0 +1,169 @@
+Starting
+Welcome to the Geth JavaScript console!
+
+instance: Geth/v1.8.23-stable-c9427004/darwin-amd64/go1.11.5
+coinbase: 0x000001f568875f378bf6d170b790967fe429c81a
+at block: 7376610 (Sat, 16 Mar 2019 10:50:52 AEDT)
+ datadir: /Users/bok/Library/Ethereum
+ modules: admin:1.0 debug:1.0 eth:1.0 ethash:1.0 miner:1.0 net:1.0 personal:1.0 rpc:1.0 txpool:1.0 web3:1.0
+
+> 
+> 
+undefined
+> 
+undefined
+> 
+> 
+true
+> 
+> 
+RESULT: --- CryptoPunksMarket @ 0xb47e3cd837dDF8e4c57F05d70Ab865de6e193BBB ---
+undefined
+> 
+RESULT: imageHash: ac39af4793119ee46bbff351d8cb6b5f23da60222126add4268e261199a2921b
+undefined
+> 
+RESULT: standard: CryptoPunks
+undefined
+> 
+RESULT: name: CRYPTOPUNKS
+undefined
+> 
+RESULT: symbol: Ͼ
+undefined
+> 
+RESULT: decimals: 0
+undefined
+> 
+RESULT: totalSupply: 10000
+undefined
+> 
+RESULT: nextPunkIndexToAssign: 0
+undefined
+> 
+RESULT: allPunksAssigned: true
+undefined
+> 
+RESULT: punksRemainingToAssign: 0
+undefined
+> 
+> 
+> 
+undefined
+> 
+undefined
+> 
+> 
+undefined
+> 
+> 
+undefined
+> 
+... 
+... 
+... 
+... 
+RESULT: punkIndexToAddress(0): 0xe08c32737c021c7d05d116b00a68a02f2d144ac0 balance=1
+RESULT: punkIndexToAddress(1): 0xf5099e196469257c0d457e896a648d5f616af034 balance=16
+RESULT: punkIndexToAddress(2): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(3): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(4): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(5): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(6): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(7): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(8): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(9): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(10): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(11): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(12): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(13): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(14): 0x7c00c9f0e7aed440c0c730a9bd9ee4f49de20d5c balance=8
+RESULT: punkIndexToAddress(15): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(16): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(17): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(18): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(19): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(20): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(21): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(22): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(23): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(24): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(25): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(26): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(27): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(28): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(29): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(30): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(31): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(32): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(33): 0x6611fe71c233e4e7510b2795c242c9a57790b376 balance=326
+RESULT: punkIndexToAddress(34): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(35): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(36): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(37): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(38): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(39): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(40): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(41): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(42): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(43): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(44): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(45): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(46): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(47): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(48): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(49): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(50): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(51): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(52): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(53): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(54): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(55): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(56): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(57): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(58): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(59): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(60): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(61): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(62): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(63): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(64): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(65): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(66): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(67): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(68): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(69): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(70): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(71): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(72): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(73): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(74): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(75): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(76): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(77): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(78): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(79): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(80): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(81): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(82): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(83): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(84): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(85): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(86): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(87): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(88): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(89): 0x052564eb0fd8b340803df55def89c25c432f43f4 balance=47
+RESULT: punkIndexToAddress(90): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(91): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(92): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(93): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(94): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(95): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(96): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(97): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(98): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+RESULT: punkIndexToAddress(99): 0xc352b534e8b987e036a93539fd6897f53488e56a balance=1007
+undefined
+> 
+> 
+> 
