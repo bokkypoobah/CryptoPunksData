@@ -11,6 +11,9 @@
 # Enjoy. (c) BokkyPooBah / Bok Consulting Pty Ltd 2019. The MIT Licence.
 # ----------------------------------------------------------------------------------------------
 
+# echo "Options: [all|events|state]"
+# MODE=${1:-all}
+
 ABI=cryptoPunks.js
 OUTPUTFILE=cryptoPunksData.txt
 TSVFILE=cryptoPunksData.tsv
@@ -18,147 +21,179 @@ TSVFILE=cryptoPunksData.tsv
 echo "Starting" | tee $OUTPUTFILE
 
 geth attach << EOF | tee -a $OUTPUTFILE
-
-// 0
-var START = 2500;
-// cryptoPunks.totalSupply() = 10000
-var END = 2530;
-console.log("RESULT: NOTE. Using only the indices between " + START + " and " + END + " for testing");
-
 loadScript("$ABI");
 
-console.log("RESULT: --- CryptoPunksMarket @ " + cryptoPunksAddress + " ---");
-console.log("RESULT: imageHash: " + cryptoPunks.imageHash());
-console.log("RESULT: standard: " + cryptoPunks.standard());
-console.log("RESULT: name: " + cryptoPunks.name());
-console.log("RESULT: symbol: " + cryptoPunks.symbol());
-console.log("RESULT: decimals: " + cryptoPunks.decimals());
-console.log("RESULT: totalSupply: " + cryptoPunks.totalSupply());
-console.log("RESULT: nextPunkIndexToAssign: " + cryptoPunks.nextPunkIndexToAssign());
-console.log("RESULT: allPunksAssigned: " + cryptoPunks.allPunksAssigned());
-console.log("RESULT: punksRemainingToAssign: " + cryptoPunks.punksRemainingToAssign());
+console.log("RESULT: blockNumber\t" + eth.blockNumber);
+console.log("RESULT: address\t" + cryptoPunksAddress);
+console.log("RESULT: imageHash\t" + cryptoPunks.imageHash());
+console.log("RESULT: standard\t" + cryptoPunks.standard());
+console.log("RESULT: name\t" + cryptoPunks.name());
+console.log("RESULT: symbol\t" + cryptoPunks.symbol());
+console.log("RESULT: decimals\t" + cryptoPunks.decimals());
+console.log("RESULT: totalSupply\t" + cryptoPunks.totalSupply());
+console.log("RESULT: nextPunkIndexToAssign\t" + cryptoPunks.nextPunkIndexToAssign());
+console.log("RESULT: allPunksAssigned\t" + cryptoPunks.allPunksAssigned());
+console.log("RESULT: punksRemainingToAssign\t" + cryptoPunks.punksRemainingToAssign());
 
 var accountsData = {};
+var blocksData = {};
+var transactionsData = {};
 
 var i;
-for (i = START; i < END; i++) {
+
+// --- Get events in blocks ---
+
+var rangeStart = cryptoPunksDeploymentBlock;
+var rangeEnd = eth.blockNumber;
+// var rangeEnd = parseInt(rangeStart) + 10000;
+var fromBlock;
+var toBlock;
+var stepSize = 20000;
+for (fromBlock = rangeStart; fromBlock < rangeEnd; fromBlock = parseInt(fromBlock) + stepSize) {
+  var toBlock = Math.min(parseInt(fromBlock) + stepSize, eth.blockNumber);
+  console.log("RESULT: processing\t" + fromBlock + "\t" + toBlock);
+
+  // event Assign(address indexed to, uint256 punkIndex);
+  var assignEvents = cryptoPunks.Assign({}, { fromBlock: fromBlock, toBlock: toBlock });
+  assignEvents.watch(function (error, result) {
+    transactionsData[result.transactionHash] = 1;
+    accountsData[result.address] = 1;
+    accountsData[result.args.to] = 1;
+    // console.log("RESULT: Assign " + JSON.stringify(result));
+    console.log("RESULT: event\t" + result.blockNumber + "\t" + result.transactionIndex + "\t" +
+      result.transactionHash + "\t" + result.removed + "\t" + result.address + "\t" +
+      "Assign\t" + "\t" + result.args.to + "\t" + result.args.punkIndex);
+  });
+  assignEvents.stopWatching();
+
+  // event Transfer(address indexed from, address indexed to, uint256 value);
+  var transferEvents = cryptoPunks.Transfer({}, { fromBlock: fromBlock, toBlock: toBlock });
+  transferEvents.watch(function (error, result) {
+    transactionsData[result.transactionHash] = 1;
+    accountsData[result.address] = 1;
+    accountsData[result.args.from] = 1;
+    accountsData[result.args.to] = 1;
+    console.log("RESULT: event\t" + result.blockNumber + "\t" + result.transactionIndex + "\t" +
+      result.transactionHash + "\t" + result.removed + "\t" + result.address + "\t" +
+      "Transfer\t" + "\t" + result.args.from + "\t" + result.args.to + "\t" + result.args.value);
+  });
+  transferEvents.stopWatching();
+
+  // event PunkTransfer(address indexed from, address indexed to, uint256 punkIndex);
+  var punkTransferEvents = cryptoPunks.PunkTransfer({}, { fromBlock: fromBlock, toBlock: toBlock });
+  punkTransferEvents.watch(function (error, result) {
+    transactionsData[result.transactionHash] = 1;
+    accountsData[result.address] = 1;
+    accountsData[result.args.from] = 1;
+    accountsData[result.args.to] = 1;
+    console.log("RESULT: event\t" + result.blockNumber + "\t" + result.transactionIndex + "\t" +
+      result.transactionHash + "\t" + result.removed + "\t" + result.address + "\t" +
+      "PunkTransfer\t" + "\t" + result.args.from + "\t" + result.args.to + "\t" + result.args.punkIndex);
+  });
+  punkTransferEvents.stopWatching();
+
+  // event PunkOffered(uint indexed punkIndex, uint minValue, address indexed toAddress);
+  var punkOfferedEvents = cryptoPunks.PunkOffered({}, { fromBlock: fromBlock, toBlock: toBlock });
+  punkOfferedEvents.watch(function (error, result) {
+    transactionsData[result.transactionHash] = 1;
+    accountsData[result.address] = 1;
+    accountsData[result.args.toAddress] = 1;
+    console.log("RESULT: event\t" + result.blockNumber + "\t" + result.transactionIndex + "\t" +
+      result.transactionHash + "\t" + result.removed + "\t" + result.address + "\t" +
+      "PunkOffered\t" + "\t" + result.args.punkIndex + "\t" + result.args.minValue + "\t" + result.args.toAddress);
+  });
+  punkOfferedEvents.stopWatching();
+
+  // event PunkBidEntered(uint indexed punkIndex, uint value, address indexed fromAddress);
+  var punkBidEnteredEvents = cryptoPunks.PunkBidEntered({}, { fromBlock: fromBlock, toBlock: toBlock });
+  punkBidEnteredEvents.watch(function (error, result) {
+    transactionsData[result.transactionHash] = 1;
+    accountsData[result.address] = 1;
+    accountsData[result.args.fromAddress] = 1;
+    console.log("RESULT: event\t" + result.blockNumber + "\t" + result.transactionIndex + "\t" +
+      result.transactionHash + "\t" + result.removed + "\t" + result.address + "\t" +
+      "PunkBidEntered\t" + "\t" + result.args.punkIndex + "\t" + result.args.value + "\t" + result.args.fromAddress);
+  });
+  punkBidEnteredEvents.stopWatching();
+
+  // event PunkBidWithdrawn(uint indexed punkIndex, uint value, address indexed fromAddress);
+  var punkBidWithdrawnEvents = cryptoPunks.PunkBidWithdrawn({}, { fromBlock: fromBlock, toBlock: toBlock });
+  punkBidWithdrawnEvents.watch(function (error, result) {
+    transactionsData[result.transactionHash] = 1;
+    accountsData[result.address] = 1;
+    accountsData[result.args.fromAddress] = 1;
+    console.log("RESULT: event\t" + result.blockNumber + "\t" + result.transactionIndex + "\t" +
+      result.transactionHash + "\t" + result.removed + "\t" + result.address + "\t" +
+      "PunkBidWithdrawn\t" + "\t" + result.args.punkIndex + "\t" + result.args.value + "\t" + result.args.fromAddress);
+  });
+  punkBidWithdrawnEvents.stopWatching();
+
+  // event PunkBought(uint indexed punkIndex, uint value, address indexed fromAddress, address indexed toAddress);
+  var assignEvents = cryptoPunks.PunkBought({}, { fromBlock: fromBlock, toBlock: toBlock });
+  assignEvents.watch(function (error, result) {
+    transactionsData[result.transactionHash] = 1;
+    accountsData[result.address] = 1;
+    accountsData[result.args.fromAddress] = 1;
+    accountsData[result.args.toAddress] = 1;
+    console.log("RESULT: event\t" + result.blockNumber + "\t" + result.transactionIndex + "\t" +
+      result.transactionHash + "\t" + result.removed + "\t" + result.address + "\t" +
+      "PunkBought\t" + "\t" + result.args.punkIndex + "\t" + result.args.value + "\t" + result.args.fromAddress + "\t" + result.args.toAddress);
+  });
+  assignEvents.stopWatching();
+
+  // event PunkNoLongerForSale(uint indexed punkIndex);
+  var punkNoLongerForSaleEvents = cryptoPunks.PunkNoLongerForSale({}, { fromBlock: fromBlock, toBlock: toBlock });
+  punkNoLongerForSaleEvents.watch(function (error, result) {
+    transactionsData[result.transactionHash] = 1;
+    accountsData[result.address] = 1;
+    console.log("RESULT: event\t" + result.blockNumber + "\t" + result.transactionIndex + "\t" +
+      result.transactionHash + "\t" + result.removed + "\t" + result.address + "\t" +
+      "PunkNoLongerForSale\t" + "\t" + result.args.punkIndex);
+  });
+  punkNoLongerForSaleEvents.stopWatching();
+}
+
+
+// 0 (2500 for testing)
+var indexStart = 0;
+var indexEnd = cryptoPunks.totalSupply();
+// var indexEnd = 10;
+console.log("RESULT: indexStart\t" + indexStart);
+console.log("RESULT: indexEnd\t" + indexEnd);
+
+// Get data by index
+for (i = indexStart; i < indexEnd; i++) {
   var address = cryptoPunks.punkIndexToAddress(i);
   accountsData[address] = 1;
-  console.log("RESULT: punkIndexToAddress(" + i + "): " + cryptoPunks.punkIndexToAddress(i));
-  console.log("RESULT: punksOfferedForSale(" + i + "): " + cryptoPunks.punksOfferedForSale(i));
-  console.log("RESULT: punkBids(" + i + "): " + cryptoPunks.punkBids(i));
+  console.log("RESULT: punkIndexToAddress\t" + i + "\t" + cryptoPunks.punkIndexToAddress(i));
+  var offer = cryptoPunks.punksOfferedForSale(i);
+  console.log("RESULT: punksOfferedForSale\t" + i + "\t" + offer[0] + "\t" + offer[1] + "\t" + offer[2] + "\t" + offer[3] + "\t" + offer[3]);
+  var bid = cryptoPunks.punkBids(i);
+  console.log("RESULT: punkBids\t" + i + "\t" + bid[0] + "\t" + bid[1] + "\t" + bid[2] + "\t" + bid[3]);
 }
-var accounts = Object.keys(accountsData).sort();
 
+// Get data by accounts
+var accounts = Object.keys(accountsData).sort();
 accounts.forEach(function(e) {
   var balance = cryptoPunks.balanceOf(e);
-  console.log("RESULT: balanceOf(" + e + "): " + balance);
-  console.log("RESULT: pendingWithdrawals(" + e + "): " + cryptoPunks.pendingWithdrawals(e));
+  console.log("RESULT: balanceOf\t" + e + "\t" + balance);
+  console.log("RESULT: pendingWithdrawals\t" + e + "\t" + cryptoPunks.pendingWithdrawals(e));
+  console.log("RESULT: getBalance\t" + e + "\t" + eth.getBalance(e));
 });
 
-var fromBlock = cryptoPunksDeploymentBlock;
-var toBlock = eth.blockNumber;
-
-// event Assign(address indexed to, uint256 punkIndex);
-fromBlock = 3918216;
-// First assignment phase end. Further assignments after this block
-// var toBlock = 3919418;
-toBlock = parseInt(fromBlock) + 20;
-var assignEvents = cryptoPunks.Assign({}, { fromBlock: fromBlock, toBlock: toBlock });
-i = 0;
-assignEvents.watch(function (error, result) {
-  console.log("RESULT: " + result.blockNumber + "\t" + result.transactionIndex + "\t" +
-    result.transactionHash + "\t" + result.address + "\t" + "Assign\t" + "\t" + result.args.to + "\t" +
-    result.args.punkIndex);
+/*
+// Get data by transactions
+var transactions = Object.keys(transactionsData).sort();
+transactions.forEach(function(e) {
+  var tx = eth.getTransaction(e);
+  var txr = eth.getTransactionReceipt(e);
+  console.log("RESULT: tx\t" + e + "\t" + JSON.stringify(tx));
+  console.log("RESULT: txReceipt\t" + e + "\t" + JSON.stringify(txReceipt));
 });
-assignEvents.stopWatching();
-
-// event Transfer(address indexed from, address indexed to, uint256 value);
-fromBlock = 3920026;
-toBlock = 3920546;
-var transferEvents = cryptoPunks.Transfer({}, { fromBlock: fromBlock, toBlock: toBlock });
-i = 0;
-transferEvents.watch(function (error, result) {
-  console.log("RESULT: " + result.blockNumber + "\t" + result.transactionIndex + "\t" +
-    result.transactionHash + "\t" + result.address + "\t" + "Transfer\t" + "\t" + result.args.from + "\t" +
-    result.args.to + "\t" + result.args.value);
-});
-transferEvents.stopWatching();
-
-// event PunkTransfer(address indexed from, address indexed to, uint256 punkIndex);
-fromBlock = 3920026;
-toBlock = 3931970;
-var punkTransferEvents = cryptoPunks.PunkTransfer({}, { fromBlock: fromBlock, toBlock: toBlock });
-i = 0;
-punkTransferEvents.watch(function (error, result) {
-  console.log("RESULT: " + result.blockNumber + "\t" + result.transactionIndex + "\t" +
-    result.transactionHash + "\t" + result.address + "\t" + "PunkTransfer\t" + "\t" + result.args.from + "\t" +
-    result.args.to + "\t" + result.args.punkIndex);
-});
-punkTransferEvents.stopWatching();
-
-// event PunkOffered(uint indexed punkIndex, uint minValue, address indexed toAddress);
-fromBlock = 7317877;
-toBlock = 7355280;
-var punkOfferedEvents = cryptoPunks.PunkOffered({}, { fromBlock: fromBlock, toBlock: toBlock });
-i = 0;
-punkOfferedEvents.watch(function (error, result) {
-  console.log("RESULT: " + result.blockNumber + "\t" + result.transactionIndex + "\t" +
-    result.transactionHash + "\t" + result.address + "\t" + "PunkOffered\t" + "\t" + result.args.punkIndex + "\t" +
-    result.args.minValue + "\t" + result.args.toAddress);
-});
-punkOfferedEvents.stopWatching();
-
-// event PunkBidEntered(uint indexed punkIndex, uint value, address indexed fromAddress);
-fromBlock = 7355365;
-toBlock = 7366652;
-var punkBidEnteredEvents = cryptoPunks.PunkBidEntered({}, { fromBlock: fromBlock, toBlock: toBlock });
-i = 0;
-punkBidEnteredEvents.watch(function (error, result) {
-  console.log("RESULT: " + result.blockNumber + "\t" + result.transactionIndex + "\t" +
-    result.transactionHash + "\t" + result.address + "\t" + "PunkBidEntered\t" + "\t" + result.args.punkIndex + "\t" +
-    result.args.value + "\t" + result.args.fromAddress);
-});
-punkBidEnteredEvents.stopWatching();
-
-// event PunkBidWithdrawn(uint indexed punkIndex, uint value, address indexed fromAddress);
-fromBlock = 7355365;
-toBlock = 7366652;
-var punkBidWithdrawnEvents = cryptoPunks.PunkBidWithdrawn({}, { fromBlock: fromBlock, toBlock: toBlock });
-i = 0;
-punkBidWithdrawnEvents.watch(function (error, result) {
-  console.log("RESULT: " + result.blockNumber + "\t" + result.transactionIndex + "\t" +
-    result.transactionHash + "\t" + result.address + "\t" + "PunkBidWithdrawn\t" + "\t" + result.args.punkIndex + "\t" +
-    result.args.value + "\t" + result.args.fromAddress);
-});
-punkBidWithdrawnEvents.stopWatching();
-
-// event PunkBought(uint indexed punkIndex, uint value, address indexed fromAddress, address indexed toAddress);
-fromBlock = 7372263;
-toBlock = 7372277;
-var assignEvents = cryptoPunks.PunkBought({}, { fromBlock: fromBlock, toBlock: toBlock });
-i = 0;
-assignEvents.watch(function (error, result) {
-  console.log("RESULT: " + result.blockNumber + "\t" + result.transactionIndex + "\t" +
-    result.transactionHash + "\t" + result.address + "\t" + "PunkBought\t" + "\t" + result.args.punkIndex + "\t" +
-    result.args.value + "\t" + result.args.fromAddress + "\t" + result.args.toAddress);
-});
-assignEvents.stopWatching();
-
-// event PunkNoLongerForSale(uint indexed punkIndex);
-fromBlock = 7355365;
-toBlock = 7366652;
-var punkNoLongerForSaleEvents = cryptoPunks.PunkNoLongerForSale({}, { fromBlock: fromBlock, toBlock: toBlock });
-i = 0;
-punkNoLongerForSaleEvents.watch(function (error, result) {
-  // console.log("RESULT: PunkNoLongerForSale " + JSON.stringify(result));
-  console.log("RESULT: " + result.blockNumber + "\t" + result.transactionIndex + "\t" +
-    result.transactionHash + "\t" + result.address + "\t" + "PunkNoLongerForSale\t" + "\t" + result.args.punkIndex);
-});
-punkNoLongerForSaleEvents.stopWatching();
+*/
 
 
 EOF
 
-grep "RESULTS: " $OUTPUTFILE > $TSVFILE
+grep "RESULT: " $OUTPUTFILE > $TSVFILE
 cat $TSVFILE
