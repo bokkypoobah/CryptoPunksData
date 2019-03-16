@@ -49,19 +49,28 @@ accounts.forEach(function(e) {
 var ENDEVENTS = eth.blockNumber;
 var STARTEVENTS = ENDEVENTS - 2000;
 
+if (false) {
 var ASSIGNSTART = 3918216;
-
-// First assignment phase end
-var ASSIGNEND = 3919418;
-// var ASSIGNEND = parseInt(ASSIGNSTART) + 2000;
-
-
+// First assignment phase end. Further assignments after this block
+// var ASSIGNEND = 3919418;
+var ASSIGNEND = parseInt(ASSIGNSTART) + 20;
 var assignEvents = cryptoPunks.Assign({}, { fromBlock: ASSIGNSTART, toBlock: ASSIGNEND });
 i = 0;
 assignEvents.watch(function (error, result) {
   console.log("RESULT: Assign " + i++ + " #" + result.blockNumber + " " + JSON.stringify(result.args));
 });
 assignEvents.stopWatching();
+}
+
+var PUNKBOUGHTEND = 7372277;
+var PUNKBOUGHTSTART = 7372277;
+var assignEvents = cryptoPunks.PunkBought({}, { fromBlock: PUNKBOUGHTSTART, toBlock: PUNKBOUGHTEND });
+i = 0;
+assignEvents.watch(function (error, result) {
+  console.log("RESULT: PunkBought " + i++ + " #" + result.blockNumber + " " + JSON.stringify(result.args));
+});
+assignEvents.stopWatching();
+
 
 exit;
 
