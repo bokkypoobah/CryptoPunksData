@@ -67,7 +67,9 @@ toBlock = parseInt(fromBlock) + 20;
 var assignEvents = cryptoPunks.Assign({}, { fromBlock: fromBlock, toBlock: toBlock });
 i = 0;
 assignEvents.watch(function (error, result) {
-  console.log("RESULT: Assign " + i++ + " #" + result.blockNumber + " " + JSON.stringify(result.args));
+  console.log("RESULT: " + result.blockNumber + "\t" + result.transactionIndex + "\t" +
+    result.transactionHash + "\t" + result.address + "\t" + "Assign\t" + "\t" + result.args.to + "\t" +
+    result.args.punkIndex);
 });
 assignEvents.stopWatching();
 
@@ -77,7 +79,9 @@ toBlock = 3920546;
 var transferEvents = cryptoPunks.Transfer({}, { fromBlock: fromBlock, toBlock: toBlock });
 i = 0;
 transferEvents.watch(function (error, result) {
-  console.log("RESULT: Transfer " + i++ + " #" + result.blockNumber + " " + JSON.stringify(result.args));
+  console.log("RESULT: " + result.blockNumber + "\t" + result.transactionIndex + "\t" +
+    result.transactionHash + "\t" + result.address + "\t" + "Transfer\t" + "\t" + result.args.from + "\t" +
+    result.args.to + "\t" + result.args.value);
 });
 transferEvents.stopWatching();
 
@@ -87,7 +91,9 @@ toBlock = 3931970;
 var punkTransferEvents = cryptoPunks.PunkTransfer({}, { fromBlock: fromBlock, toBlock: toBlock });
 i = 0;
 punkTransferEvents.watch(function (error, result) {
-  console.log("RESULT: PunkTransfer " + i++ + " #" + result.blockNumber + " " + JSON.stringify(result.args));
+  console.log("RESULT: " + result.blockNumber + "\t" + result.transactionIndex + "\t" +
+    result.transactionHash + "\t" + result.address + "\t" + "PunkTransfer\t" + "\t" + result.args.from + "\t" +
+    result.args.to + "\t" + result.args.punkIndex);
 });
 punkTransferEvents.stopWatching();
 
@@ -97,7 +103,9 @@ toBlock = 7355280;
 var punkOfferedEvents = cryptoPunks.PunkOffered({}, { fromBlock: fromBlock, toBlock: toBlock });
 i = 0;
 punkOfferedEvents.watch(function (error, result) {
-  console.log("RESULT: PunkOffered " + i++ + " #" + result.blockNumber + " " + JSON.stringify(result.args));
+  console.log("RESULT: " + result.blockNumber + "\t" + result.transactionIndex + "\t" +
+    result.transactionHash + "\t" + result.address + "\t" + "PunkOffered\t" + "\t" + result.args.punkIndex + "\t" +
+    result.args.minValue + "\t" + result.args.toAddress);
 });
 punkOfferedEvents.stopWatching();
 
@@ -107,7 +115,9 @@ toBlock = 7366652;
 var punkBidEnteredEvents = cryptoPunks.PunkBidEntered({}, { fromBlock: fromBlock, toBlock: toBlock });
 i = 0;
 punkBidEnteredEvents.watch(function (error, result) {
-  console.log("RESULT: PunkBidEntered " + i++ + " #" + result.blockNumber + " " + JSON.stringify(result.args));
+  console.log("RESULT: " + result.blockNumber + "\t" + result.transactionIndex + "\t" +
+    result.transactionHash + "\t" + result.address + "\t" + "PunkBidEntered\t" + "\t" + result.args.punkIndex + "\t" +
+    result.args.value + "\t" + result.args.fromAddress);
 });
 punkBidEnteredEvents.stopWatching();
 
@@ -117,7 +127,9 @@ toBlock = 7366652;
 var punkBidWithdrawnEvents = cryptoPunks.PunkBidWithdrawn({}, { fromBlock: fromBlock, toBlock: toBlock });
 i = 0;
 punkBidWithdrawnEvents.watch(function (error, result) {
-  console.log("RESULT: PunkBidWithdrawn " + i++ + " #" + result.blockNumber + " " + JSON.stringify(result.args));
+  console.log("RESULT: " + result.blockNumber + "\t" + result.transactionIndex + "\t" +
+    result.transactionHash + "\t" + result.address + "\t" + "PunkBidWithdrawn\t" + "\t" + result.args.punkIndex + "\t" +
+    result.args.value + "\t" + result.args.fromAddress);
 });
 punkBidWithdrawnEvents.stopWatching();
 
@@ -127,7 +139,9 @@ toBlock = 7372277;
 var assignEvents = cryptoPunks.PunkBought({}, { fromBlock: fromBlock, toBlock: toBlock });
 i = 0;
 assignEvents.watch(function (error, result) {
-  console.log("RESULT: PunkBought " + i++ + " #" + result.blockNumber + " " + JSON.stringify(result.args));
+  console.log("RESULT: " + result.blockNumber + "\t" + result.transactionIndex + "\t" +
+    result.transactionHash + "\t" + result.address + "\t" + "PunkBought\t" + "\t" + result.args.punkIndex + "\t" +
+    result.args.value + "\t" + result.args.fromAddress + "\t" + result.args.toAddress);
 });
 assignEvents.stopWatching();
 
@@ -137,13 +151,11 @@ toBlock = 7366652;
 var punkNoLongerForSaleEvents = cryptoPunks.PunkNoLongerForSale({}, { fromBlock: fromBlock, toBlock: toBlock });
 i = 0;
 punkNoLongerForSaleEvents.watch(function (error, result) {
-  console.log("RESULT: PunkNoLongerForSale " + i++ + " #" + result.blockNumber + " " + JSON.stringify(result.args));
+  // console.log("RESULT: PunkNoLongerForSale " + JSON.stringify(result));
+  console.log("RESULT: " + result.blockNumber + "\t" + result.transactionIndex + "\t" +
+    result.transactionHash + "\t" + result.address + "\t" + "PunkNoLongerForSale\t" + "\t" + result.args.punkIndex);
 });
 punkNoLongerForSaleEvents.stopWatching();
-
-
-exit;
-
 
 
 EOF
