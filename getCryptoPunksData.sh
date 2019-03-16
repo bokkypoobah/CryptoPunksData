@@ -22,7 +22,7 @@ geth attach << EOF | tee -a $OUTPUTFILE
 // 0
 var START = 2500;
 // cryptoPunks.totalSupply() = 10000
-var END = 2600;
+var END = 2530;
 console.log("RESULT: NOTE. Using only the indices between " + START + " and " + END + " for testing");
 
 loadScript("$ABI");
@@ -60,6 +60,7 @@ accounts.forEach(function(e) {
 var ENDEVENTS = eth.blockNumber;
 var STARTEVENTS = ENDEVENTS - 2000;
 
+// event Assign(address indexed to, uint256 punkIndex);
 var ASSIGNSTART = 3918216;
 // First assignment phase end. Further assignments after this block
 // var ASSIGNEND = 3919418;
@@ -71,6 +72,31 @@ assignEvents.watch(function (error, result) {
 });
 assignEvents.stopWatching();
 
+// event Transfer(address indexed from, address indexed to, uint256 value);
+// TODO
+
+// event PunkTransfer(address indexed from, address indexed to, uint256 punkIndex);
+// TODO
+
+// event PunkOffered(uint indexed punkIndex, uint minValue, address indexed toAddress);
+// TODO
+
+// event PunkBidEntered(uint indexed punkIndex, uint value, address indexed fromAddress);
+// TODO
+
+// event PunkBidWithdrawn(uint indexed punkIndex, uint value, address indexed fromAddress);
+// TODO
+var PUNKBIDWITHDRAWNSTART = 7355365;
+var PUNKBIDWITHDRAWNEND = 7366652;
+var punkBidWithdrawnEvents = cryptoPunks.PunkBidWithdrawn({}, { fromBlock: PUNKBIDWITHDRAWNSTART, toBlock: PUNKBIDWITHDRAWNEND });
+i = 0;
+punkBidWithdrawnEvents.watch(function (error, result) {
+  console.log("RESULT: PunkBidWithdrawn " + i++ + " #" + result.blockNumber + " " + JSON.stringify(result.args));
+});
+punkBidWithdrawnEvents.stopWatching();
+
+
+// event PunkBought(uint indexed punkIndex, uint value, address indexed fromAddress, address indexed toAddress);
 var PUNKBOUGHTSTART = 7372263;
 var PUNKBOUGHTEND = 7372277;
 var assignEvents = cryptoPunks.PunkBought({}, { fromBlock: PUNKBOUGHTSTART, toBlock: PUNKBOUGHTEND });
@@ -80,17 +106,10 @@ assignEvents.watch(function (error, result) {
 });
 assignEvents.stopWatching();
 
+// event PunkNoLongerForSale(uint indexed punkIndex);
+// TODO
 
 exit;
-
-event Assign(address indexed to, uint256 punkIndex);
-event Transfer(address indexed from, address indexed to, uint256 value);
-event PunkTransfer(address indexed from, address indexed to, uint256 punkIndex);
-event PunkOffered(uint indexed punkIndex, uint minValue, address indexed toAddress);
-event PunkBidEntered(uint indexed punkIndex, uint value, address indexed fromAddress);
-event PunkBidWithdrawn(uint indexed punkIndex, uint value, address indexed fromAddress);
-event PunkBought(uint indexed punkIndex, uint value, address indexed fromAddress, address indexed toAddress);
-event PunkNoLongerForSale(uint indexed punkIndex);
 
 
 
