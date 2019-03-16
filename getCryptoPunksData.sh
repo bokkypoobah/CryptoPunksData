@@ -11,7 +11,7 @@ geth attach << EOF | tee -a $OUTPUTFILE
 // 0
 var START = 2500;
 // cryptoPunks.totalSupply() = 10000
-var END = 2510;
+var END = 2600;
 console.log("RESULT: NOTE. Using only the indices between " + START + " and " + END + " for testing");
 
 loadScript("$ABI");
@@ -49,7 +49,6 @@ accounts.forEach(function(e) {
 var ENDEVENTS = eth.blockNumber;
 var STARTEVENTS = ENDEVENTS - 2000;
 
-if (false) {
 var ASSIGNSTART = 3918216;
 // First assignment phase end. Further assignments after this block
 // var ASSIGNEND = 3919418;
@@ -60,10 +59,9 @@ assignEvents.watch(function (error, result) {
   console.log("RESULT: Assign " + i++ + " #" + result.blockNumber + " " + JSON.stringify(result.args));
 });
 assignEvents.stopWatching();
-}
 
+var PUNKBOUGHTSTART = 7372263;
 var PUNKBOUGHTEND = 7372277;
-var PUNKBOUGHTSTART = 7372277;
 var assignEvents = cryptoPunks.PunkBought({}, { fromBlock: PUNKBOUGHTSTART, toBlock: PUNKBOUGHTEND });
 i = 0;
 assignEvents.watch(function (error, result) {
