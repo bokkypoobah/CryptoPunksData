@@ -8,6 +8,9 @@
 
 Exercise for [BokkyPooBah's Ethereum Workshop #119 \[Beginner/Intermediate\] Ethereum Blockchain Data Analysis With CryptoPunks](https://www.meetup.com/BokkyPooBahs-Ethereum-Workshop/events/259807082/).
 
+With a `geth console` running in one terminal, running the script [getCryptoPunksData.sh](getCryptoPunksData.sh) will generate the intermediate results [cryptoPunksData.txt](cryptoPunksData.txt) and the tab separated values (tsv) formatted data [cryptoPunksData.tsv](cryptoPunksData.tsv).
+
+
 References:
 
 * [CryptoPunks by Larva Labs](https://www.larvalabs.com/cryptopunks)
