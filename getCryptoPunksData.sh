@@ -72,13 +72,26 @@ assignEvents.watch(function (error, result) {
 assignEvents.stopWatching();
 
 // event Transfer(address indexed from, address indexed to, uint256 value);
-// TODO
+fromBlock = 3920026;
+toBlock = 3920546;
+var transferEvents = cryptoPunks.Transfer({}, { fromBlock: fromBlock, toBlock: toBlock });
+i = 0;
+transferEvents.watch(function (error, result) {
+  console.log("RESULT: Transfer " + i++ + " #" + result.blockNumber + " " + JSON.stringify(result.args));
+});
+transferEvents.stopWatching();
 
 // event PunkTransfer(address indexed from, address indexed to, uint256 punkIndex);
-// TODO
+fromBlock = 3920026;
+toBlock = 3931970;
+var punkTransferEvents = cryptoPunks.PunkTransfer({}, { fromBlock: fromBlock, toBlock: toBlock });
+i = 0;
+punkTransferEvents.watch(function (error, result) {
+  console.log("RESULT: PunkTransfer " + i++ + " #" + result.blockNumber + " " + JSON.stringify(result.args));
+});
+punkTransferEvents.stopWatching();
 
 // event PunkOffered(uint indexed punkIndex, uint minValue, address indexed toAddress);
-// TODO
 fromBlock = 7317877;
 toBlock = 7355280;
 var punkOfferedEvents = cryptoPunks.PunkOffered({}, { fromBlock: fromBlock, toBlock: toBlock });
