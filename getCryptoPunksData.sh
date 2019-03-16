@@ -56,16 +56,15 @@ accounts.forEach(function(e) {
   console.log("RESULT: pendingWithdrawals(" + e + "): " + cryptoPunks.pendingWithdrawals(e));
 });
 
-
+var STARTEVENTS = cryptoPunksDeploymentBlock;
 var ENDEVENTS = eth.blockNumber;
-var STARTEVENTS = ENDEVENTS - 2000;
 
 // event Assign(address indexed to, uint256 punkIndex);
-var ASSIGNSTART = 3918216;
+STARTEVENTS = 3918216;
 // First assignment phase end. Further assignments after this block
-// var ASSIGNEND = 3919418;
-var ASSIGNEND = parseInt(ASSIGNSTART) + 20;
-var assignEvents = cryptoPunks.Assign({}, { fromBlock: ASSIGNSTART, toBlock: ASSIGNEND });
+// var ENDEVENTS = 3919418;
+ENDEVENTS = parseInt(STARTEVENTS) + 20;
+var assignEvents = cryptoPunks.Assign({}, { fromBlock: STARTEVENTS, toBlock: ENDEVENTS });
 i = 0;
 assignEvents.watch(function (error, result) {
   console.log("RESULT: Assign " + i++ + " #" + result.blockNumber + " " + JSON.stringify(result.args));
@@ -85,10 +84,9 @@ assignEvents.stopWatching();
 // TODO
 
 // event PunkBidWithdrawn(uint indexed punkIndex, uint value, address indexed fromAddress);
-// TODO
-var PUNKBIDWITHDRAWNSTART = 7355365;
-var PUNKBIDWITHDRAWNEND = 7366652;
-var punkBidWithdrawnEvents = cryptoPunks.PunkBidWithdrawn({}, { fromBlock: PUNKBIDWITHDRAWNSTART, toBlock: PUNKBIDWITHDRAWNEND });
+STARTEVENTS = 7355365;
+ENDEVENTS = 7366652;
+var punkBidWithdrawnEvents = cryptoPunks.PunkBidWithdrawn({}, { fromBlock: STARTEVENTS, toBlock: ENDEVENTS });
 i = 0;
 punkBidWithdrawnEvents.watch(function (error, result) {
   console.log("RESULT: PunkBidWithdrawn " + i++ + " #" + result.blockNumber + " " + JSON.stringify(result.args));
@@ -97,9 +95,9 @@ punkBidWithdrawnEvents.stopWatching();
 
 
 // event PunkBought(uint indexed punkIndex, uint value, address indexed fromAddress, address indexed toAddress);
-var PUNKBOUGHTSTART = 7372263;
-var PUNKBOUGHTEND = 7372277;
-var assignEvents = cryptoPunks.PunkBought({}, { fromBlock: PUNKBOUGHTSTART, toBlock: PUNKBOUGHTEND });
+var STARTEVENTS = 7372263;
+var ENDEVENTS = 7372277;
+var assignEvents = cryptoPunks.PunkBought({}, { fromBlock: STARTEVENTS, toBlock: ENDEVENTS });
 i = 0;
 assignEvents.watch(function (error, result) {
   console.log("RESULT: PunkBought " + i++ + " #" + result.blockNumber + " " + JSON.stringify(result.args));
@@ -107,7 +105,15 @@ assignEvents.watch(function (error, result) {
 assignEvents.stopWatching();
 
 // event PunkNoLongerForSale(uint indexed punkIndex);
-// TODO
+STARTEVENTS = 7355365;
+ENDEVENTS = 7366652;
+var punkNoLongerForSaleEvents = cryptoPunks.PunkNoLongerForSale({}, { fromBlock: STARTEVENTS, toBlock: ENDEVENTS });
+i = 0;
+punkNoLongerForSaleEvents.watch(function (error, result) {
+  console.log("RESULT: PunkNoLongerForSale " + i++ + " #" + result.blockNumber + " " + JSON.stringify(result.args));
+});
+punkNoLongerForSaleEvents.stopWatching();
+
 
 exit;
 
