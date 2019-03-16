@@ -1,4 +1,10 @@
-#!/bin/sh
+#!/bin/bash
+# ----------------------------------------------------------------------------------------------
+# Bash script to execute a Go Ethereum `geth` script to extract data from the CryptoPunks
+# contract at 0xb47e3cd837dDF8e4c57F05d70Ab865de6e193BBB
+#
+# Enjoy. (c) BokkyPooBah / Bok Consulting Pty Ltd 2019. The MIT Licence.
+# ----------------------------------------------------------------------------------------------
 
 ABI=cryptoPunks.js
 OUTPUTFILE=cryptoPunksData.txt
