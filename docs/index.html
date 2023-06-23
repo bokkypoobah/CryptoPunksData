@@ -2760,33 +2760,69 @@
                   const filter = { address: process.address, fromBlock, toBlock, topics: [null, null, null] };
                   const eventLogs = await provider.getLogs(filter);
                   newEvents += eventLogs.length;
-                  for (const event of eventLogs.slice(0, 5)) {
-                    const logData = contract.interface.parseLog(event);
-                    // if (!(logData.eventFragment.name in this.eventTypesToIndex)) {
-                      // console.log(logData.eventFragment.name + ": " + JSON.stringify(logData));
-                    // }
-                    if (logData.eventFragment.name == "Assign") {
-                      console.log("Assign: " + JSON.stringify(logData));
-                    } else {
-
+                  for (const event of eventLogs) {
+                    if (!event.removed) {
+                      const logData = contract.interface.parseLog(event);
+                      const eventType = logData.eventFragment.name;
+                      const eventTypeIndex = this.eventTypesToIndex[eventType];
+                      if (eventType == "Assign") {
+                        const [to, punkIndex] = logData.args;
+                        record = { eventType, eventTypeIndex, to, punkIndex: parseInt(punkIndex) };
+                      } else if (eventType == "Transfer") {
+                        const [from, to, value] = logData.args;
+                        record = { eventType, eventTypeIndex, from, to, value: parseInt(value) };
+                      } else if (eventType == "PunkTransfer") {
+                        const [from, to, punkIndex] = logData.args;
+                        record = { eventType, eventTypeIndex, from, to, punkIndex: parseInt(punkIndex) };
+                      } else if (eventType == "PunkOffered") {
+                        const [punkIndex, minValue, toAddress] = logData.args;
+                        record = { eventType, eventTypeIndex, punkIndex: parseInt(punkIndex), minValue: minValue.toString(), toAddress };
+                      } else if (eventType == "PunkBought") {
+                        const [punkIndex, value, fromAddress, toAddress] = logData.args;
+                        record = { eventType, eventTypeIndex, punkIndex: parseInt(punkIndex), value: value.toString(), fromAddress, toAddress };
+                      } else if (eventType == "PunkNoLongerForSale") {
+                        const [punkIndex] = logData.args;
+                        record = { eventType, eventTypeIndex, punkIndex: parseInt(punkIndex) };
+                      } else if (eventType == "PunkBidEntered") {
+                        const [punkIndex, value, fromAddress] = logData.args;
+                        record = { eventType, eventTypeIndex, punkIndex: parseInt(punkIndex), value: value.toString(), fromAddress };
+                      } else if (eventType == "PunkBidWithdrawn") {
+                        const [punkIndex, value, fromAddress] = logData.args;
+                        record = { eventType, eventTypeIndex, punkIndex: parseInt(punkIndex), value: value.toString(), fromAddress };
+                      } else if (eventType == "OwnershipTransferred") {
+                        const [previousOwner, newOwner] = logData.args;
+                        record = { eventType, eventTypeIndex, previousOwner, newOwner };
+                      } else if (eventType == "Approval") {
+                        const [owner, approved, tokenId] = logData.args;
+                        record = { eventType, eventTypeIndex, owner, approved, tokenId: tokenId.toString() };
+                      } else if (eventType == "ApprovalForAll") {
+                        const [owner, operator, approved] = logData.args;
+                        record = { eventType, eventTypeIndex, owner, operator, approved };
+                      } else if (eventType == "Paused") {
+                        const [account] = logData.args;
+                        record = { eventType, eventTypeIndex, account };
+                      } else if (eventType == "Unpaused") {
+                        const [account] = logData.args;
+                        record = { eventType, eventTypeIndex, account };
+                      } else {
+                        console.log("UNKNOWN eventType: " + eventType);
+                      }
+                      console.log("record: " + JSON.stringify(record));
+                      // v1 v2 event Assign(address indexed to, uint256 punkIndex);
+                      // v1 v2 event Transfer(address indexed from, address indexed to, uint256 value);
+                      // v1 v2 event PunkTransfer(address indexed from, address indexed to, uint256 punkIndex);
+                      // v1 v2 event PunkOffered(uint indexed punkIndex, uint minValue, address indexed toAddress);
+                      // v1 v2 event PunkBought(uint indexed punkIndex, uint value, address indexed fromAddress, address indexed toAddress);
+                      // v1 v2 event PunkNoLongerForSale(uint indexed punkIndex);
+                      // v2 event PunkBidEntered(uint indexed punkIndex, uint value, address indexed fromAddress);
+                      // v2 event PunkBidWithdrawn(uint indexed punkIndex, uint value, address indexed fromAddress);
+                      // w1 w2 event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+                      // w1 w2 event Transfer(address indexed from, address indexed to, uint256 indexed tokenId);
+                      // w1 w2 event Approval(address indexed owner, address indexed approved, uint256 indexed tokenId);
+                      // w1 w2 event ApprovalForAll(address indexed owner, address indexed operator, bool approved);
+                      // w2 event Paused(address account);
+                      // w2 event Unpaused(address account);
                     }
-
-                    // v1 v2 event Assign(address indexed to, uint256 punkIndex);
-                    // v1 v2 event Transfer(address indexed from, address indexed to, uint256 value);
-                    // v1 v2 event PunkTransfer(address indexed from, address indexed to, uint256 punkIndex);
-                    // v1 v2 event PunkOffered(uint indexed punkIndex, uint minValue, address indexed toAddress);
-                    // v1 v2 event PunkBought(uint indexed punkIndex, uint value, address indexed fromAddress, address indexed toAddress);
-                    // v1 v2 event PunkNoLongerForSale(uint indexed punkIndex);
-                    // v2 event PunkBidEntered(uint indexed punkIndex, uint value, address indexed fromAddress);
-                    // v2 event PunkBidWithdrawn(uint indexed punkIndex, uint value, address indexed fromAddress);
-
-                    // w1 w2 event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
-                    // w1 w2 event Transfer(address indexed from, address indexed to, uint256 indexed tokenId);
-                    // w1 w2 event Approval(address indexed owner, address indexed approved, uint256 indexed tokenId);
-                    // w1 w2 event ApprovalForAll(address indexed owner, address indexed operator, bool approved);
-                    // w2 event Paused(address account);
-                    // w2 event Unpaused(address account);
-
                   }
                   console.log(moment().format("HH:mm:ss") + " syncCryptoPunksData #" + fromBlock + "-" + toBlock + " [" + (toBlock - fromBlock) + "/" + batchSize + "] newEvents: " + newEvents);
                   fromBlock = toBlock;
