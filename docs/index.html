@@ -2752,6 +2752,12 @@
               addressToIndex = addressToIndexDataItems[0].object;
               // console.log("addressToIndex: " + JSON.stringify(addressToIndex));
             }
+            for (const address of [ADDRESS0, this.coinbase]) {
+              if (!(address in addressToIndex)) {
+                addressToIndex[address] = indexToAddress.length;
+                indexToAddress.push(address);
+              }
+            }
             for (const process of processes) {
               console.log("processing: " + process.name);
               const contract = new ethers.Contract(process.address, process.abi, provider);
@@ -5759,12 +5765,12 @@
             const indexToAddressDataItems = await db0.cache.where("objectName").equals(this.chainId + "_indexToAddress").toArray();
             if (indexToAddressDataItems.length == 1) {
               this.indexToAddress = indexToAddressDataItems[0].object;
-              // console.log("indexToAddress: " + JSON.stringify(this.indexToAddress));
+              console.log("indexToAddress: " + JSON.stringify(this.indexToAddress));
             }
             const addressToIndexDataItems = await db0.cache.where("objectName").equals(this.chainId + "_addressToIndex").toArray();
             if (addressToIndexDataItems.length == 1) {
               this.addressToIndex = addressToIndexDataItems[0].object;
-              // console.log("addressToIndex: " + JSON.stringify(this.addressToIndex));
+              console.log("addressToIndex: " + JSON.stringify(this.addressToIndex));
             }
 
             const tokensDataItems = await db0.cache.where("objectName").equals(this.chainId + "_tokens").toArray();
