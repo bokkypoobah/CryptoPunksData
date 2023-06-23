@@ -2760,16 +2760,28 @@
                   const filter = { address: process.address, fromBlock, toBlock, topics: [null, null, null] };
                   const eventLogs = await provider.getLogs(filter);
                   newEvents += eventLogs.length;
-                  for (const event of eventLogs) {
+                  for (const event of eventLogs.slice(0, 5)) {
                     if (!event.removed) {
                       const logData = contract.interface.parseLog(event);
                       const eventType = logData.eventFragment.name;
                       const eventTypeIndex = this.eventTypesToIndex[eventType];
                       if (eventType == "Assign") {
                         const [to, punkIndex] = logData.args;
-                        record = { eventType, eventTypeIndex, to, punkIndex: parseInt(punkIndex) };
+                        if (!(to in addressToIndex)) {
+                          addressToIndex[to] = indexToAddress.length;
+                          indexToAddress.push(to);
+                        }
+                        const toIndex = addressToIndex[to];
+                        record = { eventType, eventTypeIndex, to, toIndex, punkIndex: parseInt(punkIndex) };
+                        console.log("record: " + JSON.stringify(record));
                       } else if (eventType == "Transfer") {
                         const [from, to, value] = logData.args;
+                        // for (const address of [CHADEXADDRESS_SEPOLIA, this.coinbase]) {
+                        //   if (!(address in addressToIndex)) {
+                        //     addressToIndex[address] = indexToAddress.length;
+                        //     indexToAddress.push(address);
+                        //   }
+                        // }
                         record = { eventType, eventTypeIndex, from, to, value: parseInt(value) };
                       } else if (eventType == "PunkTransfer") {
                         const [from, to, punkIndex] = logData.args;
@@ -2807,7 +2819,7 @@
                       } else {
                         console.log("UNKNOWN eventType: " + eventType);
                       }
-                      console.log("record: " + JSON.stringify(record));
+                      // console.log("record: " + JSON.stringify(record));
                       // v1 v2 event Assign(address indexed to, uint256 punkIndex);
                       // v1 v2 event Transfer(address indexed from, address indexed to, uint256 value);
                       // v1 v2 event PunkTransfer(address indexed from, address indexed to, uint256 punkIndex);
@@ -2834,7 +2846,7 @@
                 // done = fromBlock >= blockNumber;
                 // done = true; // TODO
               } while (!done && !this.sync.halt);
-
+              console.log("indexToAddress: " + JSON.stringify(indexToAddress, null, 2));
 
               // const filter = {
               //   address: process.address,
