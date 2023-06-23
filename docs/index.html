@@ -2705,6 +2705,22 @@
             this.saveSettings();
           },
           async syncCryptoPunksData(section) {
+
+            // v1 v2 event Assign(address indexed to, uint256 punkIndex);
+            // v1 v2 event Transfer(address indexed from, address indexed to, uint256 value);
+            // v1 v2 event PunkTransfer(address indexed from, address indexed to, uint256 punkIndex);
+            // v1 v2 event PunkOffered(uint indexed punkIndex, uint minValue, address indexed toAddress);
+            // v1 v2 event PunkBought(uint indexed punkIndex, uint value, address indexed fromAddress, address indexed toAddress);
+            // v1 v2 event PunkNoLongerForSale(uint indexed punkIndex);
+            // v2 event PunkBidEntered(uint indexed punkIndex, uint value, address indexed fromAddress);
+            // v2 event PunkBidWithdrawn(uint indexed punkIndex, uint value, address indexed fromAddress);
+            // w1 w2 event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+            // w1 w2 event Transfer(address indexed from, address indexed to, uint256 indexed tokenId);
+            // w1 w2 event Approval(address indexed owner, address indexed approved, uint256 indexed tokenId);
+            // w1 w2 event ApprovalForAll(address indexed owner, address indexed operator, bool approved);
+            // w2 event Paused(address account);
+            // w2 event Unpaused(address account);
+
             const CONFIRMATIONS = 20;
             console.log(moment().format("HH:mm:ss") + " syncCryptoPunksData - chainId: " + this.chainId);
             const db = new Dexie(this.db.name);
@@ -2714,13 +2730,13 @@
             const blockNumber = block && (block.number - CONFIRMATIONS) || null;
             console.log(moment().format("HH:mm:ss") + " syncCryptoPunksData - blockNumber: " + blockNumber + ", chainId: " + this.chainId);
 
-            console.log("this.indexToEventTypes: " + JSON.stringify(this.indexToEventTypes));
-            console.log("this.eventTypesToIndex: " + JSON.stringify(this.eventTypesToIndex));
+            // console.log("this.indexToEventTypes: " + JSON.stringify(this.indexToEventTypes));
+            // console.log("this.eventTypesToIndex: " + JSON.stringify(this.eventTypesToIndex));
 
             const processes = [
-              // { name: "v1", address: CRYPTOPUNKSV1ADDRESS, abi: CRYPTOPUNKSV1ABI, deploymentBlockNumber: CRYPTOPUNKSV1DEPLOYMENTBLOCKNUMBER },
+              { name: "v1", address: CRYPTOPUNKSV1ADDRESS, abi: CRYPTOPUNKSV1ABI, deploymentBlockNumber: CRYPTOPUNKSV1DEPLOYMENTBLOCKNUMBER },
               // { name: "v2", address: CRYPTOPUNKSV2ADDRESS, abi: CRYPTOPUNKSV2ABI, deploymentBlockNumber: CRYPTOPUNKSV2DEPLOYMENTBLOCKNUMBER },
-              { name: "wrappedV1", address: WRAPPEDCRYPTOPUNKSV1ADDRESS, abi: WRAPPEDCRYPTOPUNKSV1ABI, deploymentBlockNumber: WRAPPEDCRYPTOPUNKSV1DEPLOYMENTBLOCKNUMBER },
+              // { name: "wrappedV1", address: WRAPPEDCRYPTOPUNKSV1ADDRESS, abi: WRAPPEDCRYPTOPUNKSV1ABI, deploymentBlockNumber: WRAPPEDCRYPTOPUNKSV1DEPLOYMENTBLOCKNUMBER },
               // { name: "wrappedV2", address: WRAPPEDCRYPTOPUNKSV2ADDRESS, abi: WRAPPEDCRYPTOPUNKSV2ABI, deploymentBlockNumber: WRAPPEDCRYPTOPUNKSV2DEPLOYMENTBLOCKNUMBER },
             ];
 
@@ -2743,6 +2759,7 @@
               const BATCHREDUCTIONFACTOR = 0.75;
               let done = false;
               let count = 0;
+              let events = {};
               let newEvents = 0;
 
               const startBlock = process.deploymentBlockNumber;
@@ -2759,10 +2776,14 @@
                   const records = [];
                   const filter = { address: process.address, fromBlock, toBlock, topics: [null, null, null] };
                   const eventLogs = await provider.getLogs(filter);
-                  newEvents += eventLogs.length;
+                  // newEvents += eventLogs.length;
                   for (const event of eventLogs /*.slice(0, 5) */) {
                     if (!event.removed) {
                       const logData = contract.interface.parseLog(event);
+                      const txHash = event.transactionHash;
+                      const blockNumber = event.blockNumber;
+                      const transactionIndex = event.transactionIndex;
+                      const logIndex = event.logIndex;
                       const eventType = logData.eventFragment.name;
                       const eventTypeIndex = this.eventTypesToIndex[eventType];
                       if (eventType == "Assign") {
@@ -2868,20 +2889,23 @@
                         console.log("UNKNOWN eventType: " + eventType);
                       }
                       console.log("record: " + JSON.stringify(record));
-                      // v1 v2 event Assign(address indexed to, uint256 punkIndex);
-                      // v1 v2 event Transfer(address indexed from, address indexed to, uint256 value);
-                      // v1 v2 event PunkTransfer(address indexed from, address indexed to, uint256 punkIndex);
-                      // v1 v2 event PunkOffered(uint indexed punkIndex, uint minValue, address indexed toAddress);
-                      // v1 v2 event PunkBought(uint indexed punkIndex, uint value, address indexed fromAddress, address indexed toAddress);
-                      // v1 v2 event PunkNoLongerForSale(uint indexed punkIndex);
-                      // v2 event PunkBidEntered(uint indexed punkIndex, uint value, address indexed fromAddress);
-                      // v2 event PunkBidWithdrawn(uint indexed punkIndex, uint value, address indexed fromAddress);
-                      // w1 w2 event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
-                      // w1 w2 event Transfer(address indexed from, address indexed to, uint256 indexed tokenId);
-                      // w1 w2 event Approval(address indexed owner, address indexed approved, uint256 indexed tokenId);
-                      // w1 w2 event ApprovalForAll(address indexed owner, address indexed operator, bool approved);
-                      // w2 event Paused(address account);
-                      // w2 event Unpaused(address account);
+
+                      if (record) {
+                        if (!(blockNumber in events)) {
+                          events[blockNumber] = {};
+                        }
+                        if (!(transactionIndex in events[blockNumber])) {
+                          events[blockNumber][transactionIndex] = {};
+                        }
+                        if (!(txHash in events[blockNumber][transactionIndex])) {
+                          events[blockNumber][transactionIndex][txHash] = {};
+                        }
+                        if (!(logIndex in events[blockNumber][transactionIndex][txHash])) {
+                          events[blockNumber][transactionIndex][txHash][logIndex] = record;
+                          newEvents++;
+                        }
+                      }
+
                     }
                   }
                   console.log(moment().format("HH:mm:ss") + " syncCryptoPunksData #" + fromBlock + "-" + toBlock + " [" + (toBlock - fromBlock) + "/" + batchSize + "] newEvents: " + newEvents);
@@ -2890,26 +2914,22 @@
                   console.log(e);
                   batchSize = parseInt(batchSize * BATCHREDUCTIONFACTOR);
                 }
-                done = fromBlock >= blockNumber || newEvents > 10000;
-                // done = fromBlock >= blockNumber;
-                // done = true; // TODO
+                done = fromBlock >= blockNumber || newEvents > 10000; // TODO
               } while (!done && !this.sync.halt);
               console.log("indexToAddress: " + JSON.stringify(indexToAddress, null, 2));
+              console.log("events: " + JSON.stringify(events, null, 2));
 
-              // const filter = {
-              //   address: process.address,
-              //   fromBlock: startBlock,
-              //   toBlock: endBlock,
-              //   topics: [
-              //     null,
-              //     null,
-              //     null,
-              //   ],
-              // };
-              // const eventLogs = await provider.getLogs(filter);
-              // console.log(moment().format("HH:mm:ss") + " syncCryptoPunksData - eventLogs: " + JSON.stringify(eventLogs.slice(0, 1), null, 2));
             }
-
+            Vue.set(this, "addressToIndex", addressToIndex);
+            Vue.set(this, "indexToAddress", indexToAddress);
+            await db.cache.put({ objectName: this.chainId + "_indexToAddress", object: indexToAddress }).then (function() {
+            }).catch(function(error) {
+              console.log("error: " + error);
+            });
+            await db.cache.put({ objectName: this.chainId + "_addressToIndex", object: addressToIndex }).then (function() {
+            }).catch(function(error) {
+              console.log("error: " + error);
+            });
           },
           async syncPairs(section) {
             console.log("syncTokens");
