@@ -2689,20 +2689,30 @@
             const blockNumber = block && block.number || null;
             console.log(moment().format("HH:mm:ss") + " syncCryptoPunksData - blockNumber: " + blockNumber + ", chainId: " + this.chainId);
 
-            const startBlock = 3842489; // V1 deployment
-            const endBlock = parseInt(startBlock) + 10000;
-            const filter = {
-              address: CRYPTOPUNKSV1ADDRESS,
-              fromBlock: startBlock,
-              toBlock: endBlock,
-              topics: [
-                null,
-                null,
-                null,
-              ],
-            };
-            const eventLogs = await provider.getLogs(filter);
-            console.log(moment().format("HH:mm:ss") + " syncCryptoPunksData - eventLogs: " + JSON.stringify(eventLogs, null, 2));
+            const processes = [
+              { name: "v1", address: CRYPTOPUNKSV1ADDRESS, abi: CRYPTOPUNKSV1ABI, deploymentBlockNumber: CRYPTOPUNKSV1DEPLOYMENTBLOCKNUMBER },
+              // { name: "v2", address: CRYPTOPUNKSV2ADDRESS, abi: CRYPTOPUNKSV2ABI, deploymentBlockNumber: CRYPTOPUNKSV2DEPLOYMENTBLOCKNUMBER },
+              // { name: "wrappedV1", address: WRAPPEDCRYPTOPUNKSV1ADDRESS, abi: WRAPPEDCRYPTOPUNKSV1ABI, deploymentBlockNumber: WRAPPEDCRYPTOPUNKSV1DEPLOYMENTBLOCKNUMBER },
+              // { name: "wrappedV2", address: WRAPPEDCRYPTOPUNKSV2ADDRESS, abi: WRAPPEDCRYPTOPUNKSV2ABI, deploymentBlockNumber: WRAPPEDCRYPTOPUNKSV2DEPLOYMENTBLOCKNUMBER },
+            ];
+
+            for (const process of processes) {
+              console.log("processing: " + process.name);
+              const startBlock = process.deploymentBlockNumber;
+              const endBlock = parseInt(startBlock) + 5000;
+              const filter = {
+                address: process.address,
+                fromBlock: startBlock,
+                toBlock: endBlock,
+                topics: [
+                  null,
+                  null,
+                  null,
+                ],
+              };
+              const eventLogs = await provider.getLogs(filter);
+              console.log(moment().format("HH:mm:ss") + " syncCryptoPunksData - eventLogs: " + JSON.stringify(eventLogs.slice(0, 1), null, 2));
+            }
 
           },
           async syncPairs(section) {
@@ -3445,10 +3455,10 @@
               await this.syncChadexPairs(context);
               await this.syncChadexPair(context);
             }
-            if (this.chainId == CHAINID_MAINNET) {
-              console.log("CHAINID_MAINNET: TODO");
-              await this.syncAllENSNames(context);
-            }
+            // if (this.chainId == CHAINID_MAINNET) {
+              // console.log("CHAINID_MAINNET: TODO");
+              // await this.syncAllENSNames(context);
+            // }
             // for (const [address, coinInfo] of Object.entries(this.settings.tokens)) {
             //   if (coinInfo.sync && !this.sync.halt) {
             //     const context = { provider, confirmedBlockNumber, db, address, symbol: coinInfo.symbol };
@@ -3535,16 +3545,16 @@
               }
               try {
                 const batch = addresses.slice(start, end + 1);
-                console.log("batch: " + JSON.stringify(batch, null, 2));
+                // console.log("batch: " + JSON.stringify(batch, null, 2));
                 const allnames = await ensReverseRecordsContract.getNames(batch);
-                console.log("allnames: " + JSON.stringify(allnames, null, 2));
-                console.log(start + " - " + end + " " + batch.length);
+                // console.log("allnames: " + JSON.stringify(allnames, null, 2));
+                // console.log(start + " - " + end + " " + batch.length);
                 for (let j = 0; j < batch.length; j++) {
                   const account = batch[j];
                   const name = allnames[j];
                   // const normalized = normalize(account);
                   if (name.length > 0) {
-                    console.log(account + " => " + name);
+                    // console.log(account + " => " + name);
                     Vue.set(this.indexToName, addressToIndex[account], name);
                   }
                 }
@@ -3560,7 +3570,7 @@
               }
               done = start > indexToAddress.length;
             } while (!done);
-            console.log("this.indexToName: " + JSON.stringify(this.indexToName, null, 2));
+            // console.log("this.indexToName: " + JSON.stringify(this.indexToName, null, 2));
             await context.db.cache.put({ objectName: CHAINID_MAINNET + "_indexToName", object: this.indexToName }).then (function() {
             }).catch(function(error) {
               console.log("error: " + error);
