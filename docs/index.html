@@ -2756,7 +2756,8 @@
                   console.log(e);
                   batchSize = parseInt(batchSize * BATCHREDUCTIONFACTOR);
                 }
-                done = fromBlock >= blockNumber;
+                done = fromBlock >= blockNumber || newEvents > 5000;
+                // done = fromBlock >= blockNumber;
                 // done = true; // TODO
               } while (!done && !this.sync.halt);
 
