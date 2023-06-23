@@ -2718,9 +2718,9 @@
             console.log("this.eventTypesToIndex: " + JSON.stringify(this.eventTypesToIndex));
 
             const processes = [
-              { name: "v1", address: CRYPTOPUNKSV1ADDRESS, abi: CRYPTOPUNKSV1ABI, deploymentBlockNumber: CRYPTOPUNKSV1DEPLOYMENTBLOCKNUMBER },
+              // { name: "v1", address: CRYPTOPUNKSV1ADDRESS, abi: CRYPTOPUNKSV1ABI, deploymentBlockNumber: CRYPTOPUNKSV1DEPLOYMENTBLOCKNUMBER },
               // { name: "v2", address: CRYPTOPUNKSV2ADDRESS, abi: CRYPTOPUNKSV2ABI, deploymentBlockNumber: CRYPTOPUNKSV2DEPLOYMENTBLOCKNUMBER },
-              // { name: "wrappedV1", address: WRAPPEDCRYPTOPUNKSV1ADDRESS, abi: WRAPPEDCRYPTOPUNKSV1ABI, deploymentBlockNumber: WRAPPEDCRYPTOPUNKSV1DEPLOYMENTBLOCKNUMBER },
+              { name: "wrappedV1", address: WRAPPEDCRYPTOPUNKSV1ADDRESS, abi: WRAPPEDCRYPTOPUNKSV1ABI, deploymentBlockNumber: WRAPPEDCRYPTOPUNKSV1DEPLOYMENTBLOCKNUMBER },
               // { name: "wrappedV2", address: WRAPPEDCRYPTOPUNKSV2ADDRESS, abi: WRAPPEDCRYPTOPUNKSV2ABI, deploymentBlockNumber: WRAPPEDCRYPTOPUNKSV2DEPLOYMENTBLOCKNUMBER },
             ];
 
@@ -2773,7 +2773,6 @@
                         }
                         const toIndex = addressToIndex[to];
                         record = [eventTypeIndex, toIndex, parseInt(punkIndex) ];
-                        // console.log("record: " + JSON.stringify(record));
                       } else if (eventType == "Transfer") {
                         const [from, to, value] = logData.args;
                         for (const address of [from, to]) {
@@ -2785,7 +2784,6 @@
                         const fromIndex = addressToIndex[from];
                         const toIndex = addressToIndex[to];
                         record = [ eventTypeIndex, fromIndex, toIndex, parseInt(value) ];
-                        // console.log("record: " + JSON.stringify(record));
                       } else if (eventType == "PunkTransfer") {
                         const [from, to, punkIndex] = logData.args;
                         for (const address of [from, to]) {
@@ -2797,7 +2795,6 @@
                         const fromIndex = addressToIndex[from];
                         const toIndex = addressToIndex[to];
                         record = [ eventTypeIndex, fromIndex, toIndex, parseInt(punkIndex)];
-                        // console.log("record: " + JSON.stringify(record));
                       } else if (eventType == "PunkOffered") {
                         const [punkIndex, minValue, toAddress] = logData.args;
                         if (!(toAddress in addressToIndex)) {
@@ -2806,7 +2803,6 @@
                         }
                         const toAddressIndex = addressToIndex[toAddress];
                         record = [ eventTypeIndex, parseInt(punkIndex), minValue.toString(), toAddressIndex ];
-                        // console.log("record: " + JSON.stringify(record));
                       } else if (eventType == "PunkBought") {
                         const [punkIndex, value, fromAddress, toAddress] = logData.args;
                         for (const address of [fromAddress, toAddress]) {
@@ -2818,36 +2814,60 @@
                         const fromAddressIndex = addressToIndex[fromAddress];
                         const toAddressIndex = addressToIndex[toAddress];
                         record = [ eventTypeIndex, parseInt(punkIndex), value.toString(), fromAddressIndex, toAddressIndex ];
-                        // console.log("record: " + JSON.stringify(record));
                       } else if (eventType == "PunkNoLongerForSale") {
                         const [punkIndex] = logData.args;
                         record = [ eventTypeIndex, parseInt(punkIndex) ];
-                        console.log("record: " + JSON.stringify(record));
                       } else if (eventType == "PunkBidEntered") {
                         const [punkIndex, value, fromAddress] = logData.args;
-                        record = { eventType, eventTypeIndex, punkIndex: parseInt(punkIndex), value: value.toString(), fromAddress };
+                        if (!(fromAddress in addressToIndex)) {
+                          addressToIndex[fromAddress] = indexToAddress.length;
+                          indexToAddress.push(fromAddress);
+                        }
+                        const fromAddressIndex = addressToIndex[fromAddress];
+                        record = [ eventTypeIndex, parseInt(punkIndex), value.toString(), fromAddressIndex ];
                       } else if (eventType == "PunkBidWithdrawn") {
                         const [punkIndex, value, fromAddress] = logData.args;
-                        record = { eventType, eventTypeIndex, punkIndex: parseInt(punkIndex), value: value.toString(), fromAddress };
+                        if (!(fromAddress in addressToIndex)) {
+                          addressToIndex[fromAddress] = indexToAddress.length;
+                          indexToAddress.push(fromAddress);
+                        }
+                        const fromAddressIndex = addressToIndex[fromAddress];
+                        record = [ eventTypeIndex, parseInt(punkIndex), value.toString(), fromAddressIndex ];
                       } else if (eventType == "OwnershipTransferred") {
                         const [previousOwner, newOwner] = logData.args;
-                        record = { eventType, eventTypeIndex, previousOwner, newOwner };
+                        record = [ eventTypeIndex, previousOwner, newOwner ];
                       } else if (eventType == "Approval") {
                         const [owner, approved, tokenId] = logData.args;
-                        record = { eventType, eventTypeIndex, owner, approved, tokenId: tokenId.toString() };
+                        for (const address of [owner, approved]) {
+                          if (!(address in addressToIndex)) {
+                            addressToIndex[address] = indexToAddress.length;
+                            indexToAddress.push(address);
+                          }
+                        }
+                        const ownerIndex = addressToIndex[owner];
+                        const approvedIndex = addressToIndex[approved];
+                        record = [ eventTypeIndex, ownerIndex, approvedIndex, tokenId.toString() ];
                       } else if (eventType == "ApprovalForAll") {
                         const [owner, operator, approved] = logData.args;
-                        record = { eventType, eventTypeIndex, owner, operator, approved };
+                        for (const address of [owner, operator]) {
+                          if (!(address in addressToIndex)) {
+                            addressToIndex[address] = indexToAddress.length;
+                            indexToAddress.push(address);
+                          }
+                        }
+                        const ownerIndex = addressToIndex[owner];
+                        const operatorIndex = addressToIndex[operator];
+                        record = [ eventTypeIndex, ownerIndex, operatorIndex, approved ];
                       } else if (eventType == "Paused") {
                         const [account] = logData.args;
-                        record = { eventType, eventTypeIndex, account };
+                        record = [ eventTypeIndex, account ];
                       } else if (eventType == "Unpaused") {
                         const [account] = logData.args;
-                        record = { eventType, eventTypeIndex, account };
+                        record = [ eventTypeIndex, account ];
                       } else {
                         console.log("UNKNOWN eventType: " + eventType);
                       }
-                      // console.log("record: " + JSON.stringify(record));
+                      console.log("record: " + JSON.stringify(record));
                       // v1 v2 event Assign(address indexed to, uint256 punkIndex);
                       // v1 v2 event Transfer(address indexed from, address indexed to, uint256 value);
                       // v1 v2 event PunkTransfer(address indexed from, address indexed to, uint256 punkIndex);
