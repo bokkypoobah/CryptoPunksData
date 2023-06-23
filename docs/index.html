@@ -2770,6 +2770,23 @@
                     } else {
 
                     }
+
+                    // v1 v2 event Assign(address indexed to, uint256 punkIndex);
+                    // v1 v2 event Transfer(address indexed from, address indexed to, uint256 value);
+                    // v1 v2 event PunkTransfer(address indexed from, address indexed to, uint256 punkIndex);
+                    // v1 v2 event PunkOffered(uint indexed punkIndex, uint minValue, address indexed toAddress);
+                    // v1 v2 event PunkBought(uint indexed punkIndex, uint value, address indexed fromAddress, address indexed toAddress);
+                    // v1 v2 event PunkNoLongerForSale(uint indexed punkIndex);
+                    // v2 event PunkBidEntered(uint indexed punkIndex, uint value, address indexed fromAddress);
+                    // v2 event PunkBidWithdrawn(uint indexed punkIndex, uint value, address indexed fromAddress);
+
+                    // w1 w2 event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+                    // w1 w2 event Transfer(address indexed from, address indexed to, uint256 indexed tokenId);
+                    // w1 w2 event Approval(address indexed owner, address indexed approved, uint256 indexed tokenId);
+                    // w1 w2 event ApprovalForAll(address indexed owner, address indexed operator, bool approved);
+                    // w2 event Paused(address account);
+                    // w2 event Unpaused(address account);
+
                   }
                   console.log(moment().format("HH:mm:ss") + " syncCryptoPunksData #" + fromBlock + "-" + toBlock + " [" + (toBlock - fromBlock) + "/" + batchSize + "] newEvents: " + newEvents);
                   fromBlock = toBlock;
