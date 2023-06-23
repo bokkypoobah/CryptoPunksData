@@ -2695,10 +2695,13 @@
             this.saveSettings();
           },
           async syncCryptoPunksData(section) {
+            const CONFIRMATIONS = 20;
             console.log(moment().format("HH:mm:ss") + " syncCryptoPunksData - chainId: " + this.chainId);
+            const db = new Dexie(this.db.name);
+            db.version(this.db.version).stores(this.db.schemaDefinition);
             const provider = new ethers.providers.Web3Provider(window.ethereum);
             const block = await provider.getBlock();
-            const blockNumber = block && block.number || null;
+            const blockNumber = block && (block.number - CONFIRMATIONS) || null;
             console.log(moment().format("HH:mm:ss") + " syncCryptoPunksData - blockNumber: " + blockNumber + ", chainId: " + this.chainId);
 
             console.log("this.indexToEventTypes: " + JSON.stringify(this.indexToEventTypes));
@@ -2711,10 +2714,48 @@
               // { name: "wrappedV2", address: WRAPPEDCRYPTOPUNKSV2ADDRESS, abi: WRAPPEDCRYPTOPUNKSV2ABI, deploymentBlockNumber: WRAPPEDCRYPTOPUNKSV2DEPLOYMENTBLOCKNUMBER },
             ];
 
+            let indexToAddress = [];
+            let addressToIndex = {};
+            const indexToAddressDataItems = await db.cache.where("objectName").equals(this.chainId + "_indexToAddress").toArray();
+            if (indexToAddressDataItems.length == 1) {
+              indexToAddress = indexToAddressDataItems[0].object;
+              // console.log("indexToAddress: " + JSON.stringify(indexToAddress));
+            }
+            const addressToIndexDataItems = await db.cache.where("objectName").equals(this.chainId + "_addressToIndex").toArray();
+            if (addressToIndexDataItems.length == 1) {
+              addressToIndex = addressToIndexDataItems[0].object;
+              // console.log("addressToIndex: " + JSON.stringify(addressToIndex));
+            }
             for (const process of processes) {
               console.log("processing: " + process.name);
+              const chadexContract = new ethers.Contract(process.address, process.abi, provider);
+              let batchSize = 100000000;
+              const BATCHREDUCTIONFACTOR = 0.50;
+              let done = false;
+              let count = 0;
+              let newEvents = 0;
+
               const startBlock = process.deploymentBlockNumber;
               const endBlock = parseInt(startBlock) + 5000;
+
+              let fromBlock = startBlock;
+              do {
+                if (batchSize > 1000 && parseInt(fromBlock) + batchSize > blockNumber) {
+                  batchSize = parseInt((blockNumber - fromBlock) * 0.75);
+                }
+                batchSize = (batchSize > 10) ? batchSize: 10; // avoid divide by 0
+                let toBlock = (parseInt(fromBlock) + batchSize < blockNumber) ? (parseInt(fromBlock) + batchSize) : blockNumber;
+
+
+                // console.log(moment().format("HH:mm:ss") + " syncChadexEvents #" + fromBlock + "-" + toBlock + " [" + (toBlock - fromBlock) + "/" + batchSize + "] newEvents: " + newEvents);
+                console.log(moment().format("HH:mm:ss") + " syncCryptoPunksData #" + fromBlock + "-" + toBlock + " [" + (toBlock - fromBlock) + "/" + batchSize + "] newEvents: " + newEvents);
+
+
+                // done = fromBlock >= context.latestBlockNumber;
+                done = true; // TODO
+              } while (!done && !this.sync.halt);
+
+
               const filter = {
                 address: process.address,
                 fromBlock: startBlock,
