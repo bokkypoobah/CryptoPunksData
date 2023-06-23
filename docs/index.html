@@ -2760,7 +2760,7 @@
                   const filter = { address: process.address, fromBlock, toBlock, topics: [null, null, null] };
                   const eventLogs = await provider.getLogs(filter);
                   newEvents += eventLogs.length;
-                  for (const event of eventLogs.slice(0, 5)) {
+                  for (const event of eventLogs /*.slice(0, 5) */) {
                     if (!event.removed) {
                       const logData = contract.interface.parseLog(event);
                       const eventType = logData.eventFragment.name;
@@ -2772,29 +2772,57 @@
                           indexToAddress.push(to);
                         }
                         const toIndex = addressToIndex[to];
-                        record = { eventType, eventTypeIndex, to, toIndex, punkIndex: parseInt(punkIndex) };
-                        console.log("record: " + JSON.stringify(record));
+                        record = [eventTypeIndex, toIndex, parseInt(punkIndex) ];
+                        // console.log("record: " + JSON.stringify(record));
                       } else if (eventType == "Transfer") {
                         const [from, to, value] = logData.args;
-                        // for (const address of [CHADEXADDRESS_SEPOLIA, this.coinbase]) {
-                        //   if (!(address in addressToIndex)) {
-                        //     addressToIndex[address] = indexToAddress.length;
-                        //     indexToAddress.push(address);
-                        //   }
-                        // }
-                        record = { eventType, eventTypeIndex, from, to, value: parseInt(value) };
+                        for (const address of [from, to]) {
+                          if (!(address in addressToIndex)) {
+                            addressToIndex[address] = indexToAddress.length;
+                            indexToAddress.push(address);
+                          }
+                        }
+                        const fromIndex = addressToIndex[from];
+                        const toIndex = addressToIndex[to];
+                        record = [ eventTypeIndex, fromIndex, toIndex, parseInt(value) ];
+                        // console.log("record: " + JSON.stringify(record));
                       } else if (eventType == "PunkTransfer") {
                         const [from, to, punkIndex] = logData.args;
-                        record = { eventType, eventTypeIndex, from, to, punkIndex: parseInt(punkIndex) };
+                        for (const address of [from, to]) {
+                          if (!(address in addressToIndex)) {
+                            addressToIndex[address] = indexToAddress.length;
+                            indexToAddress.push(address);
+                          }
+                        }
+                        const fromIndex = addressToIndex[from];
+                        const toIndex = addressToIndex[to];
+                        record = [ eventTypeIndex, fromIndex, toIndex, parseInt(punkIndex)];
+                        // console.log("record: " + JSON.stringify(record));
                       } else if (eventType == "PunkOffered") {
                         const [punkIndex, minValue, toAddress] = logData.args;
-                        record = { eventType, eventTypeIndex, punkIndex: parseInt(punkIndex), minValue: minValue.toString(), toAddress };
+                        if (!(toAddress in addressToIndex)) {
+                          addressToIndex[toAddress] = indexToAddress.length;
+                          indexToAddress.push(toAddress);
+                        }
+                        const toAddressIndex = addressToIndex[toAddress];
+                        record = [ eventTypeIndex, parseInt(punkIndex), minValue.toString(), toAddressIndex ];
+                        // console.log("record: " + JSON.stringify(record));
                       } else if (eventType == "PunkBought") {
                         const [punkIndex, value, fromAddress, toAddress] = logData.args;
-                        record = { eventType, eventTypeIndex, punkIndex: parseInt(punkIndex), value: value.toString(), fromAddress, toAddress };
+                        for (const address of [fromAddress, toAddress]) {
+                          if (!(address in addressToIndex)) {
+                            addressToIndex[address] = indexToAddress.length;
+                            indexToAddress.push(address);
+                          }
+                        }
+                        const fromAddressIndex = addressToIndex[fromAddress];
+                        const toAddressIndex = addressToIndex[toAddress];
+                        record = [ eventTypeIndex, parseInt(punkIndex), value.toString(), fromAddressIndex, toAddressIndex ];
+                        // console.log("record: " + JSON.stringify(record));
                       } else if (eventType == "PunkNoLongerForSale") {
                         const [punkIndex] = logData.args;
-                        record = { eventType, eventTypeIndex, punkIndex: parseInt(punkIndex) };
+                        record = [ eventTypeIndex, parseInt(punkIndex) ];
+                        console.log("record: " + JSON.stringify(record));
                       } else if (eventType == "PunkBidEntered") {
                         const [punkIndex, value, fromAddress] = logData.args;
                         record = { eventType, eventTypeIndex, punkIndex: parseInt(punkIndex), value: value.toString(), fromAddress };
