@@ -307,6 +307,40 @@
               Home
             </template>
             <b-card-text class="m-0 p-0">
+              <div class="d-flex flex-wrap m-0 p-0">
+                <!-- <div class="mt-0 pr-1">
+                  <b-form-input type="text" size="sm" v-model.trim="settings.pairsTable.filter" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Base or quote symbol and name filter'" placeholder="🔍 sym/name regex" style="min-width: 8.0rem;"></b-form-input>
+                </div> -->
+                <div class="mt-0 flex-grow-1">
+                </div>
+                <div v-if="!sync.section" class="mt-0 pr-1">
+                  <b-button size="sm" @click="syncCryptoPunksData" variant="primary" v-b-popover.hover.top="'Sync CryptoPunksData'">Sync</b-button>
+                </div>
+                <div class="mt-1" style="width: 250px;">
+                  <b-progress v-if="sync.section != null" height="1.5rem" :max="sync.total" show-progress :animated="sync.section != null" :variant="sync.section != null ? 'success' : 'secondary'" v-b-popover.hover.top="'Click the button on the right to stop. This process can be continued later'">
+                    <b-progress-bar :value="sync.completed">
+                      {{ sync.total == null || sync.total == 0 ? (sync.completed + ' ' + sync.section) : (sync.completed + '/' + sync.total + ' ' + ((sync.completed / sync.total) * 100).toFixed(0) + '% ' + sync.section) }}
+                    </b-progress-bar>
+                  </b-progress>
+                </div>
+                <!-- <div class="ml-0 mt-1">
+                  <b-button v-if="sync.section != null" size="sm" @click="halt" variant="link" v-b-popover.hover.top="'Click to stop. It may take a few minutes to clean up. This process can be continued later'"><b-icon-stop-fill shift-v="+1" font-scale="1.0"></b-icon-stop-fill></b-button>
+                </div> -->
+                <div class="mt-0 flex-grow-1">
+                </div>
+                <!-- <div class="mt-0 pl-1">
+                  <b-form-select size="sm" v-model="settings.pairsTable.sortOption" @change="saveSettings" :options="pairsSortOptions" v-b-popover.hover.top="'Yeah. Sort'"></b-form-select>
+                </div> -->
+                <!-- <div class="mt-0 pl-1">
+                  <font size="-2" v-b-popover.hover.top="'# tokens'">{{ filteredSortedPairs.length + '/' + Object.keys(pairs).length }}</font>
+                </div> -->
+                <!-- <div class="mt-0 pl-1">
+                  <b-pagination size="sm" v-model="settings.pairsTable.currentPage" @input="saveSettings" :total-rows="filteredSortedAccounts.length" :per-page="settings.pairsTable.pageSize" style="height: 0;"></b-pagination>
+                </div> -->
+                <!-- <div class="mt-0 pl-1">
+                  <b-form-select size="sm" v-model="settings.pairsTable.pageSize" @change="saveSettings" :options="pageSizes" v-b-popover.hover.top="'Yeah. Page size'"></b-form-select>
+                </div> -->
+              </div>
             </b-card-text>
           </b-card>
 
@@ -2647,6 +2681,13 @@
               this.$bvModal.hide('new-coin-modal-prevent-closing');
             })
             this.saveSettings();
+          },
+          async syncCryptoPunksData(section) {
+            console.log("syncCryptoPunksData");
+
+
+
+
           },
           async syncPairs(section) {
             console.log("syncTokens");
