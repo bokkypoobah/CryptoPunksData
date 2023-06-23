@@ -2689,6 +2689,21 @@
             const blockNumber = block && block.number || null;
             console.log(moment().format("HH:mm:ss") + " syncCryptoPunksData - blockNumber: " + blockNumber + ", chainId: " + this.chainId);
 
+            const startBlock = 3842489; // V1 deployment
+            const endBlock = parseInt(startBlock) + 10000;
+            const filter = {
+              address: CRYPTOPUNKSV1ADDRESS,
+              fromBlock: startBlock,
+              toBlock: endBlock,
+              topics: [
+                null,
+                null,
+                null,
+              ],
+            };
+            const eventLogs = await provider.getLogs(filter);
+            console.log(moment().format("HH:mm:ss") + " syncCryptoPunksData - eventLogs: " + JSON.stringify(eventLogs, null, 2));
+
           },
           async syncPairs(section) {
             console.log("syncTokens");
