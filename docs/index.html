@@ -2718,10 +2718,10 @@
             console.log("this.eventTypesToIndex: " + JSON.stringify(this.eventTypesToIndex));
 
             const processes = [
-              // { name: "v1", address: CRYPTOPUNKSV1ADDRESS, abi: CRYPTOPUNKSV1ABI, deploymentBlockNumber: CRYPTOPUNKSV1DEPLOYMENTBLOCKNUMBER },
+              { name: "v1", address: CRYPTOPUNKSV1ADDRESS, abi: CRYPTOPUNKSV1ABI, deploymentBlockNumber: CRYPTOPUNKSV1DEPLOYMENTBLOCKNUMBER },
               // { name: "v2", address: CRYPTOPUNKSV2ADDRESS, abi: CRYPTOPUNKSV2ABI, deploymentBlockNumber: CRYPTOPUNKSV2DEPLOYMENTBLOCKNUMBER },
               // { name: "wrappedV1", address: WRAPPEDCRYPTOPUNKSV1ADDRESS, abi: WRAPPEDCRYPTOPUNKSV1ABI, deploymentBlockNumber: WRAPPEDCRYPTOPUNKSV1DEPLOYMENTBLOCKNUMBER },
-              { name: "wrappedV2", address: WRAPPEDCRYPTOPUNKSV2ADDRESS, abi: WRAPPEDCRYPTOPUNKSV2ABI, deploymentBlockNumber: WRAPPEDCRYPTOPUNKSV2DEPLOYMENTBLOCKNUMBER },
+              // { name: "wrappedV2", address: WRAPPEDCRYPTOPUNKSV2ADDRESS, abi: WRAPPEDCRYPTOPUNKSV2ABI, deploymentBlockNumber: WRAPPEDCRYPTOPUNKSV2DEPLOYMENTBLOCKNUMBER },
             ];
 
             let indexToAddress = [];
@@ -2739,7 +2739,7 @@
             for (const process of processes) {
               console.log("processing: " + process.name);
               const contract = new ethers.Contract(process.address, process.abi, provider);
-              let batchSize = 100000000;
+              let batchSize = 20000; // 100000000;
               const BATCHREDUCTIONFACTOR = 0.75;
               let done = false;
               let count = 0;
@@ -2760,10 +2760,15 @@
                   const filter = { address: process.address, fromBlock, toBlock, topics: [null, null, null] };
                   const eventLogs = await provider.getLogs(filter);
                   newEvents += eventLogs.length;
-                  for (const event of eventLogs) {
+                  for (const event of eventLogs.slice(0, 5)) {
                     const logData = contract.interface.parseLog(event);
-                    if (!(logData.eventFragment.name in this.eventTypesToIndex)) {
-                      console.log(logData.eventFragment.name + ": " + JSON.stringify(event));
+                    // if (!(logData.eventFragment.name in this.eventTypesToIndex)) {
+                      // console.log(logData.eventFragment.name + ": " + JSON.stringify(logData));
+                    // }
+                    if (logData.eventFragment.name == "Assign") {
+                      console.log("Assign: " + JSON.stringify(logData));
+                    } else {
+
                     }
                   }
                   console.log(moment().format("HH:mm:ss") + " syncCryptoPunksData #" + fromBlock + "-" + toBlock + " [" + (toBlock - fromBlock) + "/" + batchSize + "] newEvents: " + newEvents);
