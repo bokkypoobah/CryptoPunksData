@@ -2730,7 +2730,7 @@
               console.log("processing: " + process.name);
               const chadexContract = new ethers.Contract(process.address, process.abi, provider);
               let batchSize = 100000000;
-              const BATCHREDUCTIONFACTOR = 0.50;
+              const BATCHREDUCTIONFACTOR = 0.75;
               let done = false;
               let count = 0;
               let newEvents = 0;
@@ -2745,29 +2745,34 @@
                 }
                 batchSize = (batchSize > 10) ? batchSize: 10; // avoid divide by 0
                 let toBlock = (parseInt(fromBlock) + batchSize < blockNumber) ? (parseInt(fromBlock) + batchSize) : blockNumber;
-
-
-                // console.log(moment().format("HH:mm:ss") + " syncChadexEvents #" + fromBlock + "-" + toBlock + " [" + (toBlock - fromBlock) + "/" + batchSize + "] newEvents: " + newEvents);
-                console.log(moment().format("HH:mm:ss") + " syncCryptoPunksData #" + fromBlock + "-" + toBlock + " [" + (toBlock - fromBlock) + "/" + batchSize + "] newEvents: " + newEvents);
-
-
-                // done = fromBlock >= context.latestBlockNumber;
-                done = true; // TODO
+                try {
+                  const records = [];
+                  const filter = { address: process.address, fromBlock, toBlock, topics: [null, null, null] };
+                  const eventLogs = await provider.getLogs(filter);
+                  newEvents += eventLogs.length;
+                  console.log(moment().format("HH:mm:ss") + " syncCryptoPunksData #" + fromBlock + "-" + toBlock + " [" + (toBlock - fromBlock) + "/" + batchSize + "] newEvents: " + newEvents);
+                  fromBlock = toBlock;
+                } catch (e) {
+                  console.log(e);
+                  batchSize = parseInt(batchSize * BATCHREDUCTIONFACTOR);
+                }
+                done = fromBlock >= blockNumber;
+                // done = true; // TODO
               } while (!done && !this.sync.halt);
 
 
-              const filter = {
-                address: process.address,
-                fromBlock: startBlock,
-                toBlock: endBlock,
-                topics: [
-                  null,
-                  null,
-                  null,
-                ],
-              };
-              const eventLogs = await provider.getLogs(filter);
-              console.log(moment().format("HH:mm:ss") + " syncCryptoPunksData - eventLogs: " + JSON.stringify(eventLogs.slice(0, 1), null, 2));
+              // const filter = {
+              //   address: process.address,
+              //   fromBlock: startBlock,
+              //   toBlock: endBlock,
+              //   topics: [
+              //     null,
+              //     null,
+              //     null,
+              //   ],
+              // };
+              // const eventLogs = await provider.getLogs(filter);
+              // console.log(moment().format("HH:mm:ss") + " syncCryptoPunksData - eventLogs: " + JSON.stringify(eventLogs.slice(0, 1), null, 2));
             }
 
           },
