@@ -2743,7 +2743,7 @@
                 if (batchSize > 1000 && parseInt(fromBlock) + batchSize > blockNumber) {
                   batchSize = parseInt((blockNumber - fromBlock) * 0.75);
                 }
-                batchSize = (batchSize > 10) ? batchSize: 10; // avoid divide by 0
+                batchSize = (batchSize > 10) ? batchSize: 10; // avoid divide by chungo
                 let toBlock = (parseInt(fromBlock) + batchSize < blockNumber) ? (parseInt(fromBlock) + batchSize) : blockNumber;
                 try {
                   const records = [];
