@@ -2728,7 +2728,7 @@
             }
             for (const process of processes) {
               console.log("processing: " + process.name);
-              const chadexContract = new ethers.Contract(process.address, process.abi, provider);
+              const contract = new ethers.Contract(process.address, process.abi, provider);
               let batchSize = 100000000;
               const BATCHREDUCTIONFACTOR = 0.75;
               let done = false;
@@ -2750,6 +2750,10 @@
                   const filter = { address: process.address, fromBlock, toBlock, topics: [null, null, null] };
                   const eventLogs = await provider.getLogs(filter);
                   newEvents += eventLogs.length;
+                  for (const event of eventLogs) {
+                    const logData = contract.interface.parseLog(event);
+                    console.log(logData.eventFragment.name + ": " + JSON.stringify(event));
+                  }
                   console.log(moment().format("HH:mm:ss") + " syncCryptoPunksData #" + fromBlock + "-" + toBlock + " [" + (toBlock - fromBlock) + "/" + batchSize + "] newEvents: " + newEvents);
                   fromBlock = toBlock;
                 } catch (e) {
