@@ -2683,10 +2683,11 @@
             this.saveSettings();
           },
           async syncCryptoPunksData(section) {
-            console.log("syncCryptoPunksData");
-
-
-
+            console.log(moment().format("HH:mm:ss") + " syncCryptoPunksData - chainId: " + this.chainId);
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const block = await provider.getBlock();
+            const blockNumber = block && block.number || null;
+            console.log(moment().format("HH:mm:ss") + " syncCryptoPunksData - blockNumber: " + blockNumber + ", chainId: " + this.chainId);
 
           },
           async syncPairs(section) {
