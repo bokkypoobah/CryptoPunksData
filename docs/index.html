@@ -1673,8 +1673,13 @@
             33: "U3Burn",
             34: "U3Collect",
           },
+          indexToEventTypes: [
+            "Assign",
+            "Transfer",
+            "Approve",
+          ],
           db: {
-            name: "chadexdata089j",
+            name: "cryptopunksdata088a",
             version: 1,
             schemaDefinition: {
               cache: '&objectName',
@@ -1685,6 +1690,13 @@
 
         // --- COMPUTED ---
         computed: {
+          eventTypesToIndex() {
+            const results = {};
+            for (const [eventTypeIndex, eventType] of this.indexToEventTypes.entries()) {
+              results[eventType] = eventTypeIndex;
+            }
+            return results;
+          },
           chadexAddress() {
             return CHADEXADDRESS_SEPOLIA;
           },
@@ -2688,6 +2700,9 @@
             const block = await provider.getBlock();
             const blockNumber = block && block.number || null;
             console.log(moment().format("HH:mm:ss") + " syncCryptoPunksData - blockNumber: " + blockNumber + ", chainId: " + this.chainId);
+
+            console.log("this.indexToEventTypes: " + JSON.stringify(this.indexToEventTypes));
+            console.log("this.eventTypesToIndex: " + JSON.stringify(this.eventTypesToIndex));
 
             const processes = [
               { name: "v1", address: CRYPTOPUNKSV1ADDRESS, abi: CRYPTOPUNKSV1ABI, deploymentBlockNumber: CRYPTOPUNKSV1DEPLOYMENTBLOCKNUMBER },
