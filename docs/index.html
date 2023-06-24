@@ -309,6 +309,9 @@
             </template>
             <b-card-text class="m-0 p-0">
               <div class="d-flex flex-wrap m-0 p-0">
+                <div class="mt-1">
+                  <b-button size="sm" :pressed.sync="settings.showFilter" variant="link" v-b-popover.hover.top="'Show filter'"><span v-if="settings.showFilter"><b-icon-layout-sidebar-inset shift-v="+1" font-scale="1.0"></b-icon-layout-sidebar-inset></span><span v-else><b-icon-layout-sidebar shift-v="+1" font-scale="1.0"></b-icon-layout-sidebar></span></b-button>
+                </div>
                 <!-- <div class="mt-0 pr-1">
                   <b-form-input type="text" size="sm" v-model.trim="settings.pairsTable.filter" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Base or quote symbol and name filter'" placeholder="🔍 sym/name regex" style="min-width: 8.0rem;"></b-form-input>
                 </div> -->
@@ -1289,6 +1292,7 @@
 
           settings: {
             tabIndex: 0,
+            showFilter: false,
             showAdditionalFilters: false,
             filters: {},
             tokens: {
@@ -1419,7 +1423,7 @@
               pageSize: 10,
               sortOption: 'lastsaledsc',
             },
-            version: 0,
+            version: 2,
           },
           newCoinAddress: null,
           newAddress: null,
