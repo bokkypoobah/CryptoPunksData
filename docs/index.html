@@ -329,9 +329,9 @@
                 </div> -->
                 <div class="mt-0 flex-grow-1">
                 </div>
-                <!-- <div class="mt-0 pl-1">
-                  <b-form-select size="sm" v-model="settings.punksTable.sortOption" @change="saveSettings" :options="pairsSortOptions" v-b-popover.hover.top="'Yeah. Sort'"></b-form-select>
-                </div> -->
+                <div class="mt-0 pl-1">
+                  <b-form-select size="sm" v-model="settings.punksTable.sortOption" @change="saveSettings" :options="punksSortOptions" v-b-popover.hover.top="'Yeah. Sort'"></b-form-select>
+                </div>
                 <div class="mt-0 pl-1">
                   <font size="-2" v-b-popover.hover.top="'# tokens'">{{ filteredSortedPunks.length + '/' + punkAttributes.length }}</font>
                 </div>
@@ -1360,7 +1360,7 @@
               filter: null,
               currentPage: 1,
               pageSize: 100,
-              sortOption: 'tokenidasc',
+              sortOption: 'punkidasc',
             },
             pairsTable: {
               filter: null,
@@ -1416,7 +1416,7 @@
               pageSize: 10,
               sortOption: 'lastsaledsc',
             },
-            version: 8,
+            version: 0,
           },
           newCoinAddress: null,
           newAddress: null,
@@ -1567,6 +1567,10 @@
             // { value: 4, text: 'Update Expiry And Tokens' },
           ],
 
+          punksSortOptions: [
+            { value: 'punkidasc', text: '▲ PunkId' },
+            { value: 'punkiddsc', text: '▼ PunkId' },
+          ],
           pairsSortOptions: [
             { value: 'symbolquotebaseasc', text: '▲ Quote, ▲ Base' },
             { value: 'symbolbasequoteasc', text: '▲ Base, ▲ Quote' },
@@ -1894,15 +1898,27 @@
           },
           filteredPunks() {
             const results = [];
-            for (const [punkAttributeIndex, punkAttribute] of this.punkAttributes.entries()) {
-              // console.log(JSON.stringify(punkAttribute));
+            for (const [punkAttributeIndex, punkAttribute] of this.punkAttributes.slice(0, 10).entries()) {
+              console.log(JSON.stringify(punkAttribute));
               results.push({ punkId: punkAttributeIndex, aaargh: "aaargh" });
             }
             return results;
           },
           filteredSortedPunks() {
             let results = this.filteredPunks;
-            // TODO
+            console.log("DEBUG 1");
+            if (this.settings.punksTable.sortOption == 'punkidasc') {
+              console.log("DEBUG 2");
+              results.sort((a, b) => {
+                return a.punkId - b.punkId;
+              });
+            } else if (this.settings.punksTable.sortOption == 'punkiddsc') {
+              console.log("DEBUG 3");
+              results.sort((a, b) => {
+                return b.punkId - a.punkId;
+              });
+            }
+            console.log("DEBUG 4");
             return results;
           },
           pagedFilteredSortedPunks() {
