@@ -1943,12 +1943,15 @@
             }
             const results = [];
             for (const [attributeType, attributes] of Object.entries(collator)) {
-              // console.log(attributeType + " => " + JSON.stringify(attributes));
-              results.push({ attributeType, attributes });
+              const attributeList = [];
+              for (const [attribute, punks] of Object.entries(attributes)) {
+                attributeList.push({ attribute, punks });
+              }
+              attributeList.sort((a, b) => b.punks.length - a.punks.length);
+              results.push({ attributeType, attributeList });
             }
-            // console.log("results BEFORE: " + JSON.stringify(results));
             results.sort((a, b) => ('' + a.attributeType).localeCompare(b.attributeType))
-            // console.log("results AFTER: " + JSON.stringify(results));
+            console.log("results: " + JSON.stringify(results));
             return results;
           },
           filteredPunks() {
