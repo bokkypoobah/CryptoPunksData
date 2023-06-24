@@ -350,7 +350,7 @@
                 <b-col v-if="settings.showFilter" cols="2" class="m-0 p-0 border-0">
                   <b-card no-header no-body class="m-0 p-0 border-0">
                     <b-card-body class="m-0 p-1" style="flex-grow: 1; max-height: 1500px; overflow-y: auto;">
-                      <div v-for="punkAttribute of punkAttributesWithCounts">
+                      <div v-for="punkAttribute of punkAttributesWithTokenIds">
                         <b-card header-class="m-0 px-2 pt-2 pb-0" body-class="p-0" class="m-0 p-0 border-0">
                           <template #header>
                             <span variant="secondary" class="small truncate">
@@ -381,7 +381,7 @@
               </b-row>
 
 
-              {{ punkAttributesWithCounts }}
+              {{ punkAttributesWithTokenIds }}
 
             </b-card-text>
           </b-card>
@@ -1925,7 +1925,7 @@
           punkAttributes() {
             return PUNKATTRIBUTES;
           },
-          punkAttributesWithCounts() {
+          punkAttributesWithTokenIds() {
             const collator = {};
             for (const [punkId, punkAttribute] of this.punkAttributes.entries()) {
               for (const attribute of punkAttribute) {
