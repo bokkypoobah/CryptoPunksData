@@ -2761,9 +2761,9 @@
             for (const process of processes) {
               console.log("processing: " + process.name);
               const contract = new ethers.Contract(process.address, process.abi, provider);
-              if (!(process.addres in addressToIndex)) {
-                addressToIndex[process.addres] = indexToAddress.length;
-                indexToAddress.push(process.addres);
+              if (!(process.address in addressToIndex)) {
+                addressToIndex[process.address] = indexToAddress.length;
+                indexToAddress.push(process.address);
               }
               let batchSize = 20000; // 100000000;
               const BATCHREDUCTIONFACTOR = 0.75;
