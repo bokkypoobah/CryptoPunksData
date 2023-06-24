@@ -1603,7 +1603,7 @@
           punksFields: [
             { key: 'punkId', label: 'PunkId', sortable: false, thStyle: 'width: 15%;', thClass: 'text-right', tdClass: 'text-right' },
             { key: 'image', label: 'Image', sortable: false, thStyle: 'width: 45%;', thClass: 'text-left', tdClass: 'text-left' },
-            { key: 'attributes', label: 'Attributes', sortable: false, thStyle: 'width: 50%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'punkAttribute', label: 'Attributes', sortable: false, thStyle: 'width: 50%;', thClass: 'text-left', tdClass: 'text-left' },
           ],
           pairsFields: [
             // { key: 'pairKey', label: 'Pair Key', sortable: false, thStyle: 'width: 40%;', tdClass: 'text-truncate' },
@@ -1898,27 +1898,23 @@
           },
           filteredPunks() {
             const results = [];
-            for (const [punkAttributeIndex, punkAttribute] of this.punkAttributes.slice(0, 10).entries()) {
-              console.log(JSON.stringify(punkAttribute));
-              results.push({ punkId: punkAttributeIndex, aaargh: "aaargh" });
+            for (const [punkAttributeIndex, punkAttribute] of this.punkAttributes.entries()) {
+              // console.log(JSON.stringify(punkAttribute));
+              results.push({ punkId: punkAttributeIndex, punkAttribute });
             }
             return results;
           },
           filteredSortedPunks() {
             let results = this.filteredPunks;
-            console.log("DEBUG 1");
             if (this.settings.punksTable.sortOption == 'punkidasc') {
-              console.log("DEBUG 2");
               results.sort((a, b) => {
                 return a.punkId - b.punkId;
               });
             } else if (this.settings.punksTable.sortOption == 'punkiddsc') {
-              console.log("DEBUG 3");
               results.sort((a, b) => {
                 return b.punkId - a.punkId;
               });
             }
-            console.log("DEBUG 4");
             return results;
           },
           pagedFilteredSortedPunks() {
