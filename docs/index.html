@@ -330,18 +330,21 @@
                 <div class="mt-0 flex-grow-1">
                 </div>
                 <!-- <div class="mt-0 pl-1">
-                  <b-form-select size="sm" v-model="settings.pairsTable.sortOption" @change="saveSettings" :options="pairsSortOptions" v-b-popover.hover.top="'Yeah. Sort'"></b-form-select>
+                  <b-form-select size="sm" v-model="settings.punksTable.sortOption" @change="saveSettings" :options="pairsSortOptions" v-b-popover.hover.top="'Yeah. Sort'"></b-form-select>
                 </div> -->
-                <!-- <div class="mt-0 pl-1">
-                  <font size="-2" v-b-popover.hover.top="'# tokens'">{{ filteredSortedPairs.length + '/' + Object.keys(pairs).length }}</font>
-                </div> -->
-                <!-- <div class="mt-0 pl-1">
-                  <b-pagination size="sm" v-model="settings.pairsTable.currentPage" @input="saveSettings" :total-rows="filteredSortedAccounts.length" :per-page="settings.pairsTable.pageSize" style="height: 0;"></b-pagination>
-                </div> -->
-                <!-- <div class="mt-0 pl-1">
-                  <b-form-select size="sm" v-model="settings.pairsTable.pageSize" @change="saveSettings" :options="pageSizes" v-b-popover.hover.top="'Yeah. Page size'"></b-form-select>
-                </div> -->
+                <div class="mt-0 pl-1">
+                  <font size="-2" v-b-popover.hover.top="'# tokens'">{{ filteredSortedPunks.length + '/' + punkAttributes.length }}</font>
+                </div>
+                <div class="mt-0 pl-1">
+                  <b-pagination size="sm" v-model="settings.punksTable.currentPage" @input="saveSettings" :total-rows="filteredSortedPunks.length" :per-page="settings.punksTable.pageSize" style="height: 0;"></b-pagination>
+                </div>
+                <div class="mt-0 pl-1">
+                  <b-form-select size="sm" v-model="settings.punksTable.pageSize" @change="saveSettings" :options="pageSizes" v-b-popover.hover.top="'Yeah. Page size'"></b-form-select>
+                </div>
               </div>
+              <!-- <b-table small fixed striped responsive hover selectable select-mode="single" @row-selected="pairsRowSelected" :fields="pairsFields" :items="pagedFilteredSortedPairs" show-empty empty-html="Click Sync above to retrieve existing pairs" head-variant="light" class="mx-0 my-1"> -->
+              <b-table small fixed striped responsive hover :items="pagedFilteredSortedPunks" show-empty empty-html="Click Sync above to retrieve punk history" head-variant="light" class="mx-0 my-1">
+              </b-table>
             </b-card-text>
           </b-card>
 
@@ -1343,6 +1346,12 @@
                   "totalSupply": "1000000",
               }
             },
+            punksTable: {
+              filter: null,
+              currentPage: 1,
+              pageSize: 100,
+              sortOption: 'tokenidasc',
+            },
             pairsTable: {
               filter: null,
               currentPage: 1,
@@ -1865,6 +1874,26 @@
             }
             return null;
           },
+          punkAttributes() {
+            return PUNKATTRIBUTES;
+          },
+          filteredPunks() {
+            const results = [];
+            for (const [punkAttributeIndex, punkAttribute] of this.punkAttributes.entries()) {
+              // console.log(JSON.stringify(punkAttribute));
+              results.push({ tokenId: punkAttributeIndex, aaargh: "aaargh" });
+            }
+            return results;
+          },
+          filteredSortedPunks() {
+            let results = this.filteredPunks;
+            // TODO
+            return results;
+          },
+          pagedFilteredSortedPunks() {
+            return this.filteredSortedPunks.slice((this.settings.punksTable.currentPage - 1) * this.settings.punksTable.pageSize, this.settings.punksTable.currentPage * this.settings.punksTable.pageSize);
+          },
+
           filteredPairs() {
             const results = [];
             const filterRegex = this.settings.pairsTable.filter && this.settings.pairsTable.filter.length > 0 ? new RegExp(this.settings.pairsTable.filter, 'i') : null;
