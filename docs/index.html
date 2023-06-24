@@ -354,6 +354,16 @@
                   <b-card no-header no-body class="m-0 p-0 border-0">
                     <b-card-body class="m-0 p-1" style="flex-grow: 1; max-height: 1500px; overflow-y: auto;">
                       Blah
+                      <div v-for="punkAttribute of punkAttributesWithCounts">
+                        <b-card header-class="m-0 px-2 pt-2 pb-0" body-class="p-0" class="m-0 p-0 border-0">
+                          <template #header>
+                            <span variant="secondary" class="small truncate">
+                              {{ punkAttribute }}
+                            </span>
+                          </template>
+                        </b-card>
+                        <!-- {{ punkAttribute }} -->
+                      </div>
                     </b-card-body>
                   </b-card>
                 </b-col>
@@ -1935,8 +1945,15 @@
                 }
               }
             }
-            console.log("collator: " + JSON.stringify(collator));
-            return collator;
+            const results = [];
+            for (const [attributeType, attributes] of Object.entries(collator)) {
+              console.log(attributeType + " => " + JSON.stringify(attributes));
+              results.push({ attributeType, attributes });
+            }
+            // console.log("results BEFORE: " + JSON.stringify(results));
+            results.sort((a, b) => ('' + a.attributeType).localeCompare(b.attributeType))
+            // console.log("results AFTER: " + JSON.stringify(results));
+            return results;
           },
           filteredPunks() {
             const results = [];
