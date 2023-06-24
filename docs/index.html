@@ -354,11 +354,23 @@
                         <b-card header-class="m-0 px-2 pt-2 pb-0" body-class="p-0" class="m-0 p-0 border-0">
                           <template #header>
                             <span variant="secondary" class="small truncate">
-                              {{ punkAttribute }}
+                              {{ punkAttribute.attributeType }}
                             </span>
                           </template>
                         </b-card>
-                        <!-- {{ punkAttribute }} -->
+                        <font size="-2">
+                          <b-table small fixed striped sticky-header="200px" :fields="punkAttributesFields" :items="punkAttribute.attributeList" head-variant="light">
+                            <template #cell(select)="data">
+                              <!-- <b-form-checkbox size="sm" :checked="(tokenAttributesFilter[attributeType.attributeType] && tokenAttributesFilter[attributeType.attributeType].attributeOption) ? 1 : 0" value="1" @change="collectionFilterChange(attributeType.attributeType, data.item.attribute)"></b-form-checkbox> -->
+                            </template>
+                            <template #cell(attributeOption)="data">
+                              {{ data.item.attribute }}
+                            </template>
+                            <template #cell(attributeTotal)="data">
+                              {{ data.item.punks.length }}
+                            </template>
+                          </b-table>
+                        </font>
                       </div>
                     </b-card-body>
                   </b-card>
@@ -1633,6 +1645,11 @@
             { key: 'punkId', label: 'PunkId', sortable: false, thStyle: 'width: 15%;', thClass: 'text-right', tdClass: 'text-right' },
             { key: 'image', label: 'Image', sortable: false, thStyle: 'width: 45%;', thClass: 'text-left', tdClass: 'text-left' },
             { key: 'punkAttribute', label: 'Attributes', sortable: false, thStyle: 'width: 50%;', thClass: 'text-left', tdClass: 'text-left' },
+          ],
+          punkAttributesFields: [
+            { key: 'select', label: '', thStyle: 'width: 10%;' },
+            { key: 'attributeOption', label: 'Attribute' /*, sortable: true*/ },
+            { key: 'attributeTotal', label: 'Count', /*sortable: true,*/ thStyle: 'width: 30%;', thClass: 'text-right', tdClass: 'text-right' },
           ],
           pairsFields: [
             // { key: 'pairKey', label: 'Pair Key', sortable: false, thStyle: 'width: 40%;', tdClass: 'text-truncate' },
