@@ -1901,8 +1901,7 @@
           },
           punkAttributesWithCounts() {
             const collator = {};
-            for (const [punkId, punkAttribute] of this.punkAttributes.slice(0, 100).entries()) {
-              console.log(punkId + " => " + JSON.stringify(punkAttribute));
+            for (const [punkId, punkAttribute] of this.punkAttributes.entries()) {
               for (const attribute of punkAttribute) {
                 const trait_type = attribute.trait_type;
                 const value = attribute.value;
@@ -1916,7 +1915,7 @@
                 }
               }
             }
-            console.log(collator + ": " + JSON.stringify(collator));
+            console.log("collator: " + JSON.stringify(collator));
             return collator;
           },
           filteredPunks() {
