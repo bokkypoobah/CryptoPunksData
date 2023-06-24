@@ -2726,6 +2726,11 @@
             const db = new Dexie(this.db.name);
             db.version(this.db.version).stores(this.db.schemaDefinition);
             const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const signer = provider.getSigner();
+            this.coinbase = await signer.getAddress();
+            localStorage.cryptoPunksDataCoinbase = this.coinbase;
+            const network = await provider.getNetwork();
+            localStorage.cryptoPunksDataChainId = network.chainId;
             const block = await provider.getBlock();
             const blockNumber = block && (block.number - CONFIRMATIONS) || null;
             console.log(moment().format("HH:mm:ss") + " syncCryptoPunksData - blockNumber: " + blockNumber + ", chainId: " + this.chainId);
@@ -4985,6 +4990,27 @@
 
           },
           async loadCurrentData() {
+            console.log(moment().format("YYYY-MM-DD HH:mm:ss") + " " + "loadCurrentData");
+            const db = new Dexie(this.db.name);
+            db.version(this.db.version).stores(this.db.schemaDefinition);
+            const indexToAddressDataItems = await db.cache.where("objectName").equals(this.chainId + "_indexToAddress").toArray();
+            if (indexToAddressDataItems.length == 1) {
+              Vue.set(this, 'indexToAddress', indexToAddressDataItems[0].object);
+              console.log(moment().format("YYYY-MM-DD HH:mm:ss") + " " + "loadCurrentData - indexToAddress: " + JSON.stringify(this.indexToAddress.slice(0, 3)) + ", ...");
+            }
+            const addressToIndexDataItems = await db.cache.where("objectName").equals(this.chainId + "_addressToIndex").toArray();
+            if (addressToIndexDataItems.length == 1) {
+              Vue.set(this, 'addressToIndex', addressToIndexDataItems[0].object);
+              console.log(moment().format("YYYY-MM-DD HH:mm:ss") + " " + "loadCurrentData - addressToIndex: " + JSON.stringify(Object.entries(this.addressToIndex).slice(0, 3)) + ", ...");
+            }
+            const eventsDataItems = await db.cache.where("objectName").equals(this.chainId + "_events").toArray();
+            if (eventsDataItems.length == 1) {
+              this.events = eventsDataItems[0].object;
+              // console.log("mounted - Events: " + JSON.stringify(this.events));
+            }
+
+          },
+          async loadCurrentDataOld() {
 
             // if (Object.keys(this.events) == 0) {
             //   console.log("loadCurrentData: DEBUG 1");
@@ -5483,10 +5509,10 @@
               const ensReverseRecordsContract = new ethers.Contract(ENSREVERSERECORDSADDRESS, ENSREVERSERECORDSABI, provider);
               const erc721Helper = new ethers.Contract(ERC721HELPERADDRESS_SEPOLIA, ERC721HELPERABI, provider);
               this.coinbase = await signer.getAddress();
-              localStorage.chadexCoinbase = this.coinbase;
+              localStorage.cryptoPunksDataCoinbase = this.coinbase;
               const network = await provider.getNetwork();
               console.log("network: " + JSON.stringify(network));
-              localStorage.chadexChainId = network.chainId;
+              localStorage.cryptoPunksDataChainId = network.chainId;
               this.chainId = network.chainId;
               const block = await provider.getBlock("latest");
               const blockNumber = block.number;
@@ -5735,12 +5761,14 @@
             await this.connectToWeb3();
           })();
 
-          // if ('chadexCoinbase' in localStorage) {
-          //   this.coinbase = localStorage.chadexCoinbase;
-          // }
-          // if ('chadexChainId' in localStorage) {
-          //   this.chainId = localStorage.chadexChainId;
-          // }
+          if ('cryptoPunksDataChainId' in localStorage) {
+            this.chainId = localStorage.cryptoPunksDataChainId;
+            console.log("mounted - this.chainId: " + this.chainId);
+          }
+          if ('cryptoPunksDataCoinbase' in localStorage) {
+            this.coinbase = localStorage.cryptoPunksDataCoinbase;
+            console.log("mounted - this.coinbase: " + this.coinbase);
+          }
           // if ('chadexPairsV1' in localStorage) {
           //   this.pairs = JSON.parse(localStorage.chadexPairsV1);
           // }
@@ -5769,47 +5797,24 @@
               this.blockTimestamps = blockTimestampsDataItems[0].object;
             }
 
-            const indexToAddressDataItems = await db0.cache.where("objectName").equals(this.chainId + "_indexToAddress").toArray();
-            if (indexToAddressDataItems.length == 1) {
-              this.indexToAddress = indexToAddressDataItems[0].object;
-              console.log("indexToAddress: " + JSON.stringify(this.indexToAddress));
-            }
-            const addressToIndexDataItems = await db0.cache.where("objectName").equals(this.chainId + "_addressToIndex").toArray();
-            if (addressToIndexDataItems.length == 1) {
-              this.addressToIndex = addressToIndexDataItems[0].object;
-              console.log("addressToIndex: " + JSON.stringify(this.addressToIndex));
-            }
+            // const indexToAddressDataItems = await db0.cache.where("objectName").equals(this.chainId + "_indexToAddress").toArray();
+            // if (indexToAddressDataItems.length == 1) {
+            //   this.indexToAddress = indexToAddressDataItems[0].object;
+            //   console.log("indexToAddress: " + JSON.stringify(this.indexToAddress));
+            // }
+            // const addressToIndexDataItems = await db0.cache.where("objectName").equals(this.chainId + "_addressToIndex").toArray();
+            // if (addressToIndexDataItems.length == 1) {
+            //   this.addressToIndex = addressToIndexDataItems[0].object;
+            //   console.log("addressToIndex: " + JSON.stringify(this.addressToIndex));
+            // }
 
-            const tokensDataItems = await db0.cache.where("objectName").equals(this.chainId + "_tokens").toArray();
-            if (tokensDataItems.length == 1) {
-              this.tokens = tokensDataItems[0].object;
-              // console.log("tokens: " + JSON.stringify(this.tokens));
-            }
+            // const indexToNameDataItems = await db0.cache.where("objectName").equals(CHAINID_MAINNET + "_indexToName").toArray();
+            // if (indexToNameDataItems.length == 1) {
+            //   this.indexToName = indexToNameDataItems[0].object;
+            //   console.log("mounted - indexToName: " + JSON.stringify(this.indexToName));
+            // }
 
-            const indexToPairDataItems = await db0.cache.where("objectName").equals(this.chainId + "_indexToPair").toArray();
-            if (indexToPairDataItems.length == 1) {
-              this.indexToPair = indexToPairDataItems[0].object;
-              // console.log("indexToPair: " + JSON.stringify(this.indexToPair));
-            }
-            const pairToIndexDataItems = await db0.cache.where("objectName").equals(this.chainId + "_pairToIndex").toArray();
-            if (pairToIndexDataItems.length == 1) {
-              this.pairToIndex = pairToIndexDataItems[0].object;
-              // console.log("pairToIndex: " + JSON.stringify(this.pairToIndex));
-            }
-
-            const eventsDataItems = await db0.cache.where("objectName").equals(this.chainId + "_events").toArray();
-            if (eventsDataItems.length == 1) {
-              this.events = eventsDataItems[0].object;
-              // console.log("mounted - Events: " + JSON.stringify(this.events));
-            }
-
-            const indexToNameDataItems = await db0.cache.where("objectName").equals(CHAINID_MAINNET + "_indexToName").toArray();
-            if (indexToNameDataItems.length == 1) {
-              this.indexToName = indexToNameDataItems[0].object;
-              console.log("mounted - indexToName: " + JSON.stringify(this.indexToName));
-            }
-
-            db0.close();
+            // db0.close();
             await this.loadCurrentData();
           })();
         },
