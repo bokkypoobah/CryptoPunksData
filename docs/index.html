@@ -1968,7 +1968,7 @@
               results.push({ attributeType, attributeList });
             }
             results.sort((a, b) => ('' + a.attributeType).localeCompare(b.attributeType))
-            console.log("results: " + JSON.stringify(results));
+            // console.log("results: " + JSON.stringify(results));
             return results;
           },
           filteredPunks() {
@@ -1981,15 +1981,38 @@
                 results.push({ punkId: punkAttributeIndex, punkAttribute });
               }
             } else {
+              let selectedTokenIds = [];
               for (const [attributeType, attributeList] of Object.entries(this.settings.filters)) {
                 let thisAttributeTypeTokenIds = [];
                 console.log(attributeType + " => " + JSON.stringify(attributeList));
                 for (const attribute of Object.keys(attributeList)) {
                   console.log("attribute: " + attribute);
-                  console.log("this.punkAttributesWithTokenIds: " + JSON.stringify(this.punkAttributesWithTokenIds, null, 2));
+                  for (const attributeInfo of this.punkAttributesWithTokenIds) {
+                    if (attributeInfo.attributeType == attributeType) {
+                      // console.log("attributeInfo: " + JSON.stringify(attributeInfo));
+                      const tokenIds = attributeInfo.attributeList.filter(e => e.attribute == attribute).map(e => e.punks).flat();
+                      console.log("tokenIds: " + JSON.stringify(tokenIds));
+                      console.log("thisAttributeTypeTokenIds BEFORE: " + JSON.stringify(thisAttributeTypeTokenIds));
+                      thisAttributeTypeTokenIds = [...thisAttributeTypeTokenIds, ...tokenIds];
+                      console.log("thisAttributeTypeTokenIds AFTER: " + JSON.stringify(thisAttributeTypeTokenIds));
+                      break;
+                      // console.log("selectedTokenIds: " + JSON.stringify(selectedTokenIds));
+                    }
+                  }
+                  if (selectedTokenIds.length == 0) {
+                    selectedTokenIds = thisAttributeTypeTokenIds;
+                    console.log("selectedTokenIds 1: " + JSON.stringify(selectedTokenIds));
+                  } else {
+                    selectedTokenIds = selectedTokenIds.filter(tokenId => thisAttributeTypeTokenIds.includes(tokenId));
+                    console.log("selectedTokenIds 2: " + JSON.stringify(selectedTokenIds));
+                  }
+                  // const attributeList = attributeListList.filter(e => e.attribute == attribute);
+                  // console.log("attributeList: " + JSON.stringify(attributeList, null, 2));
+                  // console.log("this.punkAttributesWithTokenIds: " + JSON.stringify(this.punkAttributesWithTokenIds, null, 2));
                   // const tokenIds = this.punkAttributesWithTokenIds[attributeType][attribute];
                   // console.log("tokenIds: " + JSON.stringify(tokenIds, null, 2));
                 }
+                console.log("selectedTokenIds 3: " + selectedTokenIds.length + " " + JSON.stringify(selectedTokenIds));
               }
             }
             return results;
@@ -5138,18 +5161,18 @@
 
           },
           async loadCurrentData() {
-            console.log(moment().format("YYYY-MM-DD HH:mm:ss") + " " + "loadCurrentData");
+            // console.log(moment().format("YYYY-MM-DD HH:mm:ss") + " " + "loadCurrentData");
             const db = new Dexie(this.db.name);
             db.version(this.db.version).stores(this.db.schemaDefinition);
             const indexToAddressDataItems = await db.cache.where("objectName").equals(this.chainId + "_indexToAddress").toArray();
             if (indexToAddressDataItems.length == 1) {
               Vue.set(this, 'indexToAddress', indexToAddressDataItems[0].object);
-              console.log(moment().format("YYYY-MM-DD HH:mm:ss") + " " + "loadCurrentData - indexToAddress: " + JSON.stringify(this.indexToAddress.slice(0, 3)) + ", ...");
+              // console.log(moment().format("YYYY-MM-DD HH:mm:ss") + " " + "loadCurrentData - indexToAddress: " + JSON.stringify(this.indexToAddress.slice(0, 3)) + ", ...");
             }
             const addressToIndexDataItems = await db.cache.where("objectName").equals(this.chainId + "_addressToIndex").toArray();
             if (addressToIndexDataItems.length == 1) {
               Vue.set(this, 'addressToIndex', addressToIndexDataItems[0].object);
-              console.log(moment().format("YYYY-MM-DD HH:mm:ss") + " " + "loadCurrentData - addressToIndex: " + JSON.stringify(Object.entries(this.addressToIndex).slice(0, 3)) + ", ...");
+              // console.log(moment().format("YYYY-MM-DD HH:mm:ss") + " " + "loadCurrentData - addressToIndex: " + JSON.stringify(Object.entries(this.addressToIndex).slice(0, 3)) + ", ...");
             }
             const eventsDataItems = await db.cache.where("objectName").equals(this.chainId + "_events").toArray();
             if (eventsDataItems.length == 1) {
@@ -5599,12 +5622,12 @@
                 this.connected = false;
               }
             }
-            console.log(moment().format("HH:mm:ss") + " connectToWeb3 - connected: " + this.connected);
+            // console.log(moment().format("HH:mm:ss") + " connectToWeb3 - connected: " + this.connected);
             if (!this.connected) {
               alert("Please use the https://metamask.io addon with Firefox, Chromium, Opera or Chrome, or any other other web3 browser, for web3 data retrieval. And refresh!");
             } else {
               const t = this;
-              console.log(moment().format("HH:mm:ss") + " connectToWeb3 - installing listeners");
+              // console.log(moment().format("HH:mm:ss") + " connectToWeb3 - installing listeners");
               function handleChainChanged(_chainId) {
                 t.chainId = _chainId;
                 console.log(moment().format("HH:mm:ss") + " connectToWeb3 - handleChainChanged - this.chainId: " + t.chainId);
@@ -5620,7 +5643,7 @@
               }
               window.ethereum.on('accountsChanged', handleAccountsChanged);
               async function handleNewBlock(blockNumber) {
-                console.log(moment().format("HH:mm:ss") + " handleNewBlock - New Block #" + blockNumber);
+                // console.log(moment().format("HH:mm:ss") + " handleNewBlock - New Block #" + blockNumber);
                 const block = await provider.getBlock();
                 t.blockNumber = blockNumber;
                 t.timestamp = block.timestamp;
