@@ -388,6 +388,9 @@
                         <b-img-lazy width="100%" :src="'images/punks/punk' + data.item.punkId.toString().padStart(4, '0') + '.png'" style="background-color: #638596"/>
                       </b-link>
                     </template>
+                    <template #cell(attribute)="data">
+                      {{ data.item.attributes }}
+                    </template>
                   </b-table>
                 </b-col>
               </b-row>
@@ -1640,7 +1643,7 @@
           punksFields: [
             { key: 'punkId', label: 'PunkId', sortable: false, thStyle: 'width: 15%;', thClass: 'text-right', tdClass: 'text-right' },
             { key: 'image', label: 'Image', sortable: false, thStyle: 'width: 45%;', thClass: 'text-left', tdClass: 'text-left' },
-            { key: 'punkAttribute', label: 'Attributes', sortable: false, thStyle: 'width: 50%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'attribute', label: 'Attributes', sortable: false, thStyle: 'width: 50%;', thClass: 'text-left', tdClass: 'text-left' },
           ],
           punkAttributesFields: [
             { key: 'select', label: '', thStyle: 'width: 10%;' },
@@ -1971,8 +1974,8 @@
             // console.log("filteredPunks - this.settings.filters: " + JSON.stringify(this.settings.filters));
             let stage1Data = this.punkAttributes;
             if (Object.keys(this.settings.filters).length == 0) {
-              for (const [punkAttributeIndex, punkAttribute] of this.punkAttributes.entries()) {
-                results.push({ punkId: punkAttributeIndex, punkAttribute });
+              for (const [punkId, attributes] of this.punkAttributes.entries()) {
+                results.push({ punkId, attributes });
               }
             } else {
               let selectedTokenIds = [];
@@ -1993,8 +1996,8 @@
                   selectedTokenIds = selectedTokenIds.filter(tokenId => thisAttributeTypeTokenIds.includes(tokenId));
                 }
               }
-              for (const tokenId of selectedTokenIds) {
-                results.push({ punkId: tokenId, punkAttribute: this.punkAttributes[tokenId] });
+              for (const punkId of selectedTokenIds) {
+                results.push({ punkId, attributes: this.punkAttributes[punkId] });
               }
             }
             // console.log(moment().format("YYYY-MM-DD HH:mm:ss") + " filteredPunks - results: " + JSON.stringify(results.slice(0, 10)) + ", ...");
