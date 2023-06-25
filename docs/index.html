@@ -1775,7 +1775,7 @@
             "ProxyRegistered",
           ],
           db: {
-            name: "cryptopunksdata088a",
+            name: "cryptopunksdata088b",
             version: 1,
             schemaDefinition: {
               cache: '&objectName',
@@ -2935,7 +2935,7 @@
               addressToIndex = addressToIndexDataItems[0].object;
               // console.log("addressToIndex: " + JSON.stringify(addressToIndex));
             }
-            for (const address of [ADDRESS0, this.coinbase]) {
+            for (const address of [ADDRESS0, CRYPTOPUNKSV1ADDRESS, CRYPTOPUNKSV2ADDRESS, WRAPPEDCRYPTOPUNKSV1ADDRESS, WRAPPEDCRYPTOPUNKSV2ADDRESS, this.coinbase]) {
               if (!(address in addressToIndex)) {
                 addressToIndex[address] = indexToAddress.length;
                 indexToAddress.push(address);
