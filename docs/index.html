@@ -389,8 +389,9 @@
                       </b-link>
                     </template>
                     <template #cell(attribute)="data">
-
-                      {{ data.item.attributes }}
+                      <span v-for="(attribute, attributeIndex) in data.item.attributes" v-bind:key="attributeIndex">
+                        {{ slugToTitle(attribute.trait_type) + ':' + slugToTitle(attribute.value) }}
+                      </span>
                     </template>
                   </b-table>
                 </b-col>
