@@ -361,7 +361,7 @@
                         <font size="-2">
                           <b-table small fixed striped sticky-header="200px" :fields="punkAttributesFields" :items="punkAttribute.attributeList" head-variant="light">
                             <template #cell(select)="data">
-                              <!-- <b-form-checkbox size="sm" :checked="(tokenAttributesFilter[attributeType.attributeType] && tokenAttributesFilter[attributeType.attributeType].attributeOption) ? 1 : 0" value="1" @change="collectionFilterChange(attributeType.attributeType, data.item.attribute)"></b-form-checkbox> -->
+                              <b-form-checkbox size="sm" :checked="(settings.filters[punkAttribute.attributeType] && settings.filters[punkAttribute.attributeType][data.item.attribute]) ? 1 : 0" value="1" @change="filterChanged(punkAttribute.attributeType, data.item.attribute)"></b-form-checkbox>
                             </template>
                             <template #cell(attributeOption)="data">
                               {{ data.item.attribute }}
@@ -1964,7 +1964,7 @@
               for (const [attribute, punks] of Object.entries(attributes)) {
                 attributeList.push({ attribute, punks });
               }
-              attributeList.sort((a, b) => b.punks.length - a.punks.length);
+              attributeList.sort((a, b) => a.punks.length - b.punks.length);
               results.push({ attributeType, attributeList });
             }
             results.sort((a, b) => ('' + a.attributeType).localeCompare(b.attributeType))
@@ -3412,6 +3412,7 @@
             } else {
               Vue.set(this.settings.filters[dataType], option, true);
             }
+            console.log("filterChanged - this.settings.filters: " + JSON.stringify(this.settings.filters));
             this.saveSettings();
           },
           resetAdditionalFilters() {
