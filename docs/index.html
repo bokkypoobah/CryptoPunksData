@@ -391,10 +391,6 @@
                   </b-table>
                 </b-col>
               </b-row>
-
-
-              {{ punkAttributesWithTokenIds }}
-
             </b-card-text>
           </b-card>
 
@@ -1968,16 +1964,14 @@
               results.push({ attributeType, attributeList });
             }
             results.sort((a, b) => ('' + a.attributeType).localeCompare(b.attributeType))
-            // console.log("results: " + JSON.stringify(results));
             return results;
           },
           filteredPunks() {
             const results = [];
-            console.log("filteredPunks - this.settings.filters: " + JSON.stringify(this.settings.filters));
+            // console.log("filteredPunks - this.settings.filters: " + JSON.stringify(this.settings.filters));
             let stage1Data = this.punkAttributes;
             if (Object.keys(this.settings.filters).length == 0) {
               for (const [punkAttributeIndex, punkAttribute] of this.punkAttributes.entries()) {
-                // console.log(JSON.stringify(punkAttribute));
                 results.push({ punkId: punkAttributeIndex, punkAttribute });
               }
             } else {
@@ -1999,9 +1993,11 @@
                   selectedTokenIds = selectedTokenIds.filter(tokenId => thisAttributeTypeTokenIds.includes(tokenId));
                 }
               }
-              console.log("selectedTokenIds 3: " + selectedTokenIds.length + " " + JSON.stringify(selectedTokenIds));
+              for (const tokenId of selectedTokenIds) {
+                results.push({ punkId: tokenId, punkAttribute: this.punkAttributes[tokenId] });
+              }
             }
-            console.log("results: " + JSON.stringify(results.slice(0, 2), null, 2));
+            // console.log(moment().format("YYYY-MM-DD HH:mm:ss") + " filteredPunks - results: " + JSON.stringify(results.slice(0, 10)) + ", ...");
             return results;
           },
           filteredSortedPunks() {
@@ -3425,7 +3421,7 @@
             // console.log("saveSettings: " + JSON.stringify(this.settings));
           },
           filterChanged(dataType, option) {
-            console.log("filterChanged - dataType: " + dataType + ", option: " + JSON.stringify(option));
+            // console.log("filterChanged - dataType: " + dataType + ", option: " + JSON.stringify(option));
             if (!this.settings.filters[dataType]) {
               Vue.set(this.settings.filters, dataType, {});
             }
@@ -3437,7 +3433,7 @@
             } else {
               Vue.set(this.settings.filters[dataType], option, true);
             }
-            console.log("filterChanged - this.settings.filters: " + JSON.stringify(this.settings.filters));
+            // console.log("filterChanged - this.settings.filters: " + JSON.stringify(this.settings.filters));
             this.saveSettings();
           },
           resetAdditionalFilters() {
