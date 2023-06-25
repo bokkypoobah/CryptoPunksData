@@ -354,7 +354,7 @@
                         <b-card header-class="m-0 px-2 pt-2 pb-0" body-class="p-0" class="m-0 p-0 border-0">
                           <template #header>
                             <span variant="secondary" class="small truncate">
-                              {{ punkAttribute.attributeType }}
+                              {{ slugToTitle(punkAttribute.attributeType) }}
                             </span>
                           </template>
                         </b-card>
@@ -364,7 +364,7 @@
                               <b-form-checkbox size="sm" :checked="(settings.filters[punkAttribute.attributeType] && settings.filters[punkAttribute.attributeType][data.item.attribute]) ? 1 : 0" value="1" @change="filterChanged(punkAttribute.attributeType, data.item.attribute)"></b-form-checkbox>
                             </template>
                             <template #cell(attributeOption)="data">
-                              {{ data.item.attribute }}
+                              {{ slugToTitle(data.item.attribute) }}
                             </template>
                             <template #cell(attributeTotal)="data">
                               {{ data.item.punks.length }}
@@ -389,6 +389,7 @@
                       </b-link>
                     </template>
                     <template #cell(attribute)="data">
+
                       {{ data.item.attributes }}
                     </template>
                   </b-table>
@@ -2638,6 +2639,16 @@
 
         // --- METHODS ---
         methods: {
+          slugToTitle(slug) {
+            var words = slug.toString().split("-");
+            return words.map(function(word) {
+              if (word == "3d" || word == "vr") {
+                return word.toUpperCase();
+              } else {
+                return word.charAt(0).toUpperCase() + word.substring(1).toLowerCase();
+              }
+            }).join(' ');
+          },
           pairsRowSelected(items) {
             console.log("pairsRowSelected: " + JSON.stringify(items));
             const pairKey = items[0].pairKey;
