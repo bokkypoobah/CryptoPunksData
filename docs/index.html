@@ -1973,9 +1973,24 @@
           },
           filteredPunks() {
             const results = [];
-            for (const [punkAttributeIndex, punkAttribute] of this.punkAttributes.entries()) {
-              // console.log(JSON.stringify(punkAttribute));
-              results.push({ punkId: punkAttributeIndex, punkAttribute });
+            console.log("filteredPunks - this.settings.filters: " + JSON.stringify(this.settings.filters));
+            let stage1Data = this.punkAttributes;
+            if (Object.keys(this.settings.filters).length == 0) {
+              for (const [punkAttributeIndex, punkAttribute] of this.punkAttributes.entries()) {
+                // console.log(JSON.stringify(punkAttribute));
+                results.push({ punkId: punkAttributeIndex, punkAttribute });
+              }
+            } else {
+              for (const [attributeType, attributeList] of Object.entries(this.settings.filters)) {
+                let thisAttributeTypeTokenIds = [];
+                console.log(attributeType + " => " + JSON.stringify(attributeList));
+                for (const attribute of Object.keys(attributeList)) {
+                  console.log("attribute: " + attribute);
+                  console.log("this.punkAttributesWithTokenIds: " + JSON.stringify(this.punkAttributesWithTokenIds, null, 2));
+                  // const tokenIds = this.punkAttributesWithTokenIds[attributeType][attribute];
+                  // console.log("tokenIds: " + JSON.stringify(tokenIds, null, 2));
+                }
+              }
             }
             return results;
           },
