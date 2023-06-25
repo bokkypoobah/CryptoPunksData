@@ -1984,37 +1984,24 @@
               let selectedTokenIds = [];
               for (const [attributeType, attributeList] of Object.entries(this.settings.filters)) {
                 let thisAttributeTypeTokenIds = [];
-                console.log(attributeType + " => " + JSON.stringify(attributeList));
                 for (const attribute of Object.keys(attributeList)) {
-                  console.log("attribute: " + attribute);
                   for (const attributeInfo of this.punkAttributesWithTokenIds) {
                     if (attributeInfo.attributeType == attributeType) {
-                      // console.log("attributeInfo: " + JSON.stringify(attributeInfo));
                       const tokenIds = attributeInfo.attributeList.filter(e => e.attribute == attribute).map(e => e.punks).flat();
-                      console.log("tokenIds: " + JSON.stringify(tokenIds));
-                      console.log("thisAttributeTypeTokenIds BEFORE: " + JSON.stringify(thisAttributeTypeTokenIds));
                       thisAttributeTypeTokenIds = [...thisAttributeTypeTokenIds, ...tokenIds];
-                      console.log("thisAttributeTypeTokenIds AFTER: " + JSON.stringify(thisAttributeTypeTokenIds));
                       break;
-                      // console.log("selectedTokenIds: " + JSON.stringify(selectedTokenIds));
                     }
                   }
-                  if (selectedTokenIds.length == 0) {
-                    selectedTokenIds = thisAttributeTypeTokenIds;
-                    console.log("selectedTokenIds 1: " + JSON.stringify(selectedTokenIds));
-                  } else {
-                    selectedTokenIds = selectedTokenIds.filter(tokenId => thisAttributeTypeTokenIds.includes(tokenId));
-                    console.log("selectedTokenIds 2: " + JSON.stringify(selectedTokenIds));
-                  }
-                  // const attributeList = attributeListList.filter(e => e.attribute == attribute);
-                  // console.log("attributeList: " + JSON.stringify(attributeList, null, 2));
-                  // console.log("this.punkAttributesWithTokenIds: " + JSON.stringify(this.punkAttributesWithTokenIds, null, 2));
-                  // const tokenIds = this.punkAttributesWithTokenIds[attributeType][attribute];
-                  // console.log("tokenIds: " + JSON.stringify(tokenIds, null, 2));
                 }
-                console.log("selectedTokenIds 3: " + selectedTokenIds.length + " " + JSON.stringify(selectedTokenIds));
+                if (selectedTokenIds.length == 0) {
+                  selectedTokenIds = thisAttributeTypeTokenIds;
+                } else {
+                  selectedTokenIds = selectedTokenIds.filter(tokenId => thisAttributeTypeTokenIds.includes(tokenId));
+                }
               }
+              console.log("selectedTokenIds 3: " + selectedTokenIds.length + " " + JSON.stringify(selectedTokenIds));
             }
+            console.log("results: " + JSON.stringify(results.slice(0, 2), null, 2));
             return results;
           },
           filteredSortedPunks() {
