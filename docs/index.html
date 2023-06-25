@@ -3446,7 +3446,6 @@
             // console.log("saveSettings: " + JSON.stringify(this.settings));
           },
           filterChanged(dataType, option) {
-            // console.log("filterChanged - dataType: " + dataType + ", option: " + JSON.stringify(option));
             if (!this.settings.filters[dataType]) {
               Vue.set(this.settings.filters, dataType, {});
             }
@@ -3458,7 +3457,6 @@
             } else {
               Vue.set(this.settings.filters[dataType], option, true);
             }
-            // console.log("filterChanged - this.settings.filters: " + JSON.stringify(this.settings.filters));
             this.saveSettings();
           },
           resetFilters() {
