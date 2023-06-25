@@ -399,7 +399,8 @@
                     </template>
                     <template #cell(attribute)="data">
                       <span v-for="(attribute, attributeIndex) in data.item.attributes" v-bind:key="attributeIndex">
-                        {{ slugToTitle(attribute.trait_type) + ':' + slugToTitle(attribute.value) }}
+                        <!-- {{ /*slugToTitle(attribute.trait_type) + ':' +*/ slugToTitle(attribute.value) }} -->
+                        <b-badge size="sm" pill variant="light" v-b-popover.hover.bottom="slugToTitle(attribute.trait_type)" class="mr-1">{{ slugToTitle(attribute.value) }}</b-badge>
                       </span>
                     </template>
                   </b-table>
