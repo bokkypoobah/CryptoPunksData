@@ -3107,6 +3107,7 @@
                   console.log(e);
                   batchSize = parseInt(batchSize * BATCHREDUCTIONFACTOR);
                 }
+                // done = fromBlock >= blockNumber || newEvents > 10000; // TODO
                 done = fromBlock >= blockNumber || newEvents > 10000; // TODO
               } while (!done && !this.sync.halt);
               console.log("indexToAddress: " + JSON.stringify(indexToAddress, null, 2));
