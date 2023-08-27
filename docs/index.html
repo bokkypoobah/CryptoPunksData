@@ -2948,10 +2948,7 @@
                 addressToIndex[process.address] = indexToAddress.length;
                 indexToAddress.push(process.address);
               }
-
-
               let events = {};
-
               async function getLogs(fromBlock, toBlock, processLogs) {
                 try {
                   const filter = { address: process.address, fromBlock, toBlock, topics: [null, null, null] };
@@ -2967,6 +2964,19 @@
               function processLogs(fromBlock, toBlock, logs) {
                 total = parseInt(total) + logs.length;
                 console.log(moment().format("YYYY-MM-DD HH:mm:ss") + " " + fromBlock + " - " + toBlock + " " + logs.length + " " + total);
+                for (const event of logs) {
+                  if (!event.removed) {
+                    const logData = contract.interface.parseLog(event);
+                    const txHash = event.transactionHash;
+                    const blockNumber = event.blockNumber;
+                    const transactionIndex = event.transactionIndex;
+                    const logIndex = event.logIndex;
+                    const eventType = logData.eventFragment.name;
+                    // const eventTypeIndex = this.eventTypesToIndex[eventType];
+                    // console.log("logData: " + JSON.stringify(logData));
+                    console.log(blockNumber + "." + transactionIndex + " " + eventType);
+                  }
+                }
               }
               await getLogs(process.deploymentBlockNumber, block.number, processLogs);
 
