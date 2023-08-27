@@ -2949,6 +2949,7 @@
                 indexToAddress.push(process.address);
               }
               let events = {};
+              const t = this;
               async function getLogs(fromBlock, toBlock, processLogs) {
                 try {
                   const filter = { address: process.address, fromBlock, toBlock, topics: [null, null, null] };
@@ -2961,6 +2962,7 @@
                 }
               }
               let total = 0;
+              let newEvents = 0;
               function processLogs(fromBlock, toBlock, logs) {
                 total = parseInt(total) + logs.length;
                 console.log(moment().format("YYYY-MM-DD HH:mm:ss") + " " + fromBlock + " - " + toBlock + " " + logs.length + " " + total);
@@ -2972,13 +2974,134 @@
                     const transactionIndex = event.transactionIndex;
                     const logIndex = event.logIndex;
                     const eventType = logData.eventFragment.name;
-                    // const eventTypeIndex = this.eventTypesToIndex[eventType];
+                    const eventTypeIndex = t.eventTypesToIndex[eventType];
                     // console.log("logData: " + JSON.stringify(logData));
                     console.log(blockNumber + "." + transactionIndex + " " + eventType);
+
+                    if (eventType == "Assign") {
+                      const [to, punkIndex] = logData.args;
+                      if (!(to in addressToIndex)) {
+                        addressToIndex[to] = indexToAddress.length;
+                        indexToAddress.push(to);
+                      }
+                      const toIndex = addressToIndex[to];
+                      record = [eventTypeIndex, toIndex, parseInt(punkIndex) ];
+                    // } else if (eventType == "Transfer") {
+                    //   const [from, to, value] = logData.args;
+                    //   for (const address of [from, to]) {
+                    //     if (!(address in addressToIndex)) {
+                    //       addressToIndex[address] = indexToAddress.length;
+                    //       indexToAddress.push(address);
+                    //     }
+                    //   }
+                    //   const fromIndex = addressToIndex[from];
+                    //   const toIndex = addressToIndex[to];
+                    //   record = [ eventTypeIndex, fromIndex, toIndex, parseInt(value) ];
+                    // } else if (eventType == "PunkTransfer") {
+                    //   const [from, to, punkIndex] = logData.args;
+                    //   for (const address of [from, to]) {
+                    //     if (!(address in addressToIndex)) {
+                    //       addressToIndex[address] = indexToAddress.length;
+                    //       indexToAddress.push(address);
+                    //     }
+                    //   }
+                    //   const fromIndex = addressToIndex[from];
+                    //   const toIndex = addressToIndex[to];
+                    //   record = [ eventTypeIndex, fromIndex, toIndex, parseInt(punkIndex)];
+                    // } else if (eventType == "PunkOffered") {
+                    //   const [punkIndex, minValue, toAddress] = logData.args;
+                    //   if (!(toAddress in addressToIndex)) {
+                    //     addressToIndex[toAddress] = indexToAddress.length;
+                    //     indexToAddress.push(toAddress);
+                    //   }
+                    //   const toAddressIndex = addressToIndex[toAddress];
+                    //   record = [ eventTypeIndex, parseInt(punkIndex), minValue.toString(), toAddressIndex ];
+                    // } else if (eventType == "PunkBought") {
+                    //   const [punkIndex, value, fromAddress, toAddress] = logData.args;
+                    //   for (const address of [fromAddress, toAddress]) {
+                    //     if (!(address in addressToIndex)) {
+                    //       addressToIndex[address] = indexToAddress.length;
+                    //       indexToAddress.push(address);
+                    //     }
+                    //   }
+                    //   const fromAddressIndex = addressToIndex[fromAddress];
+                    //   const toAddressIndex = addressToIndex[toAddress];
+                    //   record = [ eventTypeIndex, parseInt(punkIndex), value.toString(), fromAddressIndex, toAddressIndex ];
+                    // } else if (eventType == "PunkNoLongerForSale") {
+                    //   const [punkIndex] = logData.args;
+                    //   record = [ eventTypeIndex, parseInt(punkIndex) ];
+                    // } else if (eventType == "PunkBidEntered") {
+                    //   const [punkIndex, value, fromAddress] = logData.args;
+                    //   if (!(fromAddress in addressToIndex)) {
+                    //     addressToIndex[fromAddress] = indexToAddress.length;
+                    //     indexToAddress.push(fromAddress);
+                    //   }
+                    //   const fromAddressIndex = addressToIndex[fromAddress];
+                    //   record = [ eventTypeIndex, parseInt(punkIndex), value.toString(), fromAddressIndex ];
+                    // } else if (eventType == "PunkBidWithdrawn") {
+                    //   const [punkIndex, value, fromAddress] = logData.args;
+                    //   if (!(fromAddress in addressToIndex)) {
+                    //     addressToIndex[fromAddress] = indexToAddress.length;
+                    //     indexToAddress.push(fromAddress);
+                    //   }
+                    //   const fromAddressIndex = addressToIndex[fromAddress];
+                    //   record = [ eventTypeIndex, parseInt(punkIndex), value.toString(), fromAddressIndex ];
+                    // } else if (eventType == "OwnershipTransferred") {
+                    //   const [previousOwner, newOwner] = logData.args;
+                    //   record = [ eventTypeIndex, previousOwner, newOwner ];
+                    // } else if (eventType == "Approval") {
+                    //   const [owner, approved, tokenId] = logData.args;
+                    //   for (const address of [owner, approved]) {
+                    //     if (!(address in addressToIndex)) {
+                    //       addressToIndex[address] = indexToAddress.length;
+                    //       indexToAddress.push(address);
+                    //     }
+                    //   }
+                    //   const ownerIndex = addressToIndex[owner];
+                    //   const approvedIndex = addressToIndex[approved];
+                    //   record = [ eventTypeIndex, ownerIndex, approvedIndex, tokenId.toString() ];
+                    // } else if (eventType == "ApprovalForAll") {
+                    //   const [owner, operator, approved] = logData.args;
+                    //   for (const address of [owner, operator]) {
+                    //     if (!(address in addressToIndex)) {
+                    //       addressToIndex[address] = indexToAddress.length;
+                    //       indexToAddress.push(address);
+                    //     }
+                    //   }
+                    //   const ownerIndex = addressToIndex[owner];
+                    //   const operatorIndex = addressToIndex[operator];
+                    //   record = [ eventTypeIndex, ownerIndex, operatorIndex, approved ];
+                    // } else if (eventType == "Paused") {
+                    //   const [account] = logData.args;
+                    //   record = [ eventTypeIndex, account ];
+                    // } else if (eventType == "Unpaused") {
+                    //   const [account] = logData.args;
+                    //   record = [ eventTypeIndex, account ];
+                    } else {
+                      console.log("UNKNOWN eventType: " + eventType);
+                    }
+                    console.log("record: " + JSON.stringify(record));
+
+                    if (record) {
+                      if (!(blockNumber in events)) {
+                        events[blockNumber] = {};
+                      }
+                      if (!(transactionIndex in events[blockNumber])) {
+                        events[blockNumber][transactionIndex] = {};
+                      }
+                      if (!(txHash in events[blockNumber][transactionIndex])) {
+                        events[blockNumber][transactionIndex][txHash] = {};
+                      }
+                      if (!(logIndex in events[blockNumber][transactionIndex][txHash])) {
+                        events[blockNumber][transactionIndex][txHash][logIndex] = record;
+                        newEvents++;
+                      }
+                    }
                   }
                 }
               }
               await getLogs(process.deploymentBlockNumber, block.number, processLogs);
+              console.log("events: " + JSON.stringify(events, null, 2));
 
 
               if (false) {
