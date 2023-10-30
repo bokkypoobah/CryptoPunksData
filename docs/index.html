@@ -2890,8 +2890,8 @@
             // v1 v2 event PunkOffered(uint indexed punkIndex, uint minValue, address indexed toAddress);
             // v1 v2 event PunkBought(uint indexed punkIndex, uint value, address indexed fromAddress, address indexed toAddress);
             // v1 v2 event PunkNoLongerForSale(uint indexed punkIndex);
-            // v2 event PunkBidEntered(uint indexed punkIndex, uint value, address indexed fromAddress);
-            // v2 event PunkBidWithdrawn(uint indexed punkIndex, uint value, address indexed fromAddress);
+            //    v2 event PunkBidEntered(uint indexed punkIndex, uint value, address indexed fromAddress);
+            //    v2 event PunkBidWithdrawn(uint indexed punkIndex, uint value, address indexed fromAddress);
             // w1 w2 event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
             // w1 w2 event Transfer(address indexed from, address indexed to, uint256 indexed tokenId);
             // w1 w2 event Approval(address indexed owner, address indexed approved, uint256 indexed tokenId);
@@ -2913,13 +2913,13 @@
             const blockNumber = block && (block.number - CONFIRMATIONS) || null;
             console.log(moment().format("HH:mm:ss") + " syncCryptoPunksData - blockNumber: " + blockNumber + ", chainId: " + this.chainId);
 
-            // console.log("this.indexToEventTypes: " + JSON.stringify(this.indexToEventTypes));
-            // console.log("this.eventTypesToIndex: " + JSON.stringify(this.eventTypesToIndex));
+            console.log("this.indexToEventTypes: " + JSON.stringify(this.indexToEventTypes));
+            console.log("this.eventTypesToIndex: " + JSON.stringify(this.eventTypesToIndex));
 
             const processes = [
-              { name: "v1", address: CRYPTOPUNKSV1ADDRESS, abi: CRYPTOPUNKSV1ABI, deploymentBlockNumber: CRYPTOPUNKSV1DEPLOYMENTBLOCKNUMBER },
-              { name: "v2", address: CRYPTOPUNKSV2ADDRESS, abi: CRYPTOPUNKSV2ABI, deploymentBlockNumber: CRYPTOPUNKSV2DEPLOYMENTBLOCKNUMBER },
-              { name: "wrappedV1", address: WRAPPEDCRYPTOPUNKSV1ADDRESS, abi: WRAPPEDCRYPTOPUNKSV1ABI, deploymentBlockNumber: WRAPPEDCRYPTOPUNKSV1DEPLOYMENTBLOCKNUMBER },
+              // { name: "v1", address: CRYPTOPUNKSV1ADDRESS, abi: CRYPTOPUNKSV1ABI, deploymentBlockNumber: CRYPTOPUNKSV1DEPLOYMENTBLOCKNUMBER },
+              // { name: "v2", address: CRYPTOPUNKSV2ADDRESS, abi: CRYPTOPUNKSV2ABI, deploymentBlockNumber: CRYPTOPUNKSV2DEPLOYMENTBLOCKNUMBER },
+              // { name: "wrappedV1", address: WRAPPEDCRYPTOPUNKSV1ADDRESS, abi: WRAPPEDCRYPTOPUNKSV1ABI, deploymentBlockNumber: WRAPPEDCRYPTOPUNKSV1DEPLOYMENTBLOCKNUMBER },
               { name: "wrappedV2", address: WRAPPEDCRYPTOPUNKSV2ADDRESS, abi: WRAPPEDCRYPTOPUNKSV2ABI, deploymentBlockNumber: WRAPPEDCRYPTOPUNKSV2DEPLOYMENTBLOCKNUMBER },
             ];
 
@@ -3103,6 +3103,7 @@
               await getLogs(process.deploymentBlockNumber, block.number, processLogs);
               console.log("events: " + JSON.stringify(events, null, 2));
 
+              console.log("addressToIndex: " + JSON.stringify(addressToIndex, null, 2));
               console.log("indexToAddress: " + JSON.stringify(indexToAddress, null, 2));
               console.log("events: " + JSON.stringify(events, null, 2));
               Vue.set(this, "addressToIndex", addressToIndex);
