@@ -1,0 +1,1 @@
+indexToEventTypes: ["Assign","Transfer","Approve","PunkOffered","PunkBidEntered","PunkNoLongerForSale","PunkBought","PunkBidWithdrawn","PunkTransfer","Approval","ApprovalForAll","OwnershipTransferred","ProxyRegistered"]
