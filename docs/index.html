@@ -2985,7 +2985,7 @@
                         indexToAddress.push(to);
                       }
                       const toIndex = addressToIndex[to];
-                      record = [eventTypeIndex, toIndex, parseInt(punkIndex) ];
+                      record = [eventTypeIndex, toIndex, parseInt(punkIndex)];
                     } else if (eventType == "Transfer") {
                       const [from, to, value] = logData.args;
                       for (const address of [from, to]) {
