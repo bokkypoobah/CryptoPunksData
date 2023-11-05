@@ -2896,8 +2896,9 @@
             // w1 w2 event Transfer(address indexed from, address indexed to, uint256 indexed tokenId);
             // w1 w2 event Approval(address indexed owner, address indexed approved, uint256 indexed tokenId);
             // w1 w2 event ApprovalForAll(address indexed owner, address indexed operator, bool approved);
-            // w2 event Paused(address account);
-            // w2 event Unpaused(address account);
+            //    w2 event Paused(address account);
+            //    w2 event Unpaused(address account);
+            //    w2 event ProxyRegistered(address user, address proxy);
 
             const CONFIRMATIONS = 20;
             console.log(moment().format("HH:mm:ss") + " syncCryptoPunksData - chainId: " + this.chainId);
@@ -3096,8 +3097,21 @@
                       }
                       const accountIndex = addressToIndex[account];
                       record = [ eventTypeIndex, accountIndex ];
+
+                    } else if (eventType == "ProxyRegistered") {
+                      const [user, proxy] = logData.args;
+                      for (const address of [user, proxy]) {
+                        if (!(address in addressToIndex)) {
+                          addressToIndex[address] = indexToAddress.length;
+                          indexToAddress.push(address);
+                        }
+                      }
+                      const userIndex = addressToIndex[user];
+                      const proxyIndex = addressToIndex[proxy];
+                      record = [ eventTypeIndex, userIndex, proxyIndex ];
+
                     } else {
-                      console.log("UNKNOWN eventType: " + eventType);
+                      console.log("--- UNKNOWN eventType: " + eventType + " ---");
                     }
                     console.log(blockNumber + "." + transactionIndex + " " + JSON.stringify(record));
 
