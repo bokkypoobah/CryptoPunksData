@@ -2950,20 +2950,9 @@
                 indexToAddress.push(process.address);
               }
               let events = {};
-              const t = this;
-              async function getLogs(fromBlock, toBlock, processLogs) {
-                try {
-                  const filter = { address: process.address, fromBlock, toBlock, topics: [null, null, null] };
-                  const eventLogs = await provider.getLogs(filter);
-                  processLogs(fromBlock, toBlock, eventLogs);
-                } catch (e) {
-                  const mid = parseInt((fromBlock + toBlock) / 2);
-                  await getLogs(fromBlock, mid, processLogs);
-                  await getLogs(parseInt(mid) + 1, toBlock, processLogs);
-                }
-              }
               let total = 0;
               let newEvents = 0;
+              
               function processLogs(fromBlock, toBlock, logs) {
                 total = parseInt(total) + logs.length;
                 console.log(moment().format("YYYY-MM-DD HH:mm:ss") + " " + fromBlock + " - " + toBlock + " " + logs.length + " " + total);
@@ -3133,6 +3122,20 @@
                   }
                 }
               }
+
+              const t = this;
+              async function getLogs(fromBlock, toBlock, processLogs) {
+                try {
+                  const filter = { address: process.address, fromBlock, toBlock, topics: [null, null, null] };
+                  const eventLogs = await provider.getLogs(filter);
+                  processLogs(fromBlock, toBlock, eventLogs);
+                } catch (e) {
+                  const mid = parseInt((fromBlock + toBlock) / 2);
+                  await getLogs(fromBlock, mid, processLogs);
+                  await getLogs(parseInt(mid) + 1, toBlock, processLogs);
+                }
+              }
+
               await getLogs(process.deploymentBlockNumber, block.number, processLogs);
               console.log("events: " + JSON.stringify(events, null, 2));
 
