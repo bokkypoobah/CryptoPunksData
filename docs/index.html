@@ -2977,6 +2977,7 @@
                     const eventTypeIndex = t.eventTypesToIndex[eventType];
                     // console.log("logData: " + JSON.stringify(logData));
                     // console.log(blockNumber + "." + transactionIndex + " " + eventType);
+                    let record = null;
 
                     if (eventType == "Assign") {
                       const [to, punkIndex] = logData.args;
@@ -3048,7 +3049,15 @@
                       record = [ eventTypeIndex, parseInt(punkIndex), value.toString(), fromAddressIndex ];
                     } else if (eventType == "OwnershipTransferred") {
                       const [previousOwner, newOwner] = logData.args;
-                      record = [ eventTypeIndex, previousOwner, newOwner ];
+                      for (const address of [previousOwner, newOwner]) {
+                        if (!(address in addressToIndex)) {
+                          addressToIndex[address] = indexToAddress.length;
+                          indexToAddress.push(address);
+                        }
+                      }
+                      const previousOwnerIndex = addressToIndex[previousOwner];
+                      const newOwnerIndex = addressToIndex[newOwner];
+                      record = [ eventTypeIndex, previousOwnerIndex, newOwnerIndex ];
                     } else if (eventType == "Approval") {
                       const [owner, approved, tokenId] = logData.args;
                       for (const address of [owner, approved]) {
@@ -3073,10 +3082,20 @@
                       record = [ eventTypeIndex, ownerIndex, operatorIndex, approved ];
                     } else if (eventType == "Paused") {
                       const [account] = logData.args;
-                      record = [ eventTypeIndex, account ];
+                      if (!(account in addressToIndex)) {
+                        addressToIndex[account] = indexToAddress.length;
+                        indexToAddress.push(fromAddress);
+                      }
+                      const accountIndex = addressToIndex[account];
+                      record = [ eventTypeIndex, accountIndex ];
                     } else if (eventType == "Unpaused") {
                       const [account] = logData.args;
-                      record = [ eventTypeIndex, account ];
+                      if (!(account in addressToIndex)) {
+                        addressToIndex[account] = indexToAddress.length;
+                        indexToAddress.push(fromAddress);
+                      }
+                      const accountIndex = addressToIndex[account];
+                      record = [ eventTypeIndex, accountIndex ];
                     } else {
                       console.log("UNKNOWN eventType: " + eventType);
                     }
