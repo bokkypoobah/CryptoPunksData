@@ -326,7 +326,7 @@
                 <div class="mt-0 flex-grow-1">
                 </div>
                 <div v-if="!sync.section" class="mt-0 pr-1">
-                  <b-button size="sm" @click="syncCryptoPunksData" variant="primary" v-b-popover.hover.top="'Sync CryptoPunksData'">Sync</b-button>
+                  <b-button size="sm" @click="syncCryptoPunksData" variant="primary" v-b-popover.hover.top="'Sync CryptoPunksData. This will take a few minutes initially, and seconds subsequently'">Sync</b-button>
                 </div>
                 <div class="mt-1" style="width: 250px;">
                   <b-progress v-if="sync.section != null" height="1.5rem" :max="sync.total" show-progress :animated="sync.section != null" :variant="sync.section != null ? 'success' : 'secondary'" v-b-popover.hover.top="'Click the button on the right to stop. This process can be continued later'">
@@ -3105,6 +3105,12 @@
                     console.log(blockNumber + "." + transactionIndex + " " + JSON.stringify(record));
 
                     if (record) {
+                      // TODO: Add unconfirmed flag
+                      // const confirmations = context.latestBlockNumber - blockNumber;
+                      // if (!(blockNumber in events)) {
+                      //   events[blockNumber] = confirmations < CONFIRMATIONS ? { unconfirmed: true } : {};
+                      // }
+
                       if (!(blockNumber in events)) {
                         events[blockNumber] = {};
                       }
