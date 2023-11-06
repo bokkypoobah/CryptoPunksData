@@ -1410,6 +1410,8 @@
             { name: "WrappedCryptoPunks V2", address: WRAPPEDCRYPTOPUNKSV2ADDRESS, abi: WRAPPEDCRYPTOPUNKSV2ABI, deploymentBlockNumber: WRAPPEDCRYPTOPUNKSV2DEPLOYMENTBLOCKNUMBER },
           ],
 
+          txs: {},
+
           newCoinAddress: null,
           newAddress: null,
           allowanceFormData: {
@@ -3118,6 +3120,8 @@
             }
             this.sync.section = null;
             this.sync.halt = false;
+
+            await this.loadCurrentData();
           },
           // newAccountResetModal() {
           //   this.newAddress = null;
@@ -3666,8 +3670,10 @@
 
             // console.log("DEBUG: " + JSON.stringify(this.contracts, null, 2));
             let count = 0;
+            const txs = {};
             for (const process of this.contracts) {
               console.log(moment().format("YYYY-MM-DD HH:mm:ss") + " loadCurrentData - processing: " + process.name);
+              const contractIndex = this.addressToIndex[process.address];
 
               const eventsDataItems = await db.cache.where("objectName").equals(this.chainId + "_" + process.address + "_events").toArray();
               if (eventsDataItems.length == 1) {
@@ -3682,8 +3688,12 @@
                 for (const [blockNumber, txIndexes] of Object.entries(events)) {
                   for (const [txIndex, txHashes] of Object.entries(txIndexes)) {
                     for (const [txHash, logIndexes] of Object.entries(txHashes)) {
+                      if (!(txHash in txs)) {
+                        txs[txHash] = [ parseInt(blockNumber), parseInt(txIndex), [] ];
+                      }
                       for (const [logIndex, txInfo] of Object.entries(logIndexes)) {
-                        if ((count % 1000) == 0) {
+                        txs[txHash][2].push([ parseInt(logIndex), contractIndex, ...txInfo ]);
+                        if ((count % 10000) == 0) {
                           console.log(count + " " + blockNumber + "/" + txIndex + "/" + txHash + "/" + logIndex + " => " + JSON.stringify(txInfo));
                         }
                         count++
@@ -3695,6 +3705,9 @@
               }
 
             }
+            // console.log(moment().format("YYYY-MM-DD HH:mm:ss") + " txs: " + JSON.stringify(txs));
+            this.txs = txs;
+            console.log(moment().format("YYYY-MM-DD HH:mm:ss") + " this.txs: " + JSON.stringify(this.txs));
 
             console.log(moment().format("YYYY-MM-DD HH:mm:ss") + " loadCurrentData END");
           },
