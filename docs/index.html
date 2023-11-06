@@ -335,9 +335,9 @@
                     </b-progress-bar>
                   </b-progress>
                 </div>
-                <!-- <div class="ml-0 mt-1">
+                <div class="ml-0 mt-1">
                   <b-button v-if="sync.section != null" size="sm" @click="halt" variant="link" v-b-popover.hover.top="'Click to stop. It may take a few minutes to clean up. This process can be continued later'"><b-icon-stop-fill shift-v="+1" font-scale="1.0"></b-icon-stop-fill></b-button>
-                </div> -->
+                </div>
                 <div class="mt-0 flex-grow-1">
                 </div>
                 <div class="mt-0 pl-1">
@@ -1340,74 +1340,6 @@
             showFilter: false,
             showAdditionalFilters: false,
             filters: {},
-            tokens: {
-              "0x03563574B3839e2CdD6281D8741497Ba82FD6739": {
-                  "sync": true,
-                  "include": true,
-                  "latestBlockNumber": null,
-                  "symbol": "BOKKY",
-                  "name": "BokkyPooBah wuz here!",
-                  "decimals": 18,
-                  "allowance": null,
-                  "balance": null,
-                  "totalSupply": "1000000000000000000000000",
-              },
-              "0x7439E9Bb6D8a84dd3A23fe621A30F95403F87fB9": {
-                  "sync": true,
-                  "include": true,
-                  "latestBlockNumber": null,
-                  "symbol": "WEENUS",
-                  "name": "Weenus 💪",
-                  "decimals": 18,
-                  "allowance": null,
-                  "balance": null,
-                  "totalSupply": "1008000000000000000000000",
-              },
-              "0x07391dbE03e7a0DEa0fce6699500da081537B6c3": {
-                  "sync": true,
-                  "include": true,
-                  "latestBlockNumber": null,
-                  "symbol": "WETH",
-                  "name": "Wrapped Ether",
-                  "decimals": 18,
-                  "allowance": null,
-                  "balance": null,
-                  "totalSupply": "0",
-              },
-              "0xc21d97673B9E0B3AA53a06439F71fDc1facE393B": {
-                  "sync": true,
-                  "include": true,
-                  "latestBlockNumber": null,
-                  "symbol": "XEENUS",
-                  "name": "Xeenus 💪",
-                  "decimals": 18,
-                  "allowance": null,
-                  "balance": null,
-                  "totalSupply": "1023000000000000000000000",
-              },
-              "0x93fCA4c6E2525C09c95269055B46f16b1459BF9d": {
-                  "sync": true,
-                  "include": true,
-                  "latestBlockNumber": null,
-                  "symbol": "YEENUS",
-                  "name": "Yeenus 💪",
-                  "decimals": 8,
-                  "allowance": null,
-                  "balance": null,
-                  "totalSupply": "100200000000000",
-              },
-              "0xe9EF74A6568E9f0e42a587C9363C9BcC582dcC6c": {
-                  "sync": true,
-                  "include": true,
-                  "latestBlockNumber": null,
-                  "symbol": "ZEENUS",
-                  "name": "Zeenus 💪",
-                  "decimals": 0,
-                  "allowance": null,
-                  "balance": null,
-                  "totalSupply": "1000000",
-              }
-            },
             punksTable: {
               filter: null,
               currentPage: 1,
@@ -1468,7 +1400,7 @@
               pageSize: 10,
               sortOption: 'lastsaledsc',
             },
-            version: 3,
+            version: 4,
           },
           newCoinAddress: null,
           newAddress: null,
@@ -3130,16 +3062,18 @@
               }
               const t = this;
               async function getLogs(fromBlock, toBlock, processLogs, section) {
-                try {
-                  const filter = { address: process.address, fromBlock, toBlock, topics: [null, null, null] };
-                  const eventLogs = await provider.getLogs(filter);
-                  processLogs(fromBlock, toBlock, eventLogs);
-                  t.sync.section = section;
-                  t.sync.completed = toBlock;
-                } catch (e) {
-                  const mid = parseInt((fromBlock + toBlock) / 2);
-                  await getLogs(fromBlock, mid, processLogs, section);
-                  await getLogs(parseInt(mid) + 1, toBlock, processLogs, section);
+                if (!t.sync.halt) {
+                  try {
+                    const filter = { address: process.address, fromBlock, toBlock, topics: [null, null, null] };
+                    const eventLogs = await provider.getLogs(filter);
+                    processLogs(fromBlock, toBlock, eventLogs);
+                    t.sync.section = section;
+                    t.sync.completed = toBlock;
+                  } catch (e) {
+                    const mid = parseInt((fromBlock + toBlock) / 2);
+                    await getLogs(fromBlock, mid, processLogs, section);
+                    await getLogs(parseInt(mid) + 1, toBlock, processLogs, section);
+                  }
                 }
               }
 
@@ -3157,16 +3091,14 @@
               const blockNumbers = Object.keys(events).sort((a, b) => { return b - a });
               // console.log("blockNumbers: " + JSON.stringify(blockNumbers));
               const startBlock = blockNumbers.length > 0 ? parseInt(blockNumbers[0]) + 1: process.deploymentBlockNumber;
-              console.log("startBlock: " + startBlock);
+              // console.log("startBlock: " + startBlock);
 
               this.sync.total = blockNumber;
               this.sync.completed = startBlock;
               await getLogs(startBlock, block.number, processLogs, process.name);
-              console.log("events: " + JSON.stringify(events, null, 2));
-
-              console.log("addressToIndex: " + JSON.stringify(addressToIndex, null, 2));
-              console.log("indexToAddress: " + JSON.stringify(indexToAddress, null, 2));
-              console.log("events: " + JSON.stringify(events, null, 2));
+              // console.log("addressToIndex: " + JSON.stringify(addressToIndex, null, 2));
+              // console.log("indexToAddress: " + JSON.stringify(indexToAddress, null, 2));
+              // console.log("events: " + JSON.stringify(events, null, 2));
               Vue.set(this, "addressToIndex", addressToIndex);
               Vue.set(this, "indexToAddress", indexToAddress);
               await db.cache.put({ objectName: this.chainId + "_indexToAddress", object: indexToAddress }).then (function() {
