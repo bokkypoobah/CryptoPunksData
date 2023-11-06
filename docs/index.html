@@ -3708,6 +3708,7 @@
             // console.log(moment().format("YYYY-MM-DD HH:mm:ss") + " txs: " + JSON.stringify(txs));
             this.txs = txs;
             console.log(moment().format("YYYY-MM-DD HH:mm:ss") + " this.txs: " + JSON.stringify(this.txs));
+            console.log(moment().format("YYYY-MM-DD HH:mm:ss") + " Unique txHashes: " + Object.keys(this.txs).length);
 
             console.log(moment().format("YYYY-MM-DD HH:mm:ss") + " loadCurrentData END");
           },
