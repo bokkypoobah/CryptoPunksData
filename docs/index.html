@@ -328,8 +328,8 @@
                 <div v-if="!sync.section" class="mt-0 pr-1">
                   <b-button size="sm" @click="syncCryptoPunksData" variant="primary" v-b-popover.hover.top="'Sync CryptoPunksData. This will take a few minutes initially, and seconds subsequently'">Sync</b-button>
                 </div>
-                <div class="mt-1" style="width: 250px;">
-                  <b-progress v-if="sync.section != null" height="1.5rem" :max="sync.total" show-progress :animated="sync.section != null" :variant="sync.section != null ? 'success' : 'secondary'" v-b-popover.hover.top="'Click the button on the right to stop. This process can be continued later'">
+                <div class="mt-1" style="width: 350px;">
+                  <b-progress v-if="sync.section != null" height="1.5rem" :max="sync.total" show-progress :animated="sync.section != null" :variant="sync.section != null ? 'success' : 'secondary'" v-b-popover.hover.top="'{processed blocked number}/{latest block number}. Click the button on the right to stop this process. This process can be continued later'">
                     <b-progress-bar :value="sync.completed">
                       {{ sync.total == null || sync.total == 0 ? (sync.completed + ' ' + sync.section) : (sync.completed + '/' + sync.total + ' ' + ((sync.completed / sync.total) * 100).toFixed(0) + '% ' + sync.section) }}
                     </b-progress-bar>
@@ -1402,6 +1402,14 @@
             },
             version: 4,
           },
+
+          contracts: [
+            { name: "CryptoPunks V1", address: CRYPTOPUNKSV1ADDRESS, abi: CRYPTOPUNKSV1ABI, deploymentBlockNumber: CRYPTOPUNKSV1DEPLOYMENTBLOCKNUMBER },
+            { name: "CryptoPunks V2", address: CRYPTOPUNKSV2ADDRESS, abi: CRYPTOPUNKSV2ABI, deploymentBlockNumber: CRYPTOPUNKSV2DEPLOYMENTBLOCKNUMBER },
+            { name: "WrappedCryptoPunks V1", address: WRAPPEDCRYPTOPUNKSV1ADDRESS, abi: WRAPPEDCRYPTOPUNKSV1ABI, deploymentBlockNumber: WRAPPEDCRYPTOPUNKSV1DEPLOYMENTBLOCKNUMBER },
+            { name: "WrappedCryptoPunks V2", address: WRAPPEDCRYPTOPUNKSV2ADDRESS, abi: WRAPPEDCRYPTOPUNKSV2ABI, deploymentBlockNumber: WRAPPEDCRYPTOPUNKSV2DEPLOYMENTBLOCKNUMBER },
+          ],
+
           newCoinAddress: null,
           newAddress: null,
           allowanceFormData: {
@@ -1707,7 +1715,7 @@
             "ProxyRegistered",
           ],
           db: {
-            name: "cryptopunksdata088c",
+            name: "cryptopunksdata088d",
             version: 1,
             schemaDefinition: {
               cache: '&objectName',
@@ -2832,7 +2840,7 @@
             //    w2 event Unpaused(address account);
             //    w2 event ProxyRegistered(address user, address proxy);
 
-            const CONFIRMATIONS = 20;
+            const CONFIRMATIONS = 1000;
             console.log(moment().format("HH:mm:ss") + " syncCryptoPunksData - chainId: " + this.chainId);
             const db = new Dexie(this.db.name);
             db.version(this.db.version).stores(this.db.schemaDefinition);
@@ -2843,18 +2851,11 @@
             const network = await provider.getNetwork();
             localStorage.cryptoPunksDataChainId = network.chainId;
             const block = await provider.getBlock();
-            const blockNumber = block && (block.number - CONFIRMATIONS) || null;
-            console.log(moment().format("HH:mm:ss") + " syncCryptoPunksData - blockNumber: " + blockNumber + ", chainId: " + this.chainId);
+            const latestBlockNumber = block && block.number || null;
+            console.log(moment().format("HH:mm:ss") + " syncCryptoPunksData - latestBlockNumber: " + latestBlockNumber + ", chainId: " + this.chainId);
 
             console.log("this.indexToEventTypes: " + JSON.stringify(this.indexToEventTypes));
             console.log("this.eventTypesToIndex: " + JSON.stringify(this.eventTypesToIndex));
-
-            const processes = [
-              { name: "v1", address: CRYPTOPUNKSV1ADDRESS, abi: CRYPTOPUNKSV1ABI, deploymentBlockNumber: CRYPTOPUNKSV1DEPLOYMENTBLOCKNUMBER },
-              { name: "v2", address: CRYPTOPUNKSV2ADDRESS, abi: CRYPTOPUNKSV2ABI, deploymentBlockNumber: CRYPTOPUNKSV2DEPLOYMENTBLOCKNUMBER },
-              { name: "wrappedV1", address: WRAPPEDCRYPTOPUNKSV1ADDRESS, abi: WRAPPEDCRYPTOPUNKSV1ABI, deploymentBlockNumber: WRAPPEDCRYPTOPUNKSV1DEPLOYMENTBLOCKNUMBER },
-              { name: "wrappedV2", address: WRAPPEDCRYPTOPUNKSV2ADDRESS, abi: WRAPPEDCRYPTOPUNKSV2ABI, deploymentBlockNumber: WRAPPEDCRYPTOPUNKSV2DEPLOYMENTBLOCKNUMBER },
-            ];
 
             let indexToAddress = [];
             let addressToIndex = {};
@@ -2874,7 +2875,7 @@
                 indexToAddress.push(address);
               }
             }
-            for (const process of processes) {
+            for (const process of this.contracts) {
               console.log("processing: " + process.name);
               // this.sync.section = process.name;
               const contract = new ethers.Contract(process.address, process.abi, provider);
@@ -3038,13 +3039,14 @@
 
                     if (record) {
                       // TODO: Add unconfirmed flag
-                      // const confirmations = context.latestBlockNumber - blockNumber;
+                      const confirmations = latestBlockNumber - blockNumber;
                       // if (!(blockNumber in events)) {
                       //   events[blockNumber] = confirmations < CONFIRMATIONS ? { unconfirmed: true } : {};
                       // }
 
                       if (!(blockNumber in events)) {
-                        events[blockNumber] = {};
+                        // events[blockNumber] = {};
+                        events[blockNumber] = confirmations < CONFIRMATIONS ? { unconfirmed: true } : {};
                       }
                       if (!(transactionIndex in events[blockNumber])) {
                         events[blockNumber][transactionIndex] = {};
@@ -3093,9 +3095,9 @@
               const startBlock = blockNumbers.length > 0 ? parseInt(blockNumbers[0]) + 1: process.deploymentBlockNumber;
               // console.log("startBlock: " + startBlock);
 
-              this.sync.total = blockNumber;
+              this.sync.total = latestBlockNumber;
               this.sync.completed = startBlock;
-              await getLogs(startBlock, block.number, processLogs, process.name);
+              await getLogs(startBlock, latestBlockNumber, processLogs, process.name);
               // console.log("addressToIndex: " + JSON.stringify(addressToIndex, null, 2));
               // console.log("indexToAddress: " + JSON.stringify(indexToAddress, null, 2));
               // console.log("events: " + JSON.stringify(events, null, 2));
@@ -3474,8 +3476,8 @@
             //     // // await this.testSyncENSNames(context);
             //   }
             // }
-            this.sync.section = null;
-            this.sync.halt = false;
+            // this.sync.section = null;
+            // this.sync.halt = false;
             db.close();
             // await this.loadCurrentData(); // TODO
           },
