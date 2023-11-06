@@ -2918,9 +2918,9 @@
             console.log("this.eventTypesToIndex: " + JSON.stringify(this.eventTypesToIndex));
 
             const processes = [
-              // { name: "v1", address: CRYPTOPUNKSV1ADDRESS, abi: CRYPTOPUNKSV1ABI, deploymentBlockNumber: CRYPTOPUNKSV1DEPLOYMENTBLOCKNUMBER },
-              // { name: "v2", address: CRYPTOPUNKSV2ADDRESS, abi: CRYPTOPUNKSV2ABI, deploymentBlockNumber: CRYPTOPUNKSV2DEPLOYMENTBLOCKNUMBER },
-              // { name: "wrappedV1", address: WRAPPEDCRYPTOPUNKSV1ADDRESS, abi: WRAPPEDCRYPTOPUNKSV1ABI, deploymentBlockNumber: WRAPPEDCRYPTOPUNKSV1DEPLOYMENTBLOCKNUMBER },
+              { name: "v1", address: CRYPTOPUNKSV1ADDRESS, abi: CRYPTOPUNKSV1ABI, deploymentBlockNumber: CRYPTOPUNKSV1DEPLOYMENTBLOCKNUMBER },
+              { name: "v2", address: CRYPTOPUNKSV2ADDRESS, abi: CRYPTOPUNKSV2ABI, deploymentBlockNumber: CRYPTOPUNKSV2DEPLOYMENTBLOCKNUMBER },
+              { name: "wrappedV1", address: WRAPPEDCRYPTOPUNKSV1ADDRESS, abi: WRAPPEDCRYPTOPUNKSV1ABI, deploymentBlockNumber: WRAPPEDCRYPTOPUNKSV1DEPLOYMENTBLOCKNUMBER },
               { name: "wrappedV2", address: WRAPPEDCRYPTOPUNKSV2ADDRESS, abi: WRAPPEDCRYPTOPUNKSV2ABI, deploymentBlockNumber: WRAPPEDCRYPTOPUNKSV2DEPLOYMENTBLOCKNUMBER },
             ];
 
@@ -3133,7 +3133,24 @@
                   await getLogs(parseInt(mid) + 1, toBlock, processLogs);
                 }
               }
-              await getLogs(process.deploymentBlockNumber, block.number, processLogs);
+
+              const eventsDataItems = await db.cache.where("objectName").equals(this.chainId + "_" + process.address + "_events").toArray();
+              if (eventsDataItems.length == 1) {
+                events = eventsDataItems[0].object;
+                // console.log("events: " + JSON.stringify(events, null, 2).substring(0, 1000));
+                Object.keys(events).forEach(function (key) {
+                  if ('unconfirmed' in events[key]) {
+                    console.log("DELETING: " + key + " => " + JSON.stringify(events[key]));
+                    delete events[key];
+                  }
+                });
+              }
+              const blockNumbers = Object.keys(events).sort((a, b) => { return b - a });
+              // console.log("blockNumbers: " + JSON.stringify(blockNumbers));
+              const startBlock = blockNumbers.length > 0 ? parseInt(blockNumbers[0]) + 1: process.deploymentBlockNumber;
+              console.log("startBlock: " + startBlock);
+
+              await getLogs(startBlock, block.number, processLogs);
               console.log("events: " + JSON.stringify(events, null, 2));
 
               console.log("addressToIndex: " + JSON.stringify(addressToIndex, null, 2));
