@@ -3119,123 +3119,123 @@
             this.sync.section = null;
             this.sync.halt = false;
           },
-          newAccountResetModal() {
-            this.newAddress = null;
-          },
-          newAccountHandleOk(bvModalEvent) {
-            // Prevent modal from closing
-            bvModalEvent.preventDefault();
-            // Trigger submit handler
-            this.newAccountHandleSubmit();
-          },
-          newAccountHandleSubmit() {
-            // Exit when the form isn't valid
-            if (!this.checkAccountFormValidity()) {
-              return;
-            }
-            if (!(this.newAddress in this.settings.accounts)) {
-              console.log("Adding: " + this.newAddress);
-              Vue.set(this.settings.accounts, this.newAddress, {
-                name: null,
-                group: null,
-              });
-            } else {
-              console.log("Discarding duplicate: " + this.newAddress);
-            }
-            // Hide the modal manually
-            this.$nextTick(() => {
-              this.$bvModal.hide('new-account-modal-prevent-closing');
-            })
-            this.saveSettings();
-          },
+          // newAccountResetModal() {
+          //   this.newAddress = null;
+          // },
+          // newAccountHandleOk(bvModalEvent) {
+          //   // Prevent modal from closing
+          //   bvModalEvent.preventDefault();
+          //   // Trigger submit handler
+          //   this.newAccountHandleSubmit();
+          // },
+          // newAccountHandleSubmit() {
+          //   // Exit when the form isn't valid
+          //   if (!this.checkAccountFormValidity()) {
+          //     return;
+          //   }
+          //   if (!(this.newAddress in this.settings.accounts)) {
+          //     console.log("Adding: " + this.newAddress);
+          //     Vue.set(this.settings.accounts, this.newAddress, {
+          //       name: null,
+          //       group: null,
+          //     });
+          //   } else {
+          //     console.log("Discarding duplicate: " + this.newAddress);
+          //   }
+          //   // Hide the modal manually
+          //   this.$nextTick(() => {
+          //     this.$bvModal.hide('new-account-modal-prevent-closing');
+          //   })
+          //   this.saveSettings();
+          // },
 
-          allowanceFormResetModal() {
-            this.allowanceFormData.amount = null;
-          },
-          wethFormResetModal() {
-            this.wethFormData.direction = "ew";
-            this.wethFormData.amount = null;
-          },
-          allowanceFormHandleOk(bvModalEvent) {
-            // Prevent modal from closing
-            bvModalEvent.preventDefault();
-            // Trigger submit handler
-            this.allowanceFormHandleSubmit();
-          },
-          wethFormHandleOk(bvModalEvent) {
-            // Prevent modal from closing
-            bvModalEvent.preventDefault();
-            // Trigger submit handler
-            this.wethFormHandleSubmit();
-          },
-          async allowanceFormHandleSubmit() {
-            console.log("allowanceFormHandleSubmit");
-            // Exit when the form isn't valid
-            if (!this.checkAllowanceFormValidity()) {
-              return;
-            }
-            const provider = new ethers.providers.Web3Provider(window.ethereum);
-            const signer = provider.getSigner();
-            const erc20Contract = new ethers.Contract(this.allowanceFormData.token, ERC20ABI, provider);
-            const erc20ContractWithSigner = erc20Contract.connect(provider.getSigner());
-            try {
-              const tx = await erc20ContractWithSigner.approve(CHADEXADDRESS_SEPOLIA, ethers.utils.parseUnits(this.allowanceFormData.amount, this.allowanceFormData.decimals).toString() );
-              console.log("tx: " + JSON.stringify(tx));
-            } catch (e) {
-              console.log("allowanceFormHandleSubmit error: " + JSON.stringify(e));
-            }
-            // Hide the modal manually
-            this.$nextTick(() => {
-              this.$bvModal.hide('allowance-modal-prevent-closing');
-            })
-          },
-          async wethFormHandleSubmit() {
-            console.log("wethFormHandleSubmit");
-            // Exit when the form isn't valid
-            if (!this.checkWethFormValidity()) {
-              return;
-            }
-            const provider = new ethers.providers.Web3Provider(window.ethereum);
-            const signer = provider.getSigner();
-            if (this.wethFormData.direction == "ew") {
-              try {
-                const tx = await signer.sendTransaction({ to: WETH9ADDRESS_SEPOLIA, value: ethers.utils.parseEther(this.wethFormData.amount) });
-                console.log("tx: " + JSON.stringify(tx));
-              } catch (e) {
-                console.log("wethFormHandleSubmit error: " + JSON.stringify(e));
-              }
-            } else {
-              const wethContract = new ethers.Contract(WETH9ADDRESS_SEPOLIA, WETH9ABI_SEPOLIA, provider);
-              const wethContractWithSigner = wethContract.connect(provider.getSigner());
-              try {
-                const tx = await wethContractWithSigner.withdraw(ethers.utils.parseEther(this.wethFormData.amount));
-                console.log("tx: " + JSON.stringify(tx));
-              } catch (e) {
-                console.log("wethFormHandleSubmit error: " + JSON.stringify(e));
-              }
-            }
-            // Hide the modal manually
-            this.$nextTick(() => {
-              this.$bvModal.hide('weth-modal-prevent-closing');
-            })
-          },
+          // allowanceFormResetModal() {
+          //   this.allowanceFormData.amount = null;
+          // },
+          // wethFormResetModal() {
+          //   this.wethFormData.direction = "ew";
+          //   this.wethFormData.amount = null;
+          // },
+          // allowanceFormHandleOk(bvModalEvent) {
+          //   // Prevent modal from closing
+          //   bvModalEvent.preventDefault();
+          //   // Trigger submit handler
+          //   this.allowanceFormHandleSubmit();
+          // },
+          // wethFormHandleOk(bvModalEvent) {
+          //   // Prevent modal from closing
+          //   bvModalEvent.preventDefault();
+          //   // Trigger submit handler
+          //   this.wethFormHandleSubmit();
+          // },
+          // async allowanceFormHandleSubmit() {
+          //   console.log("allowanceFormHandleSubmit");
+          //   // Exit when the form isn't valid
+          //   if (!this.checkAllowanceFormValidity()) {
+          //     return;
+          //   }
+          //   const provider = new ethers.providers.Web3Provider(window.ethereum);
+          //   const signer = provider.getSigner();
+          //   const erc20Contract = new ethers.Contract(this.allowanceFormData.token, ERC20ABI, provider);
+          //   const erc20ContractWithSigner = erc20Contract.connect(provider.getSigner());
+          //   try {
+          //     const tx = await erc20ContractWithSigner.approve(CHADEXADDRESS_SEPOLIA, ethers.utils.parseUnits(this.allowanceFormData.amount, this.allowanceFormData.decimals).toString() );
+          //     console.log("tx: " + JSON.stringify(tx));
+          //   } catch (e) {
+          //     console.log("allowanceFormHandleSubmit error: " + JSON.stringify(e));
+          //   }
+          //   // Hide the modal manually
+          //   this.$nextTick(() => {
+          //     this.$bvModal.hide('allowance-modal-prevent-closing');
+          //   })
+          // },
+          // async wethFormHandleSubmit() {
+          //   console.log("wethFormHandleSubmit");
+          //   // Exit when the form isn't valid
+          //   if (!this.checkWethFormValidity()) {
+          //     return;
+          //   }
+          //   const provider = new ethers.providers.Web3Provider(window.ethereum);
+          //   const signer = provider.getSigner();
+          //   if (this.wethFormData.direction == "ew") {
+          //     try {
+          //       const tx = await signer.sendTransaction({ to: WETH9ADDRESS_SEPOLIA, value: ethers.utils.parseEther(this.wethFormData.amount) });
+          //       console.log("tx: " + JSON.stringify(tx));
+          //     } catch (e) {
+          //       console.log("wethFormHandleSubmit error: " + JSON.stringify(e));
+          //     }
+          //   } else {
+          //     const wethContract = new ethers.Contract(WETH9ADDRESS_SEPOLIA, WETH9ABI_SEPOLIA, provider);
+          //     const wethContractWithSigner = wethContract.connect(provider.getSigner());
+          //     try {
+          //       const tx = await wethContractWithSigner.withdraw(ethers.utils.parseEther(this.wethFormData.amount));
+          //       console.log("tx: " + JSON.stringify(tx));
+          //     } catch (e) {
+          //       console.log("wethFormHandleSubmit error: " + JSON.stringify(e));
+          //     }
+          //   }
+          //   // Hide the modal manually
+          //   this.$nextTick(() => {
+          //     this.$bvModal.hide('weth-modal-prevent-closing');
+          //   })
+          // },
 
-          toggleAccountField(account, field) {
-            Vue.set(this.settings.accounts[account], field, !this.settings.accounts[account][field]);
-            this.saveSettings();
-          },
-          setAccountField(account, field, value) {
-            Vue.set(this.settings.accounts[account], field, value);
-            this.saveSettings();
-          },
-          deleteToken(coin) {
-            Vue.delete(this.settings.tokens, coin);
-            this.saveSettings();
-          },
-          deleteAccount(account) {
-            Vue.delete(this.settings.accounts, account);
-            this.saveSettings();
-          },
+          // toggleAccountField(account, field) {
+          //   Vue.set(this.settings.accounts[account], field, !this.settings.accounts[account][field]);
+          //   this.saveSettings();
+          // },
+          // setAccountField(account, field, value) {
+          //   Vue.set(this.settings.accounts[account], field, value);
+          //   this.saveSettings();
+          // },
+          // deleteToken(coin) {
+          //   Vue.delete(this.settings.tokens, coin);
+          //   this.saveSettings();
+          // },
+          // deleteAccount(account) {
+          //   Vue.delete(this.settings.accounts, account);
+          //   this.saveSettings();
+          // },
           saveSettings() {
             localStorage.cryptoPunksDataSettings = JSON.stringify(this.settings);
             // console.log("saveSettings: " + JSON.stringify(this.settings));
@@ -3650,7 +3650,7 @@
           },
 
           async loadCurrentData() {
-            // console.log(moment().format("YYYY-MM-DD HH:mm:ss") + " " + "loadCurrentData");
+            console.log(moment().format("YYYY-MM-DD HH:mm:ss") + " " + "loadCurrentData BEGIN");
             const db = new Dexie(this.db.name);
             db.version(this.db.version).stores(this.db.schemaDefinition);
             const indexToAddressDataItems = await db.cache.where("objectName").equals(this.chainId + "_indexToAddress").toArray();
@@ -3663,6 +3663,11 @@
               Vue.set(this, 'addressToIndex', addressToIndexDataItems[0].object);
               // console.log(moment().format("YYYY-MM-DD HH:mm:ss") + " " + "loadCurrentData - addressToIndex: " + JSON.stringify(Object.entries(this.addressToIndex).slice(0, 3)) + ", ...");
             }
+
+
+
+
+            console.log(moment().format("YYYY-MM-DD HH:mm:ss") + " " + "loadCurrentData END");
           },
 
           async halt() {
