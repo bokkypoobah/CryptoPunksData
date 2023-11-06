@@ -3258,191 +3258,191 @@
             Vue.set(this.settings, 'filters', {});
             this.saveSettings();
           },
-          async showModalAccountsImport(item) {
-            // console.log("showModalAccountsImport: " + JSON.stringify(item));
-            // let url = "https://api.reservoir.tools/collections/v5?contract=" + item.contract;
-            // console.log(url);
-            // const data = await fetch(url).then(response => response.json());
-            // const collection = data.collections && data.collections.length == 1 && data.collections[0] || {};
-            this.modalDetails = {
-              item,
-              txHash: item[0],
-            //   token: item,
-            //   collection,
-            };
-            console.log(JSON.stringify(this.modalDetails, null, 2));
-            this.$bvModal.show('modal-accounts-import');
-          },
-          async showModalTxDetails(item) {
-            // console.log("showModalTxDetails - item: " + JSON.stringify(item));
-            const provider = new ethers.providers.Web3Provider(window.ethereum);
-
-            // let url = "https://api.reservoir.tools/collections/v5?contract=" + item.contract;
-            // console.log(url);
-            // const data = await fetch(url).then(response => response.json());
-            // const collection = data.collections && data.collections.length == 1 && data.collections[0] || {};
-            this.modalTxDetails.item = item;
-            // console.log("showModalTxDetails - this.modalTxDetails.item: " + JSON.stringify(item));
-            this.$bvModal.show('modal-tx-details');
-            // this.modalTxDetails = {
-            //   item,
-            //   txHash,
-            // };
-            const tx = await provider.getTransaction(item.txHash);
-            // console.log("showModalTxDetails - tx: " + JSON.stringify(tx));
-            const txReceipt = await provider.getTransactionReceipt(item.txHash);
-            // console.log("showModalTxDetails - txReceipt: " + JSON.stringify(txReceipt));
-
-            if (tx.to == CHADEXADDRESS_SEPOLIA) {
-              const interface = new ethers.utils.Interface(CHADEXABI);
-              try {
-                let decodedData = interface.parseTransaction({ data: tx.data, value: tx.value });
-                // console.log("showModalTxDetails - decodedData: " + JSON.stringify(decodedData, null, 2));
-                if (decodedData.functionFragment.name == "execute") {
-                  console.log("showModalTxDetails - execute()");
-                  // const tradeInput = decodedData.functionFragment.inputs;
-                  // console.log("showModalTxDetails - tradeInput: " + JSON.stringify(tradeInput, null, 2));
-                  // console.log("decodedData.functionFragment.inputs: " + JSON.stringify(decodedData.functionFragment.inputs));
-                  // console.log("decodedData.args: " + JSON.stringify(decodedData.args));
-                  // struct TradeInput {
-                  //     Action action;
-                  //     BuySell buySell;
-                  //     Token base;
-                  //     Token quote;
-                  //     Price price;
-                  //     Price targetPrice;
-                  //     Unixtime expiry;
-                  //     Tokens tokens;
-                  //     bool skipCheck;
-                  // }
-
-                  const tradeInputs = [];
-                  for (let i = 0; i < decodedData.args.length; i++) {
-                    // console.log("decodedData.args[" + i + "]: " + JSON.stringify(decodedData.args[i]));
-                    const details = decodedData.args[i][0];
-                    // console.log("details: " + JSON.stringify(details, null, 2));
-                    const [action, buySell, base, quote, price, targetPrice, expiry, tokens, skipCheck] = decodedData.args[i][0];
-                    // console.log("action: " + action + ", buySell: " + buySell + ", base:" + base + ", quote:" + quote + ", price: " + price + ", targetPrice: " + targetPrice + ", expiry: " + expiry + ", tokens: " + tokens + ", skipCheck: " + skipCheck);
-                    tradeInputs.push({ action, buySell, base, quote, price: price.toString(), targetPrice: targetPrice.toString(), expiry: parseInt(expiry), tokens: tokens.toString(), skipCheck });
-                    // TODO: Testing
-                    // tradeInputs.push({ action, buySell, base, quote, price: price.toString(), targetPrice: targetPrice.toString(), expiry: parseInt(expiry), tokens: tokens.toString(), skipCheck });
-                  }
-                  console.log("tradeInputs: " + JSON.stringify(tradeInputs, null, 2));
-                  Vue.set(this.modalTxDetails, 'tradeInputs', tradeInputs);
-                  for (let i in decodedData.functionFragment.inputs) {
-                    const c = decodedData.functionFragment.inputs[i];
-                    console.log("  " + i + " " + c.name + " " + c.type + " " + JSON.stringify(decodedData.args[i]));
-                  }
-                }
-              } catch (e) {
-                console.log("showModalTxDetails - Error decoding: " + JSON.stringify(tx.data));
-              }
-            }
-
-            Vue.set(this.modalTxDetails, 'tx', {
-            //   hash: tx.hash,
-            //   type: tx.type,
-            //   blockHash: tx.blockHash,
-            //   blockNumber: tx.blockNumber,
-            //   transactionIndex: tx.transactionIndex,
-              from: tx.from,
-              to: tx.to,
-            //   gasPrice: ethers.BigNumber.from(tx.gasPrice).toString(),
-            //   gasLimit: ethers.BigNumber.from(tx.gasLimit).toString(),
-            //   to: tx.to,
-            //   value: ethers.BigNumber.from(tx.value).toString(),
-            //   nonce: tx.nonce,
-            //   data: tx.to && tx.data || null, // Remove contract creation data to reduce memory footprint
-            //   // r: tx.r,
-            //   // s: tx.s,
-            //   // v: tx.v,
-            //   chainId: tx.chainId,
-            // });
-            // const txReceipt = await provider.getTransactionReceipt(txHash);
-            // Vue.set(this.modalDetails, 'txReceipt', {
-            //   to: txReceipt.to,
-            //   from: txReceipt.from,
-            //   contractAddress: txReceipt.contractAddress,
-            //   transactionIndex: txReceipt.transactionIndex,
-            //   gasUsed: ethers.BigNumber.from(txReceipt.gasUsed).toString(),
-            //   blockHash: txReceipt.blockHash,
-            //   // transactionHash: txReceipt.transactionHash,
-            //   logs: txReceipt.logs,
-            //   blockNumber: txReceipt.blockNumber,
-            //   // confirmations: txReceipt.confirmations,
-            //   cumulativeGasUsed: ethers.BigNumber.from(txReceipt.cumulativeGasUsed).toString(),
-            //   effectiveGasPrice: ethers.BigNumber.from(txReceipt.effectiveGasPrice).toString(),
-            //   status: txReceipt.status,
-            //   type: txReceipt.type,
-            //   // byzantium: txReceipt.byzantium,
-            });
-            // console.log("tx: " + JSON.stringify(tx, null, 2));
-            // console.log("txReceipt: " + JSON.stringify(txReceipt, null, 2));
-            // console.log(JSON.stringify(this.modalDetails, null, 2));
-          },
-          async showModalTokenDetails(tokenIndex) {
-            console.log("showModalTokenDetails: " + tokenIndex);
-            const provider = new ethers.providers.Web3Provider(window.ethereum);
-            this.$bvModal.show('modal-token-details');
-            this.modalTokenDetails.tokenIndex = tokenIndex;
-            const token = this.tokens[tokenIndex] || {};
-            console.log("this.tokens: " + JSON.stringify(this.tokens, null, 2));
-            this.modalTokenDetails.address = this.indexToAddress[tokenIndex] || "?";
-            this.modalTokenDetails.symbol = token.symbol || "?";
-            this.modalTokenDetails.name = token.name || "?";
-            this.modalTokenDetails.decimals = token.decimals || "?";
-            const erc20 = new ethers.Contract(this.modalTokenDetails.address, ERC20ABI, provider);
-            this.modalTokenDetails.balance = ethers.BigNumber.from(await erc20.balanceOf(this.coinbase)).toString();
-            this.modalTokenDetails.allowance = ethers.BigNumber.from(await erc20.allowance(this.coinbase, CHADEXADDRESS_SEPOLIA)).toString();
-            this.modalTokenDetails.totalSupply = ethers.BigNumber.from(await erc20.totalSupply()).toString() || "?";
-            console.log("balance: " + this.modalTokenDetails.balance);
-          },
-          async showModalMakerOrder(buySell, item) {
-            console.log("showModalMakerOrder - buySell: " + buySell + ", item: " + JSON.stringify(item));
-            const provider = new ethers.providers.Web3Provider(window.ethereum);
-            this.$bvModal.show('modal-maker-order');
-            this.modalMakerOrder.pairKey = this.settings.pairTable.selectedPair;
-            this.modalMakerOrder.buySell = buySell;
-            this.modalMakerOrder.price = item.price;
-            this.modalMakerOrder.orderKey = item.orderKey;
-            this.modalMakerOrder.makerIndex = item.makerIndex;
-            this.modalMakerOrder.expiry = item.expiry;
-            this.modalMakerOrder.originalTokens = item.originalTokens;
-            this.modalMakerOrder.tokens = item.tokens;
-            this.modalMakerOrder.availableBase = item.availableBase;
-            this.modalMakerOrder.availableQuote = item.availableQuote;
-            console.log("this.modalMakerOrder: " + JSON.stringify(this.modalMakerOrder, null, 2));
-          },
-          toggleSyncAccounts(items) {
-            let someFalse = false;
-            let someTrue = false;
-            for (const item of items) {
-              if (item.sync) {
-                someTrue = true;
-              } else {
-                someFalse = true;
-              }
-            }
-            for (const item of items) {
-              Vue.set(this.settings.accounts[item.address], 'sync', !(someTrue && !someFalse));
-            }
-            this.saveSettings();
-          },
-          toggleIncludeAccounts(items) {
-            let someFalse = false;
-            let someTrue = false;
-            for (const item of items) {
-              if (item.include) {
-                someTrue = true;
-              } else {
-                someFalse = true;
-              }
-            }
-            for (const item of items) {
-              Vue.set(this.settings.accounts[item.address], 'include', !(someTrue && !someFalse));
-            }
-            this.saveSettings();
-          },
+          // async showModalAccountsImport(item) {
+          //   // console.log("showModalAccountsImport: " + JSON.stringify(item));
+          //   // let url = "https://api.reservoir.tools/collections/v5?contract=" + item.contract;
+          //   // console.log(url);
+          //   // const data = await fetch(url).then(response => response.json());
+          //   // const collection = data.collections && data.collections.length == 1 && data.collections[0] || {};
+          //   this.modalDetails = {
+          //     item,
+          //     txHash: item[0],
+          //   //   token: item,
+          //   //   collection,
+          //   };
+          //   console.log(JSON.stringify(this.modalDetails, null, 2));
+          //   this.$bvModal.show('modal-accounts-import');
+          // },
+          // async showModalTxDetails(item) {
+          //   // console.log("showModalTxDetails - item: " + JSON.stringify(item));
+          //   const provider = new ethers.providers.Web3Provider(window.ethereum);
+          //
+          //   // let url = "https://api.reservoir.tools/collections/v5?contract=" + item.contract;
+          //   // console.log(url);
+          //   // const data = await fetch(url).then(response => response.json());
+          //   // const collection = data.collections && data.collections.length == 1 && data.collections[0] || {};
+          //   this.modalTxDetails.item = item;
+          //   // console.log("showModalTxDetails - this.modalTxDetails.item: " + JSON.stringify(item));
+          //   this.$bvModal.show('modal-tx-details');
+          //   // this.modalTxDetails = {
+          //   //   item,
+          //   //   txHash,
+          //   // };
+          //   const tx = await provider.getTransaction(item.txHash);
+          //   // console.log("showModalTxDetails - tx: " + JSON.stringify(tx));
+          //   const txReceipt = await provider.getTransactionReceipt(item.txHash);
+          //   // console.log("showModalTxDetails - txReceipt: " + JSON.stringify(txReceipt));
+          //
+          //   if (tx.to == CHADEXADDRESS_SEPOLIA) {
+          //     const interface = new ethers.utils.Interface(CHADEXABI);
+          //     try {
+          //       let decodedData = interface.parseTransaction({ data: tx.data, value: tx.value });
+          //       // console.log("showModalTxDetails - decodedData: " + JSON.stringify(decodedData, null, 2));
+          //       if (decodedData.functionFragment.name == "execute") {
+          //         console.log("showModalTxDetails - execute()");
+          //         // const tradeInput = decodedData.functionFragment.inputs;
+          //         // console.log("showModalTxDetails - tradeInput: " + JSON.stringify(tradeInput, null, 2));
+          //         // console.log("decodedData.functionFragment.inputs: " + JSON.stringify(decodedData.functionFragment.inputs));
+          //         // console.log("decodedData.args: " + JSON.stringify(decodedData.args));
+          //         // struct TradeInput {
+          //         //     Action action;
+          //         //     BuySell buySell;
+          //         //     Token base;
+          //         //     Token quote;
+          //         //     Price price;
+          //         //     Price targetPrice;
+          //         //     Unixtime expiry;
+          //         //     Tokens tokens;
+          //         //     bool skipCheck;
+          //         // }
+          //
+          //         const tradeInputs = [];
+          //         for (let i = 0; i < decodedData.args.length; i++) {
+          //           // console.log("decodedData.args[" + i + "]: " + JSON.stringify(decodedData.args[i]));
+          //           const details = decodedData.args[i][0];
+          //           // console.log("details: " + JSON.stringify(details, null, 2));
+          //           const [action, buySell, base, quote, price, targetPrice, expiry, tokens, skipCheck] = decodedData.args[i][0];
+          //           // console.log("action: " + action + ", buySell: " + buySell + ", base:" + base + ", quote:" + quote + ", price: " + price + ", targetPrice: " + targetPrice + ", expiry: " + expiry + ", tokens: " + tokens + ", skipCheck: " + skipCheck);
+          //           tradeInputs.push({ action, buySell, base, quote, price: price.toString(), targetPrice: targetPrice.toString(), expiry: parseInt(expiry), tokens: tokens.toString(), skipCheck });
+          //           // TODO: Testing
+          //           // tradeInputs.push({ action, buySell, base, quote, price: price.toString(), targetPrice: targetPrice.toString(), expiry: parseInt(expiry), tokens: tokens.toString(), skipCheck });
+          //         }
+          //         console.log("tradeInputs: " + JSON.stringify(tradeInputs, null, 2));
+          //         Vue.set(this.modalTxDetails, 'tradeInputs', tradeInputs);
+          //         for (let i in decodedData.functionFragment.inputs) {
+          //           const c = decodedData.functionFragment.inputs[i];
+          //           console.log("  " + i + " " + c.name + " " + c.type + " " + JSON.stringify(decodedData.args[i]));
+          //         }
+          //       }
+          //     } catch (e) {
+          //       console.log("showModalTxDetails - Error decoding: " + JSON.stringify(tx.data));
+          //     }
+          //   }
+          //
+          //   Vue.set(this.modalTxDetails, 'tx', {
+          //   //   hash: tx.hash,
+          //   //   type: tx.type,
+          //   //   blockHash: tx.blockHash,
+          //   //   blockNumber: tx.blockNumber,
+          //   //   transactionIndex: tx.transactionIndex,
+          //     from: tx.from,
+          //     to: tx.to,
+          //   //   gasPrice: ethers.BigNumber.from(tx.gasPrice).toString(),
+          //   //   gasLimit: ethers.BigNumber.from(tx.gasLimit).toString(),
+          //   //   to: tx.to,
+          //   //   value: ethers.BigNumber.from(tx.value).toString(),
+          //   //   nonce: tx.nonce,
+          //   //   data: tx.to && tx.data || null, // Remove contract creation data to reduce memory footprint
+          //   //   // r: tx.r,
+          //   //   // s: tx.s,
+          //   //   // v: tx.v,
+          //   //   chainId: tx.chainId,
+          //   // });
+          //   // const txReceipt = await provider.getTransactionReceipt(txHash);
+          //   // Vue.set(this.modalDetails, 'txReceipt', {
+          //   //   to: txReceipt.to,
+          //   //   from: txReceipt.from,
+          //   //   contractAddress: txReceipt.contractAddress,
+          //   //   transactionIndex: txReceipt.transactionIndex,
+          //   //   gasUsed: ethers.BigNumber.from(txReceipt.gasUsed).toString(),
+          //   //   blockHash: txReceipt.blockHash,
+          //   //   // transactionHash: txReceipt.transactionHash,
+          //   //   logs: txReceipt.logs,
+          //   //   blockNumber: txReceipt.blockNumber,
+          //   //   // confirmations: txReceipt.confirmations,
+          //   //   cumulativeGasUsed: ethers.BigNumber.from(txReceipt.cumulativeGasUsed).toString(),
+          //   //   effectiveGasPrice: ethers.BigNumber.from(txReceipt.effectiveGasPrice).toString(),
+          //   //   status: txReceipt.status,
+          //   //   type: txReceipt.type,
+          //   //   // byzantium: txReceipt.byzantium,
+          //   });
+          //   // console.log("tx: " + JSON.stringify(tx, null, 2));
+          //   // console.log("txReceipt: " + JSON.stringify(txReceipt, null, 2));
+          //   // console.log(JSON.stringify(this.modalDetails, null, 2));
+          // },
+          // async showModalTokenDetails(tokenIndex) {
+          //   console.log("showModalTokenDetails: " + tokenIndex);
+          //   const provider = new ethers.providers.Web3Provider(window.ethereum);
+          //   this.$bvModal.show('modal-token-details');
+          //   this.modalTokenDetails.tokenIndex = tokenIndex;
+          //   const token = this.tokens[tokenIndex] || {};
+          //   console.log("this.tokens: " + JSON.stringify(this.tokens, null, 2));
+          //   this.modalTokenDetails.address = this.indexToAddress[tokenIndex] || "?";
+          //   this.modalTokenDetails.symbol = token.symbol || "?";
+          //   this.modalTokenDetails.name = token.name || "?";
+          //   this.modalTokenDetails.decimals = token.decimals || "?";
+          //   const erc20 = new ethers.Contract(this.modalTokenDetails.address, ERC20ABI, provider);
+          //   this.modalTokenDetails.balance = ethers.BigNumber.from(await erc20.balanceOf(this.coinbase)).toString();
+          //   this.modalTokenDetails.allowance = ethers.BigNumber.from(await erc20.allowance(this.coinbase, CHADEXADDRESS_SEPOLIA)).toString();
+          //   this.modalTokenDetails.totalSupply = ethers.BigNumber.from(await erc20.totalSupply()).toString() || "?";
+          //   console.log("balance: " + this.modalTokenDetails.balance);
+          // },
+          // async showModalMakerOrder(buySell, item) {
+          //   console.log("showModalMakerOrder - buySell: " + buySell + ", item: " + JSON.stringify(item));
+          //   const provider = new ethers.providers.Web3Provider(window.ethereum);
+          //   this.$bvModal.show('modal-maker-order');
+          //   this.modalMakerOrder.pairKey = this.settings.pairTable.selectedPair;
+          //   this.modalMakerOrder.buySell = buySell;
+          //   this.modalMakerOrder.price = item.price;
+          //   this.modalMakerOrder.orderKey = item.orderKey;
+          //   this.modalMakerOrder.makerIndex = item.makerIndex;
+          //   this.modalMakerOrder.expiry = item.expiry;
+          //   this.modalMakerOrder.originalTokens = item.originalTokens;
+          //   this.modalMakerOrder.tokens = item.tokens;
+          //   this.modalMakerOrder.availableBase = item.availableBase;
+          //   this.modalMakerOrder.availableQuote = item.availableQuote;
+          //   console.log("this.modalMakerOrder: " + JSON.stringify(this.modalMakerOrder, null, 2));
+          // },
+          // toggleSyncAccounts(items) {
+          //   let someFalse = false;
+          //   let someTrue = false;
+          //   for (const item of items) {
+          //     if (item.sync) {
+          //       someTrue = true;
+          //     } else {
+          //       someFalse = true;
+          //     }
+          //   }
+          //   for (const item of items) {
+          //     Vue.set(this.settings.accounts[item.address], 'sync', !(someTrue && !someFalse));
+          //   }
+          //   this.saveSettings();
+          // },
+          // toggleIncludeAccounts(items) {
+          //   let someFalse = false;
+          //   let someTrue = false;
+          //   for (const item of items) {
+          //     if (item.include) {
+          //       someTrue = true;
+          //     } else {
+          //       someFalse = true;
+          //     }
+          //   }
+          //   for (const item of items) {
+          //     Vue.set(this.settings.accounts[item.address], 'include', !(someTrue && !someFalse));
+          //   }
+          //   this.saveSettings();
+          // },
           async syncAll(blockNumber) {
             console.log(moment().format("HH:mm:ss") + " syncAll - blockNumber: " + blockNumber + ", chainId: " + this.chainId);
             const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -3650,7 +3650,7 @@
           },
 
           async loadCurrentData() {
-            console.log(moment().format("YYYY-MM-DD HH:mm:ss") + " " + "loadCurrentData BEGIN");
+            console.log(moment().format("YYYY-MM-DD HH:mm:ss") + " loadCurrentData BEGIN");
             const db = new Dexie(this.db.name);
             db.version(this.db.version).stores(this.db.schemaDefinition);
             const indexToAddressDataItems = await db.cache.where("objectName").equals(this.chainId + "_indexToAddress").toArray();
@@ -3664,10 +3664,12 @@
               // console.log(moment().format("YYYY-MM-DD HH:mm:ss") + " " + "loadCurrentData - addressToIndex: " + JSON.stringify(Object.entries(this.addressToIndex).slice(0, 3)) + ", ...");
             }
 
+            // console.log("DEBUG: " + JSON.stringify(this.contracts, null, 2));
+            for (const process of this.contracts) {
+              console.log(moment().format("YYYY-MM-DD HH:mm:ss") + " loadCurrentData - processing: " + process.name);
+            }
 
-
-
-            console.log(moment().format("YYYY-MM-DD HH:mm:ss") + " " + "loadCurrentData END");
+            console.log(moment().format("YYYY-MM-DD HH:mm:ss") + " loadCurrentData END");
           },
 
           async halt() {
