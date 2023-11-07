@@ -167,98 +167,6 @@
             </div>
           </b-modal>
 
-          <!-- <b-modal id="modal-accounts-import" hide-footer size="lg">
-            <template #modal-title>
-              Import Accounts
-            </template>
-            <b-form-group label="Restore:" label-for="restore-from-backup-browse" label-size="sm" label-cols-sm="2" label-align-sm="right" :description="'Select backup .tsv file from your local computer to restore'" class="mx-0 my-1 p-0">
-              <b-form-file size="sm" id="restore-from-backup-browse" v-model="restoreFile" @change="backupFilesChange($event.target.name, $event.target.files)" accept=".tsv" class="w-75"></b-form-file>
-            </b-form-group>
-            <b-form-group v-if="restoreAddresses" label="Loaded data:" label-for="restore-from-backup-data" label-size="sm" label-cols-sm="2" label-align-sm="right" :description="'Only valid unique addresses will be imported'" class="mx-0 my-1 p-0">
-              <font v-if="restoreAddresses" size="-2">
-                <b-table small id="restore-from-backup-data" fixed striped sticky-header="200px" :fields="accountsImportAddressesFields" :items="restoreAddresses" head-variant="light">
-                </b-table>
-              </font>
-            </b-form-group>
-            <b-form-group label="" label-for="restore-from-backup" label-size="sm" label-cols-sm="2" label-align-sm="right" :description="'Restore from backup file. Adjust Sync and Include settings and re-synced'" class="mx-0 my-1 p-0">
-              <b-button size="sm" id="restore-from-backup" :disabled="!restoreAddresses || restoreAddresses.length == 0" @click="restoreFromBackup()" variant="primary">Restore</b-button>
-            </b-form-group>
-          </b-modal> -->
-
-          <!-- <b-modal id="modal-token-details" hide-footer size="lg">
-            <template #modal-title>
-              ERC-20 Token {{ modalTokenDetails.address }}
-              <b-button size="sm" @click="copyToClipboard(modalTokenDetails.address);" variant="link" class="m-0 p-0" v-b-popover.hover.top="'Copy to clipboard'"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
-              <b-link size="sm" :href="'https://sepolia.etherscan.io/token/' + modalTokenDetails.address + '?a=' + coinbase" target="_blank" variant="link" class="m-0 p-0" v-b-popover.hover.top="'View in etherscan.io'">
-                <b-img rounded="0" width="16px" height="16px" src="images/etherscan-logo-circle.svg" blank-color="#777" target="_blank"></b-img>
-              </b-link>
-            </template>
-            <b-form-group label="Symbol:" label-for="modal-token-details-symbol" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-form-input type="text" readonly size="sm" id="modal-token-details-symbol" :value="modalTokenDetails.symbol" class="w-50"></b-form-input>
-            </b-form-group>
-            <b-form-group label="Name:" label-for="modal-token-details-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-form-input type="text" readonly size="sm" id="modal-token-details-name" :value="sanitise(modalTokenDetails.name)" class="w-50"></b-form-input>
-            </b-form-group>
-            <b-form-group label="Decimals:" label-for="modal-token-details-decimals" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-form-input type="text" readonly size="sm" id="modal-token-details-decimals" :value="modalTokenDetails.decimals" class="w-50"></b-form-input>
-            </b-form-group>
-            <b-form-group label="Balance:" label-for="modal-token-details-balance" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Get some test tokens in the Tokens tab" class="mx-0 my-1 p-0">
-              <b-form-input type="text" readonly size="sm" id="modal-token-details-balance" :value="formatERC20(modalTokenDetails.balance, modalTokenDetails.decimals)" class="w-50"></b-form-input>
-            </b-form-group>
-            <b-form-group label="Allowance:" label-for="modal-token-details-allowance" label-size="sm" label-cols-sm="3" label-align-sm="right"  description="Allowance to chadex smart contract. Update this in the Tokens tab" class="mx-0 my-1 p-0">
-              <b-form-input type="text" readonly size="sm" id="modal-token-details-allowance" :value="formatERC20(modalTokenDetails.allowance, modalTokenDetails.decimals)" class="w-50"></b-form-input>
-            </b-form-group>
-            <b-form-group label="Total Supply:" label-for="modal-token-details-totalsupply" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-form-input type="text" readonly size="sm" id="modal-token-details-totalsupply" :value="formatERC20(modalTokenDetails.totalSupply, modalTokenDetails.decimals)" class="w-50"></b-form-input>
-            </b-form-group>
-          </b-modal> -->
-
-          <!-- <b-modal id="modal-maker-order" hide-footer size="lg">
-            <template #modal-title>
-              Maker Order
-            </template>
-            <b-form-group label="Order Type:" label-for="modal-maker-order-ordertype" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-form-input type="text" readonly size="sm" id="modal-maker-order-ordertype" :value="modalMakerOrder.buySell == 0 ? 'BUY' : 'SELL'" class="w-50"></b-form-input>
-            </b-form-group>
-            <b-form-group label="Price:" label-for="modal-maker-order-price" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-form-input type="text" readonly size="sm" id="modal-maker-order-price" :value="formatERC20(modalMakerOrder.price, 12)" class="w-50"></b-form-input>
-            </b-form-group>
-            <b-form-group label="Pair Key:" label-for="modal-maker-order-pairkey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-form-input type="text" readonly size="sm" id="modal-maker-order-pairkey" :value="settings.pairTable.selectedPair" class="w-100"></b-form-input>
-            </b-form-group>
-            <b-form-group label="Order Key:" label-for="modal-maker-order-orderkey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-form-input type="text" readonly size="sm" id="modal-maker-order-orderkey" :value="modalMakerOrder.orderKey" class="w-100"></b-form-input>
-            </b-form-group>
-            <b-form-group label="Maker:" label-for="modal-maker-order-maker" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <template slot="description">
-                <div v-if="ensOrAddress(modalMakerOrder.makerIndex) != indexToAddress[modalMakerOrder.makerIndex]">
-                  {{ indexToAddress[modalMakerOrder.makerIndex] }}
-                </div>
-              </template>
-              <b-input-group size="sm" class="w-75">
-                <b-form-input type="text" readonly size="sm" id="modal-maker-order-maker" :value="ensOrAddress(modalMakerOrder.makerIndex)"></b-form-input>
-                <b-input-group-append class="ml-1">
-                  <b-button size="sm" @click="copyToClipboard(indexToAddress[modalMakerOrder.makerIndex]);" variant="link" class="m-0 p-0" v-b-popover.hover.top="'Copy to clipboard'"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
-                  <b-link size="sm" :href="'https://sepolia.etherscan.io/address/' + indexToAddress[modalMakerOrder.makerIndex]" target="_blank" variant="link" class="m-0 ml-1 p-0" v-b-popover.hover.top="'View in etherscan.io'">
-                    <b-img rounded="0" width="16px" height="16px" src="images/etherscan-logo-circle.svg" blank-color="#777" target="_blank"></b-img>
-                  </b-link>
-                </b-input-group-append>
-              </b-input-group>
-            </b-form-group>
-            <b-form-group label="Expiry:" label-for="modal-maker-order-expiry" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-form-input type="text" readonly size="sm" id="modal-maker-order-expiry" :value="formatExpiry(modalMakerOrder.expiry)" class="w-50"></b-form-input>
-            </b-form-group>
-            <b-form-group :label="getSelectedBaseSymbol +' :'" label-for="modal-maker-order-originaltokens" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-form-input type="text" readonly size="sm" id="modal-maker-order-originaltokens" :value="formatERC20(modalMakerOrder.originalTokens)" class="w-50"></b-form-input>
-            </b-form-group>
-            <b-form-group :label="'Available ' + getSelectedBaseSymbol + ':'" label-for="modal-maker-order-tokens" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="'Taking into maker\'s ' + (modalMakerOrder.buySell == 0 ? getSelectedQuoteSymbol : getSelectedBaseSymbol) + ' account balance and allowance to Chadex'" class="mx-0 my-1 p-0">
-              <b-form-input type="text" readonly size="sm" id="modal-maker-order-tokens" :value="formatERC20(modalMakerOrder.tokens)" class="w-50"></b-form-input>
-            </b-form-group>
-            <b-form-group v-if="indexToAddress[modalMakerOrder.makerIndex] == coinbase" label="" label-for="modal-maker-order-cancel" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-button size="sm" variant="warning" class="ml-1" @click="cancelOrder();" v-b-popover.hover.bottom="'Cancel order'">Cancel Order</b-button>
-            </b-form-group>
-          </b-modal> -->
-
           <!-- 0:Home -->
           <b-card v-if="coinbase && settings.tabIndex == 0" class="m-0 p-0 border-0" body-class="m-1 p-0" header-class="m-0 p-2">
             <template #header>
@@ -500,9 +408,6 @@
                 </div>
                 <div class="mt-0 flex-grow-1">
                 </div>
-                <!-- <div class="mt-0 pl-1">
-                  <b-form-select size="sm" v-model="settings.pairsTable.sortOption" @change="saveSettings" :options="pairsSortOptions" v-b-popover.hover.top="'Yeah. Sort'"></b-form-select>
-                </div> -->
                 <div class="mt-0 pl-1">
                   <font size="-2" v-b-popover.hover.top="'# tokens'">{{ filteredSortedPairs.length + '/' + Object.keys(pairs).length }}</font>
                 </div>
@@ -554,22 +459,12 @@
           <b-card v-if="coinbase && settings.tabIndex == 2000" class="m-0 p-0 border-0" body-class="m-1 p-0" header-class="m-0 p-2">
             <template #header>
               Pair
-              <!-- <div class="d-flex flex-wrap m-0 p-0">
-                <div class="mt-0 pr-2">
-                  Pair
-                </div>
-                <div class="mt-0 pr-1">
-                  <b-form-select size="sm" v-model="settings.pairTable.selectedPair" @change="saveSettings()" :options="pairsOptions"></b-form-select>
-                </div> -->
             </template>
             <b-card-text class="m-0 p-0">
               <div class="d-flex flex-wrap m-0 p-0">
                 <div class="mt-0 pr-1">
                   <b-form-select size="sm" v-model="settings.pairTable.selectedPair" @change="saveSettings(); syncAll();" :options="pairsOptions"></b-form-select>
                 </div>
-                <!-- <div class="mt-0 pr-1">
-                  <b-form-input type="text" size="sm" v-model.trim="settings.pairsTable.filter" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Base or quote symbol and name filter'" placeholder="🔍 sym/name regex" style="min-width: 8.0rem;"></b-form-input>
-                </div> -->
                 <div class="mt-0 flex-grow-1">
                 </div>
                 <div v-if="false && !sync.section" class="mt-0 pr-1">
@@ -587,20 +482,7 @@
                 </div>
                 <div class="mt-0 flex-grow-1">
                 </div>
-                <!-- <div class="mt-0 pl-1">
-                  <b-form-select size="sm" v-model="settings.pairsTable.sortOption" @change="saveSettings" :options="pairsSortOptions" v-b-popover.hover.top="'Yeah. Sort'"></b-form-select>
-                </div> -->
-                <!-- <div class="mt-0 pl-1">
-                  <font size="-2" v-b-popover.hover.top="'# tokens'">{{ filteredSortedPairs.length + '/' + Object.keys(pairs).length }}</font>
-                </div> -->
-                <!-- <div class="mt-0 pl-1">
-                  <b-pagination size="sm" v-model="settings.pairsTable.currentPage" @input="saveSettings" :total-rows="filteredSortedAccounts.length" :per-page="settings.pairsTable.pageSize" style="height: 0;"></b-pagination>
-                </div> -->
-                <!-- <div class="mt-0 pl-1">
-                  <b-form-select size="sm" v-model="settings.pairsTable.pageSize" @change="saveSettings" :options="pageSizes" v-b-popover.hover.top="'Yeah. Page size'"></b-form-select>
-                </div> -->
               </div>
-              <!-- <b-table small fixed striped responsive hover :fields="pairFields" :items="pagedFilteredSortedPair" show-empty empty-html="Click Sync above to retrieve existing pairs" head-variant="light" class="mx-0 my-1"> -->
               <b-row class="m-0 p-0">
                 <b-col class="ml-0 mr-0 pl-0 pr-1">
                   <b-table small fixed striped responsive hover selectable select-mode="single" selected-variant="primary" @row-selected="pairBuyRowSelected" :fields="pairBuyOrdersFields" :items="pagedFilteredSortedPairBuyOrders" show-empty empty-html="Loading" head-variant="light" class="mx-0 my-1">
@@ -705,25 +587,11 @@
           <b-card v-if="coinbase && (settings.tabIndex == 1000 || settings.tabIndex == 2000)" class="m-0 p-0 border-0" body-class="m-1 p-0" header-class="m-0 p-2">
             <template #header>
               History
-              <!-- <div class="d-flex flex-wrap m-0 p-0">
-                <div class="mt-0 pr-2">
-                  Pair
-                </div>
-                <div class="mt-0 pr-1">
-                  <b-form-select size="sm" v-model="settings.pairTable.selectedPair" @change="saveSettings()" :options="pairsOptions"></b-form-select>
-                </div> -->
             </template>
             <b-card-text class="m-0 p-0">
-              <!-- <b-table small fixed striped responsive hover :fields="pairHistoryFields" :items="pagedFilteredSortedPairHistory" show-empty empty-html="TODO: History" head-variant="light" class="mx-0 my-1"> -->
               <b-table small fixed striped responsive hover :items="pagedFilteredSortedPairHistory" show-empty empty-html="TODO: History" head-variant="light" class="mx-0 my-0">
                 <template #cell(timestamp)="data">
                   <b-link @click="showModalTxDetails(data.item);">{{ formatTimestamp(data.item.timestamp) }}</b-link>
-                  <!-- <b-link :href="'https://sepolia.etherscan.io/tx/' + data.item.txHash" v-b-popover.hover.bottom="'txIndex: ' + data.item.transactionIndex + ' logIndex: ' + data.item.logIndex" target="_blank">
-                    {{ formatTimestamp(data.item.timestamp) }}
-                  </b-link> -->
-                  <!-- <font size="-2">
-                    {{ '.' + data.item.transactionIndex + '/' + data.item.logIndex }}
-                  </font> -->
                 </template>
                 <template #cell(action)="data">
                   {{ actionText[data.item.action] || "Unknown" }}
@@ -791,11 +659,6 @@
               </div>
               <div class="mt-0 flex-grow-1">
               </div>
-              <!--
-              <div class="mt-0 pl-1">
-                <b-form-select size="sm" v-model="settings.tokensTable.sortOption" @change="saveSettings" :options="accountsSortOptions" v-b-popover.hover.top="'Yeah. Sort'"></b-form-select>
-              </div>
-              -->
               <div class="mt-0 pl-1">
                 <font size="-2" v-b-popover.hover.top="'# tokens'">{{ filteredSortedTokens.length + '/' + Object.keys(settings.tokens).length }}</font>
               </div>
@@ -840,27 +703,9 @@
               </template>
               <template #head(sync)="data">
                 Sync
-                <!--
-                <b-dropdown size="sm" variant="link" v-b-popover.hover="'Toggle selection'">
-                  <template #button-content>
-                    <b-icon-check-square shift-v="+1" font-scale="0.9"></b-icon-check-square>
-                  </template>
-                  <b-dropdown-item href="#" @click="toggleSyncAccounts(pagedFilteredSortedAccounts)">Toggle sync for all accounts on this page</b-dropdown-item>
-                  <b-dropdown-item href="#" @click="toggleSyncAccounts(filteredSortedAccounts)">Toggle sync for all accounts on all pages</b-dropdown-item>
-                </b-dropdown>
-                -->
               </template>
               <template #head(include)="data">
                 Include
-                <!--
-                <b-dropdown size="sm" variant="link" v-b-popover.hover="'Toggle selection'">
-                  <template #button-content>
-                    <b-icon-check-square shift-v="+1" font-scale="0.9"></b-icon-check-square>
-                  </template>
-                  <b-dropdown-item href="#" @click="toggleIncludeAccounts(pagedFilteredSortedAccounts)">Toggle include for all accounts on this page</b-dropdown-item>
-                  <b-dropdown-item href="#" @click="toggleIncludeAccounts(filteredSortedAccounts)">Toggle include for all accounts on all pages</b-dropdown-item>
-                </b-dropdown>
-                -->
               </template>
               <template #cell(address)="data">
                 <b-link :href="'https://sepolia.etherscan.io/address/' + data.item.address + '#code'" v-b-popover.hover.bottom="'View tx in etherscan.io'" target="_blank">
@@ -892,7 +737,6 @@
                 <div v-else>
                   On Exchange
                 </div>
-                <!-- <b-form-checkbox size="sm" :checked="data.item.include ? 1 : 0" value="1" @change="toggleAccountField(data.item.address, 'include')" v-b-popover.hover="'Include in NFTs view?'"></b-form-checkbox> -->
               </template>
               <template #cell(delete)="data">
                 <b-link size="sm" @click="deleteToken(data.item.address)" variant="link" v-b-popover.hover="'Delete token'"><b-icon-trash style="color: #ff0000;" shift-v="+1" font-scale="1.0"></b-icon-trash></b-link>
@@ -937,19 +781,6 @@
                     <b-form-group label="" label-for="raw-submit" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                       <b-button size="sm" :disabled="false" id="raw-submit" @click="executeRaw()" variant="warning">Execute</b-button>
                     </b-form-group>
-
-                    <!-- <b-form-group label="To:" label-for="message-to" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                      <b-form-input type="text" size="sm" id="message-to" v-model.trim="message.to" placeholder="0x1234... (optional)" class="w-50"></b-form-input>
-                    </b-form-group>
-                    <b-form-group label="Topic:" label-for="message-topic" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                      <b-form-input type="text" size="sm" id="message-topic" v-model.trim="message.topic" placeholder="{topic}" class="w-50"></b-form-input>
-                    </b-form-group>
-                    <b-form-group label="Text:" label-for="message-text" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                      <b-form-input type="text" size="sm" id="message-text" v-model.trim="message.text" placeholder="{text}" class="w-75"></b-form-input>
-                    </b-form-group>
-                    <b-form-group label="" label-for="message-submit" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                      <b-button size="sm" :disabled="message.topic == null && message.text == null" id="message-submit" @click="sendMessage()" variant="warning">Send Message</b-button>
-                    </b-form-group> -->
                   </b-form-group>
                 </b-card-body>
               </b-card>
@@ -1087,17 +918,10 @@
                   </b-card-body>
                 </b-card>
               </div>
-
             </div>
 
-            <!-- <b-table small fixed striped responsive hover selectable select-mode="single" @row-selected="showModalTxDetails" :fields="transfersFields" :items="pagedFilteredSortedTransfers" show-empty empty-html="Add your tokens in the [tokens] menu, then click [Sync] above" head-variant="light" class="mx-0 my-1"> -->
             <b-table small fixed striped responsive hover :fields="transfersFields" :items="pagedFilteredSortedTransfers" show-empty empty-html="Please click [Sync] above" head-variant="light" class="mx-0 my-1">
               <template #cell(number)="data">
-                <!--
-                <b-form-checkbox size="sm" :checked="selectedCollections[data.item.contract] ? 1 : 0" value="1" @change="toggleSelectedCollections([data.item])">
-                  {{ parseInt(data.index) + ((settings.collections.currentPage - 1) * settings.collections.pageSize) + 1 }}
-                </b-form-checkbox>
-                -->
                 {{ parseInt(data.index) + ((settings.transfersTable.currentPage - 1) * settings.transfersTable.pageSize) + 1 }}
               </template>
               <template #cell(timestamp)="data">
@@ -1121,25 +945,6 @@
                     <br />
                   </div>
                 </div>
-                <!--
-                <div v-if="data.item.info">
-                  <div v-if="data.item.info.type == 'tx'">
-                    Transfer
-                  </div>
-                  <div v-else-if="data.item.info.type == 'addLiquidity'">
-                    Add Liquidity
-                  </div>
-                  <div v-else-if="data.item.info.type == 'dex'">
-                    DEX: <font size="-2"><pre>{{ data.item }}</pre></font>
-                  </div>
-                  <div v-else>
-                    Unknown
-                  </div>
-                </div>
-                <div v-else>
-                  <font size="-2"><pre>{{ data.item }}</pre></font>
-                </div>
-                -->
                 <font size="-2"><pre>{{ data.item }}</pre></font>
               </template>
               <template #cell(from)="data">
@@ -1153,13 +958,6 @@
                     <br />
                   </div>
                 </div>
-                <!--
-                <font size="-2">
-                  <b-link v-if="data.item.info" :href="'https://etherscan.io/address/' + data.item.info.from" v-b-popover.hover.bottom="'View account in etherscan.io'" target="_blank">
-                    {{ ensOrAddress(data.item.info.from) }}
-                  </b-link>
-                </font>
-                -->
               </template>
               <template #cell(to)="data">
                 <div v-if="data.item[4]">
@@ -1172,13 +970,6 @@
                     <br />
                   </div>
                 </div>
-                <!--
-                <font size="-2">
-                  <b-link v-if="data.item.info" :href="'https://etherscan.io/address/' + data.item.info.to" v-b-popover.hover.bottom="'View account in etherscan.io'" target="_blank">
-                    {{ ensOrAddress(data.item.info.to) }}
-                  </b-link>
-                </font>
-                -->
               </template>
               <template #cell(tokens)="data">
                 <div v-if="data.item[4]">
@@ -1416,39 +1207,6 @@
               pageSize: 100,
               sortOption: 'txorderdsc',
             },
-            // pairsTable: {
-            //   filter: null,
-            //   currentPage: 1,
-            //   pageSize: 10,
-            //   sortOption: 'symbolquotebaseasc',
-            // },
-            // pairTable: {
-            //   selectedPair: null,
-            //   buyOrders: {
-            //     filter: null,
-            //     currentPage: 1,
-            //     pageSize: 10,
-            //     // sortOption: 'symbolquotebaseasc',
-            //   },
-            //   sellOrders: {
-            //     filter: null,
-            //     currentPage: 1,
-            //     pageSize: 10,
-            //     // sortOption: 'symbolquotebaseasc',
-            //   },
-            //   history: {
-            //     filter: null,
-            //     currentPage: 1,
-            //     pageSize: 20,
-            //     sortOption: 'timestampdsc',
-            //   },
-            // },
-            // tokensTable: {
-            //   filter: null,
-            //   currentPage: 1,
-            //   pageSize: 10,
-            //   sortOption: 'lastsaledsc',
-            // },
             editAccounts: false,
             accounts: {},
             accountsTable: {
@@ -1484,41 +1242,6 @@
 
           newCoinAddress: null,
           newAddress: null,
-          // allowanceFormData: {
-          //   amount: null,
-          //   token: null,
-          //   decimals: null,
-          // },
-          // wethFormData: {
-          //   direction: "ew",
-          //   amount: null,
-          // },
-          // sell: {
-          //   action: 2,
-          //   price: null,
-          //   targetPrice: null,
-          //   expiry: 1704027599,
-          //   tokens: null,
-          //   quoteTokens: null,
-          // },
-          // buy: {
-          //   action: 2,
-          //   price: null,
-          //   targetPrice: null,
-          //   expiry: 1704027599,
-          //   tokens: null,
-          //   quoteTokens: null,
-          // },
-          // raw: {
-          //   action: 2,
-          //   base: "0x7439E9Bb6D8a84dd3A23fe621A30F95403F87fB9",
-          //   quote: "0x07391dbE03e7a0DEa0fce6699500da081537B6c3",
-          //   buySell: 0,
-          //   price: "0.69012345678",
-          //   targetPrice: "0.69015",
-          //   expiry: 1704027599,
-          //   tokens: "1.012345678901234567",
-          // },
 
           restoreFile: null,
           restoreAddresses: null,
@@ -1536,27 +1259,6 @@
             token: null,
             collection: null,
           },
-          // modalTokenDetails: {
-          //   tokenIndex: null,
-          //   symbol: null,
-          //   name: null,
-          //   decimals: null,
-          //   balance: null,
-          //   allowance: null,
-          //   totalSupply: null,
-          // },
-          // modalMakerOrder: {
-          //   pairKey: null,
-          //   buySell: null,
-          //   price: null,
-          //   orderKey: null,
-          //   makerIndex: null,
-          //   expiry: null,
-          //   originalTokens: null,
-          //   tokens: null,
-          //   availableBase: null,
-          //   availableQuote: null,
-          // },
 
           addressToIndex: {},
           indexToAddress: [],
@@ -1584,38 +1286,6 @@
           selectedCollections: {},
           selectedMainTable: {},
 
-          // messages: {
-          //   invalidInputTokens: "Please enter a valid amount - up to 18 whole numbers and 24 decimal places",
-          //   invalidInputPrice: "Please enter a valid price - up to 12 whole numbers and 12 decimal places",
-          // },
-
-          // tokenInfo: {
-          //   "0x03563574B3839e2CdD6281D8741497Ba82FD6739": {
-          //       "faucet": null,
-          //       "symbol": "BOKKY",
-          //   },
-          //   "0x7439E9Bb6D8a84dd3A23fe621A30F95403F87fB9": {
-          //       "faucet": "weenus",
-          //       "symbol": "WEENUS",
-          //   },
-          //   "0x07391dbE03e7a0DEa0fce6699500da081537B6c3": {
-          //       "faucet": "weth",
-          //       "symbol": "WETH",
-          //   },
-          //   "0xc21d97673B9E0B3AA53a06439F71fDc1facE393B": {
-          //     "faucet": "weenus",
-          //       "symbol": "XEENUS",
-          //   },
-          //   "0x93fCA4c6E2525C09c95269055B46f16b1459BF9d": {
-          //       "faucet": "weenus",
-          //       "symbol": "YEENUS",
-          //   },
-          //   "0xe9EF74A6568E9f0e42a587C9363C9BcC582dcC6c": {
-          //       "faucet": "weenus",
-          //       "symbol": "ZEENUS",
-          //   }
-          // },
-
           actionText: {
             "pairadded": "Pair Added",
             "orderadded": "Order Added",
@@ -1627,8 +1297,6 @@
             { value: 0, text: 'Fill' },
             { value: 1, text: 'Fill Or Kill' },
             { value: 2, text: 'Fill And Add Order' },
-            // { value: 3, text: 'Remove Order' },
-            // { value: 4, text: 'Update Expiry And Tokens' },
           ],
 
           punksSortOptions: [
@@ -1684,7 +1352,6 @@
             { key: 'attributeTotal', label: 'Count', /*sortable: true,*/ thStyle: 'width: 30%;', thClass: 'text-right', tdClass: 'text-right' },
           ],
           pairsFields: [
-            // { key: 'pairKey', label: 'Pair Key', sortable: false, thStyle: 'width: 40%;', tdClass: 'text-truncate' },
             { key: 'baseSymbol', label: 'Base', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
             { key: 'baseName', label: 'Name', sortable: false, thStyle: 'width: 20%;', tdClass: 'text-truncate' },
             { key: 'quoteSymbol', label: 'Quote', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
@@ -1725,8 +1392,6 @@
             { key: 'allowance', label: 'Allowance', sortable: false, thStyle: 'width: 17%;', thClass: 'text-right', tdClass: 'text-right' },
             { key: 'balance', label: 'Balance', sortable: false, thStyle: 'width: 17%;', thClass: 'text-right', tdClass: 'text-right' },
             { key: 'totalSupply', label: 'Total Supply', sortable: false, thStyle: 'width: 17%;', thClass: 'text-right', tdClass: 'text-right' },
-            // { key: 'sync', label: 'Sync', sortable: false, thStyle: 'width: 7%;', tdClass: 'text-truncate' },
-            // { key: 'include', label: 'Include', sortable: false, thStyle: 'width: 7%;', tdClass: 'text-truncate' },
             { key: 'getSome', label: 'Get Some', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
             { key: 'delete', label: 'Delete', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
           ],
@@ -1738,10 +1403,8 @@
           ],
           transfersFields: [
             { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
-            // { key: 'blockNumber', label: 'Block Number', sortable: false, thStyle: 'width: 15%;', tdClass: 'text-truncate' },
             { key: 'timestamp', label: 'When', sortable: false, thStyle: 'width: 15%;', tdClass: 'text-truncate' },
             { key: 'info', label: 'Info', sortable: false, thStyle: 'width: 15%;', tdClass: 'text-truncate' },
-            // { key: 'coin', label: 'Coin', sortable: false, thStyle: 'width: 20%;', tdClass: 'text-truncate' },
             { key: 'from', label: 'From', sortable: false, thStyle: 'width: 15%;', tdClass: 'text-truncate' },
             { key: 'to', label: 'To', sortable: false, thStyle: 'width: 15%;', tdClass: 'text-truncate' },
             { key: 'tokens', label: 'Tokens', sortable: false, thStyle: 'width: 20%;', thClass: 'text-right', tdClass: 'text-right' },
@@ -1767,8 +1430,6 @@
             { key: 'address', label: 'Address', sortable: true, thStyle: 'width: 60%;', tdClass: 'text-truncate' },
             { key: 'name', label: 'Name', sortable: true, thStyle: 'width: 20%;', tdClass: 'text-truncate' },
             { key: 'group', label: 'Group', sortable: true, thStyle: 'width: 20%;', tdClass: 'text-truncate' },
-            // { key: 'sync', label: 'Sync', sortable: true, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
-            // { key: 'include', label: 'Include', sortable: true, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
           ],
           transactionTypes: {
             1: "Transfer",
@@ -3325,123 +2986,6 @@
             this.sync.section = null;
           },
 
-          // newAccountResetModal() {
-          //   this.newAddress = null;
-          // },
-          // newAccountHandleOk(bvModalEvent) {
-          //   // Prevent modal from closing
-          //   bvModalEvent.preventDefault();
-          //   // Trigger submit handler
-          //   this.newAccountHandleSubmit();
-          // },
-          // newAccountHandleSubmit() {
-          //   // Exit when the form isn't valid
-          //   if (!this.checkAccountFormValidity()) {
-          //     return;
-          //   }
-          //   if (!(this.newAddress in this.settings.accounts)) {
-          //     console.log("Adding: " + this.newAddress);
-          //     Vue.set(this.settings.accounts, this.newAddress, {
-          //       name: null,
-          //       group: null,
-          //     });
-          //   } else {
-          //     console.log("Discarding duplicate: " + this.newAddress);
-          //   }
-          //   // Hide the modal manually
-          //   this.$nextTick(() => {
-          //     this.$bvModal.hide('new-account-modal-prevent-closing');
-          //   })
-          //   this.saveSettings();
-          // },
-
-          // allowanceFormResetModal() {
-          //   this.allowanceFormData.amount = null;
-          // },
-          // wethFormResetModal() {
-          //   this.wethFormData.direction = "ew";
-          //   this.wethFormData.amount = null;
-          // },
-          // allowanceFormHandleOk(bvModalEvent) {
-          //   // Prevent modal from closing
-          //   bvModalEvent.preventDefault();
-          //   // Trigger submit handler
-          //   this.allowanceFormHandleSubmit();
-          // },
-          // wethFormHandleOk(bvModalEvent) {
-          //   // Prevent modal from closing
-          //   bvModalEvent.preventDefault();
-          //   // Trigger submit handler
-          //   this.wethFormHandleSubmit();
-          // },
-          // async allowanceFormHandleSubmit() {
-          //   console.log("allowanceFormHandleSubmit");
-          //   // Exit when the form isn't valid
-          //   if (!this.checkAllowanceFormValidity()) {
-          //     return;
-          //   }
-          //   const provider = new ethers.providers.Web3Provider(window.ethereum);
-          //   const signer = provider.getSigner();
-          //   const erc20Contract = new ethers.Contract(this.allowanceFormData.token, ERC20ABI, provider);
-          //   const erc20ContractWithSigner = erc20Contract.connect(provider.getSigner());
-          //   try {
-          //     const tx = await erc20ContractWithSigner.approve(CHADEXADDRESS_SEPOLIA, ethers.utils.parseUnits(this.allowanceFormData.amount, this.allowanceFormData.decimals).toString() );
-          //     console.log("tx: " + JSON.stringify(tx));
-          //   } catch (e) {
-          //     console.log("allowanceFormHandleSubmit error: " + JSON.stringify(e));
-          //   }
-          //   // Hide the modal manually
-          //   this.$nextTick(() => {
-          //     this.$bvModal.hide('allowance-modal-prevent-closing');
-          //   })
-          // },
-          // async wethFormHandleSubmit() {
-          //   console.log("wethFormHandleSubmit");
-          //   // Exit when the form isn't valid
-          //   if (!this.checkWethFormValidity()) {
-          //     return;
-          //   }
-          //   const provider = new ethers.providers.Web3Provider(window.ethereum);
-          //   const signer = provider.getSigner();
-          //   if (this.wethFormData.direction == "ew") {
-          //     try {
-          //       const tx = await signer.sendTransaction({ to: WETH9ADDRESS_SEPOLIA, value: ethers.utils.parseEther(this.wethFormData.amount) });
-          //       console.log("tx: " + JSON.stringify(tx));
-          //     } catch (e) {
-          //       console.log("wethFormHandleSubmit error: " + JSON.stringify(e));
-          //     }
-          //   } else {
-          //     const wethContract = new ethers.Contract(WETH9ADDRESS_SEPOLIA, WETH9ABI_SEPOLIA, provider);
-          //     const wethContractWithSigner = wethContract.connect(provider.getSigner());
-          //     try {
-          //       const tx = await wethContractWithSigner.withdraw(ethers.utils.parseEther(this.wethFormData.amount));
-          //       console.log("tx: " + JSON.stringify(tx));
-          //     } catch (e) {
-          //       console.log("wethFormHandleSubmit error: " + JSON.stringify(e));
-          //     }
-          //   }
-          //   // Hide the modal manually
-          //   this.$nextTick(() => {
-          //     this.$bvModal.hide('weth-modal-prevent-closing');
-          //   })
-          // },
-
-          // toggleAccountField(account, field) {
-          //   Vue.set(this.settings.accounts[account], field, !this.settings.accounts[account][field]);
-          //   this.saveSettings();
-          // },
-          // setAccountField(account, field, value) {
-          //   Vue.set(this.settings.accounts[account], field, value);
-          //   this.saveSettings();
-          // },
-          // deleteToken(coin) {
-          //   Vue.delete(this.settings.tokens, coin);
-          //   this.saveSettings();
-          // },
-          // deleteAccount(account) {
-          //   Vue.delete(this.settings.accounts, account);
-          //   this.saveSettings();
-          // },
           saveSettings() {
             localStorage.cryptoPunksDataSettings = JSON.stringify(this.settings);
             // console.log("saveSettings: " + JSON.stringify(this.settings));
@@ -3464,191 +3008,6 @@
             Vue.set(this.settings, 'filters', {});
             this.saveSettings();
           },
-          // async showModalAccountsImport(item) {
-          //   // console.log("showModalAccountsImport: " + JSON.stringify(item));
-          //   // let url = "https://api.reservoir.tools/collections/v5?contract=" + item.contract;
-          //   // console.log(url);
-          //   // const data = await fetch(url).then(response => response.json());
-          //   // const collection = data.collections && data.collections.length == 1 && data.collections[0] || {};
-          //   this.modalDetails = {
-          //     item,
-          //     txHash: item[0],
-          //   //   token: item,
-          //   //   collection,
-          //   };
-          //   console.log(JSON.stringify(this.modalDetails, null, 2));
-          //   this.$bvModal.show('modal-accounts-import');
-          // },
-          // async showModalTxDetails(item) {
-          //   // console.log("showModalTxDetails - item: " + JSON.stringify(item));
-          //   const provider = new ethers.providers.Web3Provider(window.ethereum);
-          //
-          //   // let url = "https://api.reservoir.tools/collections/v5?contract=" + item.contract;
-          //   // console.log(url);
-          //   // const data = await fetch(url).then(response => response.json());
-          //   // const collection = data.collections && data.collections.length == 1 && data.collections[0] || {};
-          //   this.modalTxDetails.item = item;
-          //   // console.log("showModalTxDetails - this.modalTxDetails.item: " + JSON.stringify(item));
-          //   this.$bvModal.show('modal-tx-details');
-          //   // this.modalTxDetails = {
-          //   //   item,
-          //   //   txHash,
-          //   // };
-          //   const tx = await provider.getTransaction(item.txHash);
-          //   // console.log("showModalTxDetails - tx: " + JSON.stringify(tx));
-          //   const txReceipt = await provider.getTransactionReceipt(item.txHash);
-          //   // console.log("showModalTxDetails - txReceipt: " + JSON.stringify(txReceipt));
-          //
-          //   if (tx.to == CHADEXADDRESS_SEPOLIA) {
-          //     const interface = new ethers.utils.Interface(CHADEXABI);
-          //     try {
-          //       let decodedData = interface.parseTransaction({ data: tx.data, value: tx.value });
-          //       // console.log("showModalTxDetails - decodedData: " + JSON.stringify(decodedData, null, 2));
-          //       if (decodedData.functionFragment.name == "execute") {
-          //         console.log("showModalTxDetails - execute()");
-          //         // const tradeInput = decodedData.functionFragment.inputs;
-          //         // console.log("showModalTxDetails - tradeInput: " + JSON.stringify(tradeInput, null, 2));
-          //         // console.log("decodedData.functionFragment.inputs: " + JSON.stringify(decodedData.functionFragment.inputs));
-          //         // console.log("decodedData.args: " + JSON.stringify(decodedData.args));
-          //         // struct TradeInput {
-          //         //     Action action;
-          //         //     BuySell buySell;
-          //         //     Token base;
-          //         //     Token quote;
-          //         //     Price price;
-          //         //     Price targetPrice;
-          //         //     Unixtime expiry;
-          //         //     Tokens tokens;
-          //         //     bool skipCheck;
-          //         // }
-          //
-          //         const tradeInputs = [];
-          //         for (let i = 0; i < decodedData.args.length; i++) {
-          //           // console.log("decodedData.args[" + i + "]: " + JSON.stringify(decodedData.args[i]));
-          //           const details = decodedData.args[i][0];
-          //           // console.log("details: " + JSON.stringify(details, null, 2));
-          //           const [action, buySell, base, quote, price, targetPrice, expiry, tokens, skipCheck] = decodedData.args[i][0];
-          //           // console.log("action: " + action + ", buySell: " + buySell + ", base:" + base + ", quote:" + quote + ", price: " + price + ", targetPrice: " + targetPrice + ", expiry: " + expiry + ", tokens: " + tokens + ", skipCheck: " + skipCheck);
-          //           tradeInputs.push({ action, buySell, base, quote, price: price.toString(), targetPrice: targetPrice.toString(), expiry: parseInt(expiry), tokens: tokens.toString(), skipCheck });
-          //           // TODO: Testing
-          //           // tradeInputs.push({ action, buySell, base, quote, price: price.toString(), targetPrice: targetPrice.toString(), expiry: parseInt(expiry), tokens: tokens.toString(), skipCheck });
-          //         }
-          //         console.log("tradeInputs: " + JSON.stringify(tradeInputs, null, 2));
-          //         Vue.set(this.modalTxDetails, 'tradeInputs', tradeInputs);
-          //         for (let i in decodedData.functionFragment.inputs) {
-          //           const c = decodedData.functionFragment.inputs[i];
-          //           console.log("  " + i + " " + c.name + " " + c.type + " " + JSON.stringify(decodedData.args[i]));
-          //         }
-          //       }
-          //     } catch (e) {
-          //       console.log("showModalTxDetails - Error decoding: " + JSON.stringify(tx.data));
-          //     }
-          //   }
-          //
-          //   Vue.set(this.modalTxDetails, 'tx', {
-          //   //   hash: tx.hash,
-          //   //   type: tx.type,
-          //   //   blockHash: tx.blockHash,
-          //   //   blockNumber: tx.blockNumber,
-          //   //   transactionIndex: tx.transactionIndex,
-          //     from: tx.from,
-          //     to: tx.to,
-          //   //   gasPrice: ethers.BigNumber.from(tx.gasPrice).toString(),
-          //   //   gasLimit: ethers.BigNumber.from(tx.gasLimit).toString(),
-          //   //   to: tx.to,
-          //   //   value: ethers.BigNumber.from(tx.value).toString(),
-          //   //   nonce: tx.nonce,
-          //   //   data: tx.to && tx.data || null, // Remove contract creation data to reduce memory footprint
-          //   //   // r: tx.r,
-          //   //   // s: tx.s,
-          //   //   // v: tx.v,
-          //   //   chainId: tx.chainId,
-          //   // });
-          //   // const txReceipt = await provider.getTransactionReceipt(txHash);
-          //   // Vue.set(this.modalDetails, 'txReceipt', {
-          //   //   to: txReceipt.to,
-          //   //   from: txReceipt.from,
-          //   //   contractAddress: txReceipt.contractAddress,
-          //   //   transactionIndex: txReceipt.transactionIndex,
-          //   //   gasUsed: ethers.BigNumber.from(txReceipt.gasUsed).toString(),
-          //   //   blockHash: txReceipt.blockHash,
-          //   //   // transactionHash: txReceipt.transactionHash,
-          //   //   logs: txReceipt.logs,
-          //   //   blockNumber: txReceipt.blockNumber,
-          //   //   // confirmations: txReceipt.confirmations,
-          //   //   cumulativeGasUsed: ethers.BigNumber.from(txReceipt.cumulativeGasUsed).toString(),
-          //   //   effectiveGasPrice: ethers.BigNumber.from(txReceipt.effectiveGasPrice).toString(),
-          //   //   status: txReceipt.status,
-          //   //   type: txReceipt.type,
-          //   //   // byzantium: txReceipt.byzantium,
-          //   });
-          //   // console.log("tx: " + JSON.stringify(tx, null, 2));
-          //   // console.log("txReceipt: " + JSON.stringify(txReceipt, null, 2));
-          //   // console.log(JSON.stringify(this.modalDetails, null, 2));
-          // },
-          // async showModalTokenDetails(tokenIndex) {
-          //   console.log("showModalTokenDetails: " + tokenIndex);
-          //   const provider = new ethers.providers.Web3Provider(window.ethereum);
-          //   this.$bvModal.show('modal-token-details');
-          //   this.modalTokenDetails.tokenIndex = tokenIndex;
-          //   const token = this.tokens[tokenIndex] || {};
-          //   console.log("this.tokens: " + JSON.stringify(this.tokens, null, 2));
-          //   this.modalTokenDetails.address = this.indexToAddress[tokenIndex] || "?";
-          //   this.modalTokenDetails.symbol = token.symbol || "?";
-          //   this.modalTokenDetails.name = token.name || "?";
-          //   this.modalTokenDetails.decimals = token.decimals || "?";
-          //   const erc20 = new ethers.Contract(this.modalTokenDetails.address, ERC20ABI, provider);
-          //   this.modalTokenDetails.balance = ethers.BigNumber.from(await erc20.balanceOf(this.coinbase)).toString();
-          //   this.modalTokenDetails.allowance = ethers.BigNumber.from(await erc20.allowance(this.coinbase, CHADEXADDRESS_SEPOLIA)).toString();
-          //   this.modalTokenDetails.totalSupply = ethers.BigNumber.from(await erc20.totalSupply()).toString() || "?";
-          //   console.log("balance: " + this.modalTokenDetails.balance);
-          // },
-          // async showModalMakerOrder(buySell, item) {
-          //   console.log("showModalMakerOrder - buySell: " + buySell + ", item: " + JSON.stringify(item));
-          //   const provider = new ethers.providers.Web3Provider(window.ethereum);
-          //   this.$bvModal.show('modal-maker-order');
-          //   this.modalMakerOrder.pairKey = this.settings.pairTable.selectedPair;
-          //   this.modalMakerOrder.buySell = buySell;
-          //   this.modalMakerOrder.price = item.price;
-          //   this.modalMakerOrder.orderKey = item.orderKey;
-          //   this.modalMakerOrder.makerIndex = item.makerIndex;
-          //   this.modalMakerOrder.expiry = item.expiry;
-          //   this.modalMakerOrder.originalTokens = item.originalTokens;
-          //   this.modalMakerOrder.tokens = item.tokens;
-          //   this.modalMakerOrder.availableBase = item.availableBase;
-          //   this.modalMakerOrder.availableQuote = item.availableQuote;
-          //   console.log("this.modalMakerOrder: " + JSON.stringify(this.modalMakerOrder, null, 2));
-          // },
-          // toggleSyncAccounts(items) {
-          //   let someFalse = false;
-          //   let someTrue = false;
-          //   for (const item of items) {
-          //     if (item.sync) {
-          //       someTrue = true;
-          //     } else {
-          //       someFalse = true;
-          //     }
-          //   }
-          //   for (const item of items) {
-          //     Vue.set(this.settings.accounts[item.address], 'sync', !(someTrue && !someFalse));
-          //   }
-          //   this.saveSettings();
-          // },
-          // toggleIncludeAccounts(items) {
-          //   let someFalse = false;
-          //   let someTrue = false;
-          //   for (const item of items) {
-          //     if (item.include) {
-          //       someTrue = true;
-          //     } else {
-          //       someFalse = true;
-          //     }
-          //   }
-          //   for (const item of items) {
-          //     Vue.set(this.settings.accounts[item.address], 'include', !(someTrue && !someFalse));
-          //   }
-          //   this.saveSettings();
-          // },
           async syncAll(blockNumber) {
             console.log(moment().format("HH:mm:ss") + " syncAll - blockNumber: " + blockNumber + ", chainId: " + this.chainId);
             const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -3665,64 +3024,8 @@
               await this.syncChadexPairs(context);
               await this.syncChadexPair(context);
             }
-            // if (this.chainId == CHAINID_MAINNET) {
-              // console.log("CHAINID_MAINNET: TODO");
-              // await this.syncAllENSNames(context);
-            // }
-            // for (const [address, coinInfo] of Object.entries(this.settings.tokens)) {
-            //   if (coinInfo.sync && !this.sync.halt) {
-            //     const context = { provider, confirmedBlockNumber, db, address, symbol: coinInfo.symbol };
-            //     // await this.syncCoinTransfers(context);
-            //     // await this.syncUniswapV2Pools(context);
-            //     // await this.syncUniswapV3Pools(context);
-            //     // await this.syncUniswapV2Trades(context);
-            //     // await this.syncUniswapV3Trades(context);
-            //     // await this.syncUniswapAltTokenTransfers(context);
-            //     // // await this.syncAllENSNames(context);
-            //     // // await this.testSyncENSNames(context);
-            //   }
-            // }
-            // this.sync.section = null;
-            // this.sync.halt = false;
             db.close();
-            // await this.loadCurrentData(); // TODO
           },
-          // async syncBlockTimestamps(context, newBlocks) {
-          //   this.sync.completed = 0;
-          //   this.sync.total = newBlocks.length;
-          //   this.sync.section = context.symbol + ' Timestamps';
-          //   const BATCHSIZE = 1000;
-          //   for (let i = 0; i < newBlocks.length; i += BATCHSIZE) {
-          //     const batch = newBlocks.slice(i, parseInt(i) + BATCHSIZE);
-          //     const data = await fetch(BLOCKTIMESTAMPSUBGRAPHURL, {
-          //       method: 'POST',
-          //       headers: {
-          //         'Content-Type': 'application/json',
-          //         'Accept': 'application/json',
-          //       },
-          //       body: JSON.stringify({
-          //         query: BLOCKTIMESTAMPINQUERY,
-          //         variables: { blockNumbers: batch.map(e => parseInt(e)) },
-          //       })
-          //     }).then(response => response.json())
-          //       .catch(function(e) {
-          //         console.log("error: " + e);
-          //       });
-          //     const timestamps = data.data && data.data.blocks || [];
-          //     for (const timestampItem of timestamps) {
-          //       Vue.set(this.blockTimestamps, parseInt(timestampItem.number), parseInt(timestampItem.timestamp));
-          //     }
-          //     this.sync.completed += timestamps.length;
-          //     console.log(moment().format("HH:mm:ss") + " syncBlockTimestamps " + this.sync.completed + " of " + timestamps.length);
-          //   }
-          //   await context.db.cache.put({ objectName: "blockTimestamps", object: this.blockTimestamps }).then (function() {
-          //   }).catch(function(error) {
-          //     console.log("error: " + error);
-          //   });
-          // },
-          // async testSyncENSNames(context) {
-          //   await this.syncENSNames(context, this.indexToAddress);
-          // },
           async syncAllENSNames(context) {
             console.log("syncAllENSNames");
             const ensReverseRecordsContract = new ethers.Contract(ENSREVERSERECORDSADDRESS, ENSREVERSERECORDSABI, context.provider);
@@ -3742,7 +3045,7 @@
 
             const addresses = indexToAddress;
             // addresses.sort();
-          //
+
             const MAXBATCHSIZE = 1000;
             let batchSize = MAXBATCHSIZE;
             let completed = 0;
