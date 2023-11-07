@@ -3255,8 +3255,45 @@
             this.sync.section = null;
             this.sync.halt = false;
 
+            await this.loadBlockTimestamps();
             await this.loadCurrentData();
           },
+
+          async loadBlockTimestamps(/*context, newBlocks*/) {
+            console.log(moment().format("YYYY-MM-DD HH:mm:ss") + " loadBlockTimestamps");
+            // this.sync.completed = 0;
+            // this.sync.total = newBlocks.length;
+            // this.sync.section = context.symbol + ' Timestamps';
+            // const BATCHSIZE = 1000;
+            // for (let i = 0; i < newBlocks.length; i += BATCHSIZE) {
+            //   const batch = newBlocks.slice(i, parseInt(i) + BATCHSIZE);
+            //   const data = await fetch(BLOCKTIMESTAMPSUBGRAPHURL, {
+            //     method: 'POST',
+            //     headers: {
+            //       'Content-Type': 'application/json',
+            //       'Accept': 'application/json',
+            //     },
+            //     body: JSON.stringify({
+            //       query: BLOCKTIMESTAMPINQUERY,
+            //       variables: { blockNumbers: batch.map(e => parseInt(e)) },
+            //     })
+            //   }).then(response => response.json())
+            //     .catch(function(e) {
+            //       console.log("error: " + e);
+            //     });
+            //   const timestamps = data.data && data.data.blocks || [];
+            //   for (const timestampItem of timestamps) {
+            //     Vue.set(this.blockTimestamps, parseInt(timestampItem.number), parseInt(timestampItem.timestamp));
+            //   }
+            //   this.sync.completed += timestamps.length;
+            //   console.log(moment().format("HH:mm:ss") + " syncBlockTimestamps " + this.sync.completed + " of " + timestamps.length);
+            // }
+            // await context.db.cache.put({ objectName: "blockTimestamps", object: this.blockTimestamps }).then (function() {
+            // }).catch(function(error) {
+            //   console.log("error: " + error);
+            // });
+          },
+
           // newAccountResetModal() {
           //   this.newAddress = null;
           // },
@@ -3619,39 +3656,39 @@
             db.close();
             // await this.loadCurrentData(); // TODO
           },
-          async syncBlockTimestamps(context, newBlocks) {
-            this.sync.completed = 0;
-            this.sync.total = newBlocks.length;
-            this.sync.section = context.symbol + ' Timestamps';
-            const BATCHSIZE = 1000;
-            for (let i = 0; i < newBlocks.length; i += BATCHSIZE) {
-              const batch = newBlocks.slice(i, parseInt(i) + BATCHSIZE);
-              const data = await fetch(BLOCKTIMESTAMPSUBGRAPHURL, {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'Accept': 'application/json',
-                },
-                body: JSON.stringify({
-                  query: BLOCKTIMESTAMPINQUERY,
-                  variables: { blockNumbers: batch.map(e => parseInt(e)) },
-                })
-              }).then(response => response.json())
-                .catch(function(e) {
-                  console.log("error: " + e);
-                });
-              const timestamps = data.data && data.data.blocks || [];
-              for (const timestampItem of timestamps) {
-                Vue.set(this.blockTimestamps, parseInt(timestampItem.number), parseInt(timestampItem.timestamp));
-              }
-              this.sync.completed += timestamps.length;
-              console.log(moment().format("HH:mm:ss") + " syncBlockTimestamps " + this.sync.completed + " of " + timestamps.length);
-            }
-            await context.db.cache.put({ objectName: "blockTimestamps", object: this.blockTimestamps }).then (function() {
-            }).catch(function(error) {
-              console.log("error: " + error);
-            });
-          },
+          // async syncBlockTimestamps(context, newBlocks) {
+          //   this.sync.completed = 0;
+          //   this.sync.total = newBlocks.length;
+          //   this.sync.section = context.symbol + ' Timestamps';
+          //   const BATCHSIZE = 1000;
+          //   for (let i = 0; i < newBlocks.length; i += BATCHSIZE) {
+          //     const batch = newBlocks.slice(i, parseInt(i) + BATCHSIZE);
+          //     const data = await fetch(BLOCKTIMESTAMPSUBGRAPHURL, {
+          //       method: 'POST',
+          //       headers: {
+          //         'Content-Type': 'application/json',
+          //         'Accept': 'application/json',
+          //       },
+          //       body: JSON.stringify({
+          //         query: BLOCKTIMESTAMPINQUERY,
+          //         variables: { blockNumbers: batch.map(e => parseInt(e)) },
+          //       })
+          //     }).then(response => response.json())
+          //       .catch(function(e) {
+          //         console.log("error: " + e);
+          //       });
+          //     const timestamps = data.data && data.data.blocks || [];
+          //     for (const timestampItem of timestamps) {
+          //       Vue.set(this.blockTimestamps, parseInt(timestampItem.number), parseInt(timestampItem.timestamp));
+          //     }
+          //     this.sync.completed += timestamps.length;
+          //     console.log(moment().format("HH:mm:ss") + " syncBlockTimestamps " + this.sync.completed + " of " + timestamps.length);
+          //   }
+          //   await context.db.cache.put({ objectName: "blockTimestamps", object: this.blockTimestamps }).then (function() {
+          //   }).catch(function(error) {
+          //     console.log("error: " + error);
+          //   });
+          // },
           // async testSyncENSNames(context) {
           //   await this.syncENSNames(context, this.indexToAddress);
           // },
@@ -3827,10 +3864,10 @@
                       }
                       for (const [logIndex, txInfo] of Object.entries(logIndexes)) {
                         txs[txHash][2].push([ parseInt(logIndex), contractIndex, ...txInfo ]);
-                        if ((count % 10000) == 0) {
-                          console.log(count + " " + blockNumber + "/" + txIndex + "/" + txHash + "/" + logIndex + " => " + JSON.stringify(txInfo));
-                        }
-                        count++
+                        // if ((count % 10000) == 0) {
+                        //   console.log(count + " " + blockNumber + "/" + txIndex + "/" + txHash + "/" + logIndex + " => " + JSON.stringify(txInfo));
+                        // }
+                        // count++
                       }
                     }
                   }
@@ -3842,7 +3879,7 @@
             // console.log(moment().format("YYYY-MM-DD HH:mm:ss") + " txs: " + JSON.stringify(txs));
             this.txs = txs;
             // console.log(moment().format("YYYY-MM-DD HH:mm:ss") + " this.txs: " + JSON.stringify(new Map(Array.from(this.txs).slice(0, 9))));
-            console.log(moment().format("YYYY-MM-DD HH:mm:ss") + " this.txs: " +  JSON.stringify(this.txs).substring(0, 5000));
+            // console.log(moment().format("YYYY-MM-DD HH:mm:ss") + " this.txs: " +  JSON.stringify(this.txs).substring(0, 1000));
             console.log(moment().format("YYYY-MM-DD HH:mm:ss") + " Unique txHashes: " + Object.keys(this.txs).length);
 
             console.log(moment().format("YYYY-MM-DD HH:mm:ss") + " loadCurrentData END");
