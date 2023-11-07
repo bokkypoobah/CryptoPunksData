@@ -2987,7 +2987,7 @@
             //    w2 event Unpaused(address account);
             //    w2 event ProxyRegistered(address user, address proxy);
 
-            const CONFIRMATIONS = 1000;
+            const CONFIRMATIONS = 100;
             console.log(moment().format("HH:mm:ss") + " syncCryptoPunksData - chainId: " + this.chainId);
             const db = new Dexie(this.db.name);
             db.version(this.db.version).stores(this.db.schemaDefinition);
@@ -3226,6 +3226,7 @@
                 }
               }
 
+              // TODO
               const DEVMODE = false;
               const eventsDataItems = await db.cache.where("objectName").equals(this.chainId + "_" + process.address + "_events").toArray();
               if (eventsDataItems.length == 1) {
@@ -3271,43 +3272,68 @@
             this.sync.section = null;
             this.sync.halt = false;
 
-            await this.loadBlockTimestamps();
+            await this.loadBlockTimestamps(db);
             await this.loadCurrentData();
           },
 
-          async loadBlockTimestamps(/*context, newBlocks*/) {
+          async loadBlockTimestamps(db/*context, newBlocks*/) {
             console.log(moment().format("YYYY-MM-DD HH:mm:ss") + " loadBlockTimestamps");
-            // this.sync.completed = 0;
-            // this.sync.total = newBlocks.length;
-            // this.sync.section = context.symbol + ' Timestamps';
-            // const BATCHSIZE = 1000;
-            // for (let i = 0; i < newBlocks.length; i += BATCHSIZE) {
-            //   const batch = newBlocks.slice(i, parseInt(i) + BATCHSIZE);
-            //   const data = await fetch(BLOCKTIMESTAMPSUBGRAPHURL, {
-            //     method: 'POST',
-            //     headers: {
-            //       'Content-Type': 'application/json',
-            //       'Accept': 'application/json',
-            //     },
-            //     body: JSON.stringify({
-            //       query: BLOCKTIMESTAMPINQUERY,
-            //       variables: { blockNumbers: batch.map(e => parseInt(e)) },
-            //     })
-            //   }).then(response => response.json())
-            //     .catch(function(e) {
-            //       console.log("error: " + e);
-            //     });
-            //   const timestamps = data.data && data.data.blocks || [];
-            //   for (const timestampItem of timestamps) {
-            //     Vue.set(this.blockTimestamps, parseInt(timestampItem.number), parseInt(timestampItem.timestamp));
-            //   }
-            //   this.sync.completed += timestamps.length;
-            //   console.log(moment().format("HH:mm:ss") + " syncBlockTimestamps " + this.sync.completed + " of " + timestamps.length);
-            // }
-            // await context.db.cache.put({ objectName: "blockTimestamps", object: this.blockTimestamps }).then (function() {
-            // }).catch(function(error) {
-            //   console.log("error: " + error);
-            // });
+
+            const blockNumbersToProcess = [];
+            // TODO: Handle 'unconfirmed'
+            for (const process of this.contracts) {
+              // console.log(moment().format("YYYY-MM-DD HH:mm:ss") + " loadCurrentData - processing: " + process.name);
+              const contractIndex = this.addressToIndex[process.address];
+
+              const eventsDataItems = await db.cache.where("objectName").equals(this.chainId + "_" + process.address + "_events").toArray();
+              if (eventsDataItems.length == 1) {
+                events = eventsDataItems[0].object;
+                for (const [blockNumber, txIndexes] of Object.entries(events)) {
+                  if (!(blockNumber in this.blockTimestamps)) {
+                    blockNumbersToProcess.push(blockNumber);
+                  }
+                }
+              }
+            }
+            console.log("blockNumbersToProcess.length: " + blockNumbersToProcess.length);
+
+            this.sync.completed = 0;
+            this.sync.total = blockNumbersToProcess.length;
+            this.sync.section = 'Timestamps';
+            const BATCHSIZE = 1000;
+            for (let i = 0; i < blockNumbersToProcess.length; i += BATCHSIZE) {
+              const batch = blockNumbersToProcess.slice(i, parseInt(i) + BATCHSIZE);
+              console.log(i + " " + JSON.stringify(batch.slice(0, 10)));
+              const data = await fetch(BLOCKTIMESTAMPSUBGRAPHURL, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Accept': 'application/json',
+                },
+                body: JSON.stringify({
+                  query: BLOCKTIMESTAMPINQUERY,
+                  variables: { blockNumbers: batch.map(e => parseInt(e)) },
+                })
+              }).then(response => response.json())
+              .catch(function(e) {
+                console.log("error: " + e);
+              });
+              const timestamps = data.data && data.data.blocks || [];
+              // console.log(i + " " + JSON.stringify(timestamps));
+              for (const timestampItem of timestamps) {
+                Vue.set(this.blockTimestamps, timestampItem.number, parseInt(timestampItem.timestamp));
+              }
+              this.sync.completed += timestamps.length;
+              console.log(moment().format("HH:mm:ss") + " loadBlockTimestamps " + this.sync.completed + " of " + blockNumbersToProcess.length);
+            }
+
+            console.log(moment().format("HH:mm:ss") + " Object.keys(this.blockTimestamps).length: " + Object.keys(this.blockTimestamps).length);
+
+            await db.cache.put({ objectName: this.chainId + "_blockTimestamps", object: this.blockTimestamps }).then (function() {
+            }).catch(function(error) {
+              console.log("error: " + error);
+            });
+            this.sync.section = null;
           },
 
           // newAccountResetModal() {
@@ -3853,6 +3879,12 @@
             if (addressToIndexDataItems.length == 1) {
               Vue.set(this, 'addressToIndex', addressToIndexDataItems[0].object);
               // console.log(moment().format("YYYY-MM-DD HH:mm:ss") + " " + "loadCurrentData - addressToIndex: " + JSON.stringify(Object.entries(this.addressToIndex).slice(0, 3)) + ", ...");
+            }
+
+            const blockTimestampsDataItems = await db.cache.where("objectName").equals(this.chainId + "_blockTimestamps").toArray();
+            if (blockTimestampsDataItems.length == 1) {
+              Vue.set(this, 'blockTimestamps', blockTimestampsDataItems[0].object);
+              console.log(moment().format("YYYY-MM-DD HH:mm:ss") + " " + "loadCurrentData - Object.keys(blockTimestamps).length: " + Object.keys(this.blockTimestamps).length);
             }
 
             let count = 0;
