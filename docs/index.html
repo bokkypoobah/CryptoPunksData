@@ -548,24 +548,6 @@
             { value: 'txorderasc', text: '▲ TxOrder' },
             { value: 'txorderdsc', text: '▼ TxOrder' },
           ],
-          pairsSortOptions: [
-            { value: 'symbolquotebaseasc', text: '▲ Quote, ▲ Base' },
-            { value: 'symbolbasequoteasc', text: '▲ Base, ▲ Quote' },
-          ],
-          accountsSortOptions: [
-            { value: 'groupnameasc', text: '▲ Group, ▲ Name' },
-            { value: 'groupnamedsc', text: '▼ Group, ▲ Name' },
-            { value: 'nameasc', text: '▲ Name' },
-            { value: 'namedsc', text: '▼ Name' },
-          ],
-          transfersSortOptions: [
-            { value: 'blocknumberasc', text: '▲ Block Number' },
-            { value: 'blocknumberdsc', text: '▼ Block Number' },
-          ],
-          tokensSortOptions: [
-            { value: 'lastsaleasc', text: '▲ Last Sale' },
-            { value: 'lastsaledsc', text: '▼ Last Sale' },
-          ],
           pageSizes: [
             { value: 5, text: '5' },
             { value: 10, text: '10' },
@@ -625,60 +607,6 @@
               results[eventType] = eventTypeIndex;
             }
             return results;
-          },
-          newCoinAddressState() {
-            if (this.newCoinAddress) {
-              try {
-                const a = ethers.utils.getAddress(this.newCoinAddress);
-                return a && a.length > 0;
-              } catch (e) {
-                return false;
-              }
-            }
-            return null;
-          },
-          newAddressState() {
-            if (this.newAddress) {
-              try {
-                const a = ethers.utils.getAddress(this.newAddress);
-                return a && a.length > 0;
-              } catch (e) {
-                return false;
-              }
-            }
-            return null;
-          },
-          allowanceAmountState() {
-            if (this.allowanceFormData.amount) {
-              if (/^[+-]?\d+(\.\d+)?$/.test(this.allowanceFormData.amount)) {
-                try {
-                  const a = !isNaN(parseFloat(this.allowanceFormData.amount));
-                  console.log("allowanceAmountState: " + a);
-                  return a;
-                } catch (e) {
-                  return false;
-                }
-              } else {
-                return false;
-              }
-            }
-            return null;
-          },
-          wethAmountState() {
-            if (this.wethFormData.amount) {
-              if (/^[+-]?\d+(\.\d+)?$/.test(this.wethFormData.amount)) {
-                try {
-                  const a = !isNaN(parseFloat(this.wethFormData.amount));
-                  console.log("wethAmountState: " + a);
-                  return a;
-                } catch (e) {
-                  return false;
-                }
-              } else {
-                return false;
-              }
-            }
-            return null;
           },
           punkAttributes() {
             return PUNKATTRIBUTES;
