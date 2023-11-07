@@ -122,10 +122,6 @@
             </b-form-group>
 
             <span v-if="modalTxDetails.tradeInputs" v-for="(tradeInput, tradeInputIndex) in modalTxDetails.tradeInputs" :key="tradeInputIndex">
-              <!-- {{ tradeInputIndex }} {{ tradeInput }} -->
-              <!-- <b-form-group :label="'Execute[' + tradeInputIndex + ']:'" label-for="modal-tx-details-execute" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0"> -->
-              <!-- <b-form-group :label="'Execute[' + tradeInputIndex + ']:'" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0"> -->
-
                 <b-form-group :label="'Action[' + tradeInputIndex + ']:'" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                   <b-form-input type="text" readonly size="sm" :value="tradeInput.action == 0 ? 'Fill' : (tradeInput.action == 1 ? 'Fill Or Kill' : 'Fill And Add Order')" class="w-50"></b-form-input>
                 </b-form-group>
@@ -162,7 +158,6 @@
                   <b-form-input type="text" readonly size="sm" :value="tradeInput.skipCheck ? 'Yes' : 'No'" class="w-50"></b-form-input>
                 </b-form-group>
 
-              <!-- </b-form-group> -->
             </span>
 
             <div>
@@ -170,40 +165,9 @@
 {{ modalTxDetails }}
               </pre>
             </div>
-            <!--
-            <div class="d-flex flex-row">
-              <div>
-                <b-avatar v-if="modalDetails.token" rounded variant="light" size="8.0rem" :src="modalDetails.token.image">
-                </b-avatar>
-              </div>
-              <div class="ml-2">
-                {{ modalDetails.token && modalDetails.token.name }}
-                <br />
-                {{ modalDetails.token && modalDetails.token.collectionName }}
-                <br />
-                {{ modalDetails.token && modalDetails.token.tokenId }}
-                <b-button v-if="modalDetails.token" size="sm" :href="'https://opensea.io/assets/ethereum/' + modalDetails.token.contract + '/' + modalDetails.token.tokenId" target="_blank" variant="link" v-b-popover.hover.top="'View token in opensea.io'">
-                  <b-avatar rounded variant="light" size="0.9rem" src="images/opensea.svg">
-                  </b-avatar>
-                </b-button>
-                <b-button v-if="modalDetails.token" size="sm" :href="'https://etherscan.io/token/' + modalDetails.token.contract + ((modalDetails.token.kind == 'erc721' || modalDetails.token.kind== 'erc1155') ? ('?a=' + modalDetails.token.tokenId) : '')" target="_blank" variant="link" v-b-popover.hover.top="'View token in etherscan.io'">
-                  <b-avatar rounded variant="light" size="0.9rem" src="images/etherscan-logo-circle.svg">
-                  </b-avatar>
-                </b-button>
-                <br />
-                {{ modalDetails.token && modalDetails.token.ownerName }}
-                <b-button v-if="modalDetails.token" size="sm" :href="'https://opensea.io/' + modalDetails.token.owner" target="_blank" variant="link" v-b-popover.hover.top="'View owner account in opensea.io'">
-                  <b-avatar rounded variant="light" size="0.9rem" src="images/opensea.svg">
-                  </b-avatar>
-                </b-button>
-                <br />
-                <b-button size="sm" @click="requestReservoirAPITokenMetadataRefresh(modalDetails.token)" variant="link" v-b-popover.hover.top="'Request a metadata refresh on the Reservoir API. Re-sync after a few minutes'"><b-icon-arrow-clockwise shift-v="+1" font-scale="1.2"></b-icon-arrow-clockwise></b-button>
-              </div>
-            </div>
-            -->
           </b-modal>
 
-          <b-modal id="modal-accounts-import" hide-footer size="lg">
+          <!-- <b-modal id="modal-accounts-import" hide-footer size="lg">
             <template #modal-title>
               Import Accounts
             </template>
@@ -219,9 +183,9 @@
             <b-form-group label="" label-for="restore-from-backup" label-size="sm" label-cols-sm="2" label-align-sm="right" :description="'Restore from backup file. Adjust Sync and Include settings and re-synced'" class="mx-0 my-1 p-0">
               <b-button size="sm" id="restore-from-backup" :disabled="!restoreAddresses || restoreAddresses.length == 0" @click="restoreFromBackup()" variant="primary">Restore</b-button>
             </b-form-group>
-          </b-modal>
+          </b-modal> -->
 
-          <b-modal id="modal-token-details" hide-footer size="lg">
+          <!-- <b-modal id="modal-token-details" hide-footer size="lg">
             <template #modal-title>
               ERC-20 Token {{ modalTokenDetails.address }}
               <b-button size="sm" @click="copyToClipboard(modalTokenDetails.address);" variant="link" class="m-0 p-0" v-b-popover.hover.top="'Copy to clipboard'"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
@@ -247,15 +211,11 @@
             <b-form-group label="Total Supply:" label-for="modal-token-details-totalsupply" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-form-input type="text" readonly size="sm" id="modal-token-details-totalsupply" :value="formatERC20(modalTokenDetails.totalSupply, modalTokenDetails.decimals)" class="w-50"></b-form-input>
             </b-form-group>
-          </b-modal>
+          </b-modal> -->
 
-          <b-modal id="modal-maker-order" hide-footer size="lg">
+          <!-- <b-modal id="modal-maker-order" hide-footer size="lg">
             <template #modal-title>
               Maker Order
-              <!-- ERC-20 Token {{ modalTokenDetails.address }} -->
-              <!-- <b-link size="sm" :href="'https://sepolia.etherscan.io/token/' + modalTokenDetails.address + '?a=' + coinbase" target="_blank" variant="link" class="m-0 p-0" v-b-popover.hover.top="'View in etherscan.io'">
-                <b-img rounded="0" width="16px" height="16px" src="images/etherscan-logo-circle.svg" blank-color="#777" target="_blank"></b-img>
-              </b-link> -->
             </template>
             <b-form-group label="Order Type:" label-for="modal-maker-order-ordertype" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-form-input type="text" readonly size="sm" id="modal-maker-order-ordertype" :value="modalMakerOrder.buySell == 0 ? 'BUY' : 'SELL'" class="w-50"></b-form-input>
@@ -297,10 +257,7 @@
             <b-form-group v-if="indexToAddress[modalMakerOrder.makerIndex] == coinbase" label="" label-for="modal-maker-order-cancel" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-button size="sm" variant="warning" class="ml-1" @click="cancelOrder();" v-b-popover.hover.bottom="'Cancel order'">Cancel Order</b-button>
             </b-form-group>
-            <!-- <pre>
-{{ modalMakerOrder }}
-            </pre> -->
-          </b-modal>
+          </b-modal> -->
 
           <!-- 0:Home -->
           <b-card v-if="coinbase && settings.tabIndex == 0" class="m-0 p-0 border-0" body-class="m-1 p-0" header-class="m-0 p-2">
@@ -449,16 +406,16 @@
                 <div class="mt-0 flex-grow-1">
                 </div>
                 <div class="mt-0 pl-1">
-                  <b-form-select size="sm" v-model="settings.punksTable.sortOption" @change="saveSettings" :options="punksSortOptions" v-b-popover.hover.top="'Yeah. Sort'"></b-form-select>
+                  <b-form-select size="sm" v-model="settings.activityTable.sortOption" @change="saveSettings" :options="activitySortOptions" v-b-popover.hover.top="'Yeah. Sort'"></b-form-select>
                 </div>
                 <div class="mt-0 pl-1">
-                  <font size="-2" v-b-popover.hover.top="'# tokens'">{{ filteredSortedPunks.length + '/' + punkAttributes.length }}</font>
+                  <font size="-2" v-b-popover.hover.top="'# events'">{{ filteredSortedActivity.length + '/' + punkAttributes.length }}</font>
                 </div>
                 <div class="mt-0 pl-1">
-                  <b-pagination size="sm" v-model="settings.punksTable.currentPage" @input="saveSettings" :total-rows="filteredSortedPunks.length" :per-page="settings.punksTable.pageSize" style="height: 0;"></b-pagination>
+                  <b-pagination size="sm" v-model="settings.activityTable.currentPage" @input="saveSettings" :total-rows="filteredSortedPunks.length" :per-page="settings.activityTable.pageSize" style="height: 0;"></b-pagination>
                 </div>
                 <div class="mt-0 pl-1">
-                  <b-form-select size="sm" v-model="settings.punksTable.pageSize" @change="saveSettings" :options="pageSizes" v-b-popover.hover.top="'Yeah. Page size'"></b-form-select>
+                  <b-form-select size="sm" v-model="settings.activityTable.pageSize" @change="saveSettings" :options="pageSizes" v-b-popover.hover.top="'Yeah. Page size'"></b-form-select>
                 </div>
               </div>
               <b-row class="m-0 p-0">
@@ -493,7 +450,7 @@
                 </b-col>
                 <b-col class="m-0 p-0 pl-1">
                   <!-- <b-table small fixed striped responsive hover selectable select-mode="single" @row-selected="pairsRowSelected" :fields="pairsFields" :items="pagedFilteredSortedPairs" show-empty empty-html="Click Sync above to retrieve existing pairs" head-variant="light" class="mx-0 my-1"> -->
-                  <b-table small fixed striped responsive hover :fields="punksFields" :items="pagedFilteredSortedPunks" show-empty empty-html="Click Sync above to retrieve punk history" head-variant="light" class="mx-0 my-1">
+                  <b-table small fixed striped responsive hover :fields="activityFields" :items="pagedFilteredSortedActivity" show-empty empty-html="Click Sync above to retrieve punk history" head-variant="light" class="mx-0 my-1">
                     <template #cell(punkId)="data">
                       <b-link :href="'https://cryptopunks.app/cryptopunks/details/' + data.item.punkId" v-b-popover.hover.bottom="'View in original website'" target="_blank">
                         {{ data.item.punkId }}
@@ -1453,39 +1410,45 @@
               pageSize: 100,
               sortOption: 'punkidasc',
             },
-            pairsTable: {
+            activityTable: {
               filter: null,
               currentPage: 1,
-              pageSize: 10,
-              sortOption: 'symbolquotebaseasc',
+              pageSize: 100,
+              sortOption: 'txorderdsc',
             },
-            pairTable: {
-              selectedPair: null,
-              buyOrders: {
-                filter: null,
-                currentPage: 1,
-                pageSize: 10,
-                // sortOption: 'symbolquotebaseasc',
-              },
-              sellOrders: {
-                filter: null,
-                currentPage: 1,
-                pageSize: 10,
-                // sortOption: 'symbolquotebaseasc',
-              },
-              history: {
-                filter: null,
-                currentPage: 1,
-                pageSize: 20,
-                sortOption: 'timestampdsc',
-              },
-            },
-            tokensTable: {
-              filter: null,
-              currentPage: 1,
-              pageSize: 10,
-              sortOption: 'lastsaledsc',
-            },
+            // pairsTable: {
+            //   filter: null,
+            //   currentPage: 1,
+            //   pageSize: 10,
+            //   sortOption: 'symbolquotebaseasc',
+            // },
+            // pairTable: {
+            //   selectedPair: null,
+            //   buyOrders: {
+            //     filter: null,
+            //     currentPage: 1,
+            //     pageSize: 10,
+            //     // sortOption: 'symbolquotebaseasc',
+            //   },
+            //   sellOrders: {
+            //     filter: null,
+            //     currentPage: 1,
+            //     pageSize: 10,
+            //     // sortOption: 'symbolquotebaseasc',
+            //   },
+            //   history: {
+            //     filter: null,
+            //     currentPage: 1,
+            //     pageSize: 20,
+            //     sortOption: 'timestampdsc',
+            //   },
+            // },
+            // tokensTable: {
+            //   filter: null,
+            //   currentPage: 1,
+            //   pageSize: 10,
+            //   sortOption: 'lastsaledsc',
+            // },
             editAccounts: false,
             accounts: {},
             accountsTable: {
@@ -1507,7 +1470,7 @@
               pageSize: 10,
               sortOption: 'lastsaledsc',
             },
-            version: 4,
+            version: 5,
           },
 
           contracts: [
@@ -1521,41 +1484,41 @@
 
           newCoinAddress: null,
           newAddress: null,
-          allowanceFormData: {
-            amount: null,
-            token: null,
-            decimals: null,
-          },
-          wethFormData: {
-            direction: "ew",
-            amount: null,
-          },
-          sell: {
-            action: 2,
-            price: null,
-            targetPrice: null,
-            expiry: 1704027599,
-            tokens: null,
-            quoteTokens: null,
-          },
-          buy: {
-            action: 2,
-            price: null,
-            targetPrice: null,
-            expiry: 1704027599,
-            tokens: null,
-            quoteTokens: null,
-          },
-          raw: {
-            action: 2,
-            base: "0x7439E9Bb6D8a84dd3A23fe621A30F95403F87fB9",
-            quote: "0x07391dbE03e7a0DEa0fce6699500da081537B6c3",
-            buySell: 0,
-            price: "0.69012345678",
-            targetPrice: "0.69015",
-            expiry: 1704027599,
-            tokens: "1.012345678901234567",
-          },
+          // allowanceFormData: {
+          //   amount: null,
+          //   token: null,
+          //   decimals: null,
+          // },
+          // wethFormData: {
+          //   direction: "ew",
+          //   amount: null,
+          // },
+          // sell: {
+          //   action: 2,
+          //   price: null,
+          //   targetPrice: null,
+          //   expiry: 1704027599,
+          //   tokens: null,
+          //   quoteTokens: null,
+          // },
+          // buy: {
+          //   action: 2,
+          //   price: null,
+          //   targetPrice: null,
+          //   expiry: 1704027599,
+          //   tokens: null,
+          //   quoteTokens: null,
+          // },
+          // raw: {
+          //   action: 2,
+          //   base: "0x7439E9Bb6D8a84dd3A23fe621A30F95403F87fB9",
+          //   quote: "0x07391dbE03e7a0DEa0fce6699500da081537B6c3",
+          //   buySell: 0,
+          //   price: "0.69012345678",
+          //   targetPrice: "0.69015",
+          //   expiry: 1704027599,
+          //   tokens: "1.012345678901234567",
+          // },
 
           restoreFile: null,
           restoreAddresses: null,
@@ -1573,27 +1536,27 @@
             token: null,
             collection: null,
           },
-          modalTokenDetails: {
-            tokenIndex: null,
-            symbol: null,
-            name: null,
-            decimals: null,
-            balance: null,
-            allowance: null,
-            totalSupply: null,
-          },
-          modalMakerOrder: {
-            pairKey: null,
-            buySell: null,
-            price: null,
-            orderKey: null,
-            makerIndex: null,
-            expiry: null,
-            originalTokens: null,
-            tokens: null,
-            availableBase: null,
-            availableQuote: null,
-          },
+          // modalTokenDetails: {
+          //   tokenIndex: null,
+          //   symbol: null,
+          //   name: null,
+          //   decimals: null,
+          //   balance: null,
+          //   allowance: null,
+          //   totalSupply: null,
+          // },
+          // modalMakerOrder: {
+          //   pairKey: null,
+          //   buySell: null,
+          //   price: null,
+          //   orderKey: null,
+          //   makerIndex: null,
+          //   expiry: null,
+          //   originalTokens: null,
+          //   tokens: null,
+          //   availableBase: null,
+          //   availableQuote: null,
+          // },
 
           addressToIndex: {},
           indexToAddress: [],
@@ -1621,37 +1584,37 @@
           selectedCollections: {},
           selectedMainTable: {},
 
-          messages: {
-            invalidInputTokens: "Please enter a valid amount - up to 18 whole numbers and 24 decimal places",
-            invalidInputPrice: "Please enter a valid price - up to 12 whole numbers and 12 decimal places",
-          },
+          // messages: {
+          //   invalidInputTokens: "Please enter a valid amount - up to 18 whole numbers and 24 decimal places",
+          //   invalidInputPrice: "Please enter a valid price - up to 12 whole numbers and 12 decimal places",
+          // },
 
-          tokenInfo: {
-            "0x03563574B3839e2CdD6281D8741497Ba82FD6739": {
-                "faucet": null,
-                "symbol": "BOKKY",
-            },
-            "0x7439E9Bb6D8a84dd3A23fe621A30F95403F87fB9": {
-                "faucet": "weenus",
-                "symbol": "WEENUS",
-            },
-            "0x07391dbE03e7a0DEa0fce6699500da081537B6c3": {
-                "faucet": "weth",
-                "symbol": "WETH",
-            },
-            "0xc21d97673B9E0B3AA53a06439F71fDc1facE393B": {
-              "faucet": "weenus",
-                "symbol": "XEENUS",
-            },
-            "0x93fCA4c6E2525C09c95269055B46f16b1459BF9d": {
-                "faucet": "weenus",
-                "symbol": "YEENUS",
-            },
-            "0xe9EF74A6568E9f0e42a587C9363C9BcC582dcC6c": {
-                "faucet": "weenus",
-                "symbol": "ZEENUS",
-            }
-          },
+          // tokenInfo: {
+          //   "0x03563574B3839e2CdD6281D8741497Ba82FD6739": {
+          //       "faucet": null,
+          //       "symbol": "BOKKY",
+          //   },
+          //   "0x7439E9Bb6D8a84dd3A23fe621A30F95403F87fB9": {
+          //       "faucet": "weenus",
+          //       "symbol": "WEENUS",
+          //   },
+          //   "0x07391dbE03e7a0DEa0fce6699500da081537B6c3": {
+          //       "faucet": "weth",
+          //       "symbol": "WETH",
+          //   },
+          //   "0xc21d97673B9E0B3AA53a06439F71fDc1facE393B": {
+          //     "faucet": "weenus",
+          //       "symbol": "XEENUS",
+          //   },
+          //   "0x93fCA4c6E2525C09c95269055B46f16b1459BF9d": {
+          //       "faucet": "weenus",
+          //       "symbol": "YEENUS",
+          //   },
+          //   "0xe9EF74A6568E9f0e42a587C9363C9BcC582dcC6c": {
+          //       "faucet": "weenus",
+          //       "symbol": "ZEENUS",
+          //   }
+          // },
 
           actionText: {
             "pairadded": "Pair Added",
@@ -1671,6 +1634,10 @@
           punksSortOptions: [
             { value: 'punkidasc', text: '▲ PunkId' },
             { value: 'punkiddsc', text: '▼ PunkId' },
+          ],
+          activitySortOptions: [
+            { value: 'txorderasc', text: '▲ TxOrder' },
+            { value: 'txorderdsc', text: '▼ TxOrder' },
           ],
           pairsSortOptions: [
             { value: 'symbolquotebaseasc', text: '▲ Quote, ▲ Base' },
@@ -1702,6 +1669,11 @@
             { value: 10000, text: '10k' },
           ],
           punksFields: [
+            { key: 'punkId', label: 'PunkId', sortable: false, thStyle: 'width: 15%;', thClass: 'text-right', tdClass: 'text-right' },
+            { key: 'image', label: 'Image', sortable: false, thStyle: 'width: 45%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'attribute', label: 'Attributes', sortable: false, thStyle: 'width: 50%;', thClass: 'text-left', tdClass: 'text-left' },
+          ],
+          activityFields: [
             { key: 'punkId', label: 'PunkId', sortable: false, thStyle: 'width: 15%;', thClass: 'text-right', tdClass: 'text-right' },
             { key: 'image', label: 'Image', sortable: false, thStyle: 'width: 45%;', thClass: 'text-left', tdClass: 'text-left' },
             { key: 'attribute', label: 'Attributes', sortable: false, thStyle: 'width: 50%;', thClass: 'text-left', tdClass: 'text-left' },
@@ -2079,6 +2051,57 @@
           },
           pagedFilteredSortedPunks() {
             return this.filteredSortedPunks.slice((this.settings.punksTable.currentPage - 1) * this.settings.punksTable.pageSize, this.settings.punksTable.currentPage * this.settings.punksTable.pageSize);
+          },
+
+          filteredActivity() {
+            const results = [];
+            // console.log("filteredActivity - this.settings.filters: " + JSON.stringify(this.settings.filters));
+            let stage1Data = this.punkAttributes;
+            if (Object.keys(this.settings.filters).length == 0) {
+              for (const [punkId, attributes] of this.punkAttributes.entries()) {
+                results.push({ punkId, attributes });
+              }
+            } else {
+              let selectedTokenIds = [];
+              for (const [attributeType, attributeList] of Object.entries(this.settings.filters)) {
+                let thisAttributeTypeTokenIds = [];
+                for (const attribute of Object.keys(attributeList)) {
+                  for (const attributeInfo of this.punkAttributesWithTokenIds) {
+                    if (attributeInfo.attributeType == attributeType) {
+                      const tokenIds = attributeInfo.attributeList.filter(e => e.attribute == attribute).map(e => e.punks).flat();
+                      thisAttributeTypeTokenIds = [...thisAttributeTypeTokenIds, ...tokenIds];
+                      break;
+                    }
+                  }
+                }
+                if (selectedTokenIds.length == 0) {
+                  selectedTokenIds = thisAttributeTypeTokenIds;
+                } else {
+                  selectedTokenIds = selectedTokenIds.filter(tokenId => thisAttributeTypeTokenIds.includes(tokenId));
+                }
+              }
+              for (const punkId of selectedTokenIds) {
+                results.push({ punkId, attributes: this.punkAttributes[punkId] });
+              }
+            }
+            // console.log(moment().format("YYYY-MM-DD HH:mm:ss") + " filteredActivity - results: " + JSON.stringify(results.slice(0, 10)) + ", ...");
+            return results;
+          },
+          filteredSortedActivity() {
+            let results = this.filteredActivity;
+            if (this.settings.activityTable.sortOption == 'txorderasc') {
+              results.sort((a, b) => {
+                return a.punkId - b.punkId;
+              });
+            } else if (this.settings.activityTable.sortOption == 'txorderdsc') {
+              results.sort((a, b) => {
+                return b.punkId - a.punkId;
+              });
+            }
+            return results;
+          },
+          pagedFilteredSortedActivity() {
+            return this.filteredSortedActivity.slice((this.settings.activityTable.currentPage - 1) * this.settings.activityTable.pageSize, this.settings.activityTable.currentPage * this.settings.activityTable.pageSize);
           },
 
           filteredPairs() {
@@ -4338,8 +4361,11 @@
             const tempSettings = JSON.parse(localStorage.cryptoPunksDataSettings);
             if ('version' in tempSettings && tempSettings.version == this.settings.version) {
               this.settings = tempSettings;
-              if (this.settings.tokensTable.currentPage > 1) {
-                this.settings.tokensTable.currentPage = 1;
+              if (this.settings.punksTable.currentPage > 1) {
+                this.settings.punksTable.currentPage = 1;
+              }
+              if (this.settings.activityTable.currentPage > 1) {
+                this.settings.activityTable.currentPage = 1;
               }
             }
           }
