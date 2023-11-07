@@ -3278,9 +3278,8 @@
 
           async loadBlockTimestamps(db/*context, newBlocks*/) {
             console.log(moment().format("YYYY-MM-DD HH:mm:ss") + " loadBlockTimestamps");
-
+            // TODO: Remove blockTimestamp entries with unconfirmed blocks
             const blockNumbersToProcess = [];
-            // TODO: Handle 'unconfirmed'
             for (const process of this.contracts) {
               // console.log(moment().format("YYYY-MM-DD HH:mm:ss") + " loadCurrentData - processing: " + process.name);
               const contractIndex = this.addressToIndex[process.address];
@@ -3904,13 +3903,14 @@
                 //   }
                 // });
                 for (const [blockNumber, txIndexes] of Object.entries(events)) {
+                  const timestamp = this.blockTimestamps[blockNumber] || "(unknown)";
                   for (const [txIndex, txHashes] of Object.entries(txIndexes)) {
                     for (const [txHash, logIndexes] of Object.entries(txHashes)) {
                       if (!(txHash in txs)) {
-                        txs[txHash] = [ parseInt(blockNumber), parseInt(txIndex), [] ];
+                        txs[txHash] = [ parseInt(blockNumber), parseInt(timestamp), parseInt(txIndex), [] ];
                       }
                       for (const [logIndex, txInfo] of Object.entries(logIndexes)) {
-                        txs[txHash][2].push([ parseInt(logIndex), contractIndex, ...txInfo ]);
+                        txs[txHash][3].push([ parseInt(logIndex), contractIndex, ...txInfo ]);
                         // if ((count % 10000) == 0) {
                         //   console.log(count + " " + blockNumber + "/" + txIndex + "/" + txHash + "/" + logIndex + " => " + JSON.stringify(txInfo));
                         // }
