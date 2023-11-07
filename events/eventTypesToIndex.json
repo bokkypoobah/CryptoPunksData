@@ -1,1 +1,0 @@
-eventTypesToIndex: {"Assign":0,"Transfer":1,"Approve":2,"PunkOffered":3,"PunkBidEntered":4,"PunkNoLongerForSale":5,"PunkBought":6,"PunkBidWithdrawn":7,"PunkTransfer":8,"Approval":9,"ApprovalForAll":10,"OwnershipTransferred":11,"ProxyRegistered":12}
