@@ -3012,7 +3012,7 @@
               }
             }
             for (const process of this.contracts) {
-              console.log("processing: " + process.name);
+              console.log(moment().format("YYYY-MM-DD HH:mm:ss") + " Processing: " + process.name);
               // this.sync.section = process.name;
               const contract = new ethers.Contract(process.address, process.abi, provider);
               if (!(process.address in addressToIndex)) {
