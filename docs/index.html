@@ -412,7 +412,7 @@
                   <font size="-2" v-b-popover.hover.top="'# events'">{{ filteredSortedActivity.length + '/' + Object.keys(txs).length }}</font>
                 </div>
                 <div class="mt-0 pl-1">
-                  <b-pagination size="sm" v-model="settings.activityTable.currentPage" @input="saveSettings" :total-rows="filteredSortedPunks.length" :per-page="settings.activityTable.pageSize" style="height: 0;"></b-pagination>
+                  <b-pagination size="sm" v-model="settings.activityTable.currentPage" @input="saveSettings" :total-rows="filteredSortedActivity.length" :per-page="settings.activityTable.pageSize" style="height: 0;"></b-pagination>
                 </div>
                 <div class="mt-0 pl-1">
                   <b-form-select size="sm" v-model="settings.activityTable.pageSize" @change="saveSettings" :options="pageSizes" v-b-popover.hover.top="'Yeah. Page size'"></b-form-select>
@@ -2093,15 +2093,15 @@
           },
           filteredSortedActivity() {
             let results = this.filteredActivity;
-            // if (this.settings.activityTable.sortOption == 'txorderasc') {
-            //   results.sort((a, b) => {
-            //     return a.punkId - b.punkId;
-            //   });
-            // } else if (this.settings.activityTable.sortOption == 'txorderdsc') {
-            //   results.sort((a, b) => {
-            //     return b.punkId - a.punkId;
-            //   });
-            // }
+            if (this.settings.activityTable.sortOption == 'txorderasc') {
+              results.sort((a, b) => {
+                return a[0] - b[0];
+              });
+            } else if (this.settings.activityTable.sortOption == 'txorderdsc') {
+              results.sort((a, b) => {
+                return b[0] - a[0];
+              });
+            }
             return results;
           },
           pagedFilteredSortedActivity() {
