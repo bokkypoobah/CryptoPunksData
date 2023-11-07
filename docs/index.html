@@ -409,7 +409,7 @@
                   <b-form-select size="sm" v-model="settings.activityTable.sortOption" @change="saveSettings" :options="activitySortOptions" v-b-popover.hover.top="'Yeah. Sort'"></b-form-select>
                 </div>
                 <div class="mt-0 pl-1">
-                  <font size="-2" v-b-popover.hover.top="'# events'">{{ filteredSortedActivity.length + '/' + punkAttributes.length }}</font>
+                  <font size="-2" v-b-popover.hover.top="'# events'">{{ filteredSortedActivity.length + '/' + Object.keys(txs).length }}</font>
                 </div>
                 <div class="mt-0 pl-1">
                   <b-pagination size="sm" v-model="settings.activityTable.currentPage" @input="saveSettings" :total-rows="filteredSortedPunks.length" :per-page="settings.activityTable.pageSize" style="height: 0;"></b-pagination>
@@ -449,7 +449,7 @@
                   </b-card>
                 </b-col>
                 <b-col class="m-0 p-0 pl-1">
-                  <b-table small fixed striped responsive hover :items="pagedFilteredSortedActivity" show-empty empty-html="Click Sync above to retrieve punk history" head-variant="light" class="mx-0 my-1">
+                  <b-table small fixed striped responsive hover :items="pagedFilteredSortedActivity" show-empty empty-html="Click Sync above to retrieve punk activity" head-variant="light" class="mx-0 my-1">
                   </b-table>
                   <!-- <b-table small fixed striped responsive hover :fields="activityFields" :items="pagedFilteredSortedActivity" show-empty empty-html="Click Sync above to retrieve punk history" head-variant="light" class="mx-0 my-1">
                     <template #cell(punkId)="data">
@@ -2056,34 +2056,38 @@
           filteredActivity() {
             const results = [];
             // console.log("filteredActivity - this.settings.filters: " + JSON.stringify(this.settings.filters));
-            let stage1Data = this.punkAttributes;
-            if (Object.keys(this.settings.filters).length == 0) {
-              for (const [punkId, attributes] of this.punkAttributes.entries()) {
-                results.push({ punkId, attributes });
-              }
-            } else {
-              let selectedTokenIds = [];
-              for (const [attributeType, attributeList] of Object.entries(this.settings.filters)) {
-                let thisAttributeTypeTokenIds = [];
-                for (const attribute of Object.keys(attributeList)) {
-                  for (const attributeInfo of this.punkAttributesWithTokenIds) {
-                    if (attributeInfo.attributeType == attributeType) {
-                      const tokenIds = attributeInfo.attributeList.filter(e => e.attribute == attribute).map(e => e.punks).flat();
-                      thisAttributeTypeTokenIds = [...thisAttributeTypeTokenIds, ...tokenIds];
-                      break;
-                    }
-                  }
-                }
-                if (selectedTokenIds.length == 0) {
-                  selectedTokenIds = thisAttributeTypeTokenIds;
-                } else {
-                  selectedTokenIds = selectedTokenIds.filter(tokenId => thisAttributeTypeTokenIds.includes(tokenId));
-                }
-              }
-              for (const punkId of selectedTokenIds) {
-                results.push({ punkId, attributes: this.punkAttributes[punkId] });
-              }
+            console.log(JSON.stringify(this.txs).substring(0, 1000));
+            for (const [txHash, txInfo] of Object.entries(this.txs)) {
+              results.push({ txHash, txInfo });
             }
+            // let stage1Data = this.punkAttributes;
+            // if (Object.keys(this.settings.filters).length == 0) {
+            //   for (const [punkId, attributes] of this.punkAttributes.entries()) {
+            //     results.push({ punkId, attributes });
+            //   }
+            // } else {
+            //   let selectedTokenIds = [];
+            //   for (const [attributeType, attributeList] of Object.entries(this.settings.filters)) {
+            //     let thisAttributeTypeTokenIds = [];
+            //     for (const attribute of Object.keys(attributeList)) {
+            //       for (const attributeInfo of this.punkAttributesWithTokenIds) {
+            //         if (attributeInfo.attributeType == attributeType) {
+            //           const tokenIds = attributeInfo.attributeList.filter(e => e.attribute == attribute).map(e => e.punks).flat();
+            //           thisAttributeTypeTokenIds = [...thisAttributeTypeTokenIds, ...tokenIds];
+            //           break;
+            //         }
+            //       }
+            //     }
+            //     if (selectedTokenIds.length == 0) {
+            //       selectedTokenIds = thisAttributeTypeTokenIds;
+            //     } else {
+            //       selectedTokenIds = selectedTokenIds.filter(tokenId => thisAttributeTypeTokenIds.includes(tokenId));
+            //     }
+            //   }
+            //   for (const punkId of selectedTokenIds) {
+            //     results.push({ punkId, attributes: this.punkAttributes[punkId] });
+            //   }
+            // }
             // console.log(moment().format("YYYY-MM-DD HH:mm:ss") + " filteredActivity - results: " + JSON.stringify(results.slice(0, 10)) + ", ...");
             return results;
           },
