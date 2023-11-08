@@ -191,7 +191,7 @@
                 <div class="mt-0 flex-grow-1">
                 </div>
                 <div v-if="!sync.section" class="mt-0 pr-1">
-                  <b-button size="sm" @click="syncCryptoPunksData" variant="primary" v-b-popover.hover.top="'Sync CryptoPunksData. This will take ~6 minutes initially, and ~10 seconds subsequently'">Sync</b-button>
+                  <b-button size="sm" @click="syncCryptoPunksData" variant="primary" v-b-popover.hover.top="'Sync CryptoPunksData. This will take ~10 minutes initially, and ~0.5 minutes subsequently'">Sync</b-button>
                 </div>
                 <div class="mt-1" style="width: 350px;">
                   <b-progress v-if="sync.section != null" height="1.5rem" :max="sync.total" show-progress :animated="sync.section != null" :variant="sync.section != null ? 'success' : 'secondary'" v-b-popover.hover.top="'{processed blocked number}/{latest block number}. Click the button on the right to stop this process. This process can be continued later'">
@@ -296,6 +296,17 @@
                 <!-- <div class="mt-0 pr-1">
                   <b-form-input type="text" size="sm" v-model.trim="settings.pairsTable.filter" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Base or quote symbol and name filter'" placeholder="🔍 sym/name regex" style="min-width: 8.0rem;"></b-form-input>
                 </div> -->
+
+                <div class="mt-0 flex-grow-1">
+                </div>
+
+                <div class="mt-0 pr-1">
+                  <b-form-checkbox-group size="sm" @input="saveSettings(); loadCurrentData();" v-model="settings.selectedContracts" :options="contractOptions" buttons button-variant="outline-primary" v-b-popover.hover.top="'[Un]Wrapped CryptoPunks V1 & V2'"></b-form-checkbox-group>
+                  <!-- <font size="-2">
+                    {{ settings.selectedContracts }}
+                  </font> -->
+                </div>
+
                 <div class="mt-0 flex-grow-1">
                 </div>
                 <div v-if="!sync.section" class="mt-0 pr-1">
@@ -623,6 +634,7 @@
           timestamp: null,
 
           settings: {
+            selectedContracts: [],
             utcMode: false,
             tabIndex: 0,
             showFilter: false,
@@ -661,7 +673,7 @@
               pageSize: 10,
               sortOption: 'lastsaledsc',
             },
-            version: 6,
+            version: 7,
           },
 
           contracts: [
@@ -708,16 +720,16 @@
           tokens: {},
           events: {}, // TODO: Only load relevant events to reduce memory load, in loadCurrentData()
 
-          selectedBuyOrders: {},
-          selectedSellOrders: {},
+          // selectedBuyOrders: {},
+          // selectedSellOrders: {},
 
           transfers: {},
           pools: {},
           trades: {},
           blockTimestamps: {},
           collections: {},
-          selectedCollections: {},
-          selectedMainTable: {},
+          // selectedCollections: {},
+          // selectedMainTable: {},
 
           punksSortOptions: [
             { value: 'punkidasc', text: '▲ PunkId' },
@@ -727,6 +739,14 @@
             { value: 'txorderasc', text: '▲ TxOrder' },
             { value: 'txorderdsc', text: '▼ TxOrder' },
           ],
+
+          contractOptions: [
+            { text: 'v1', value: 1 },
+            { text: 'w1', value: 3 },
+            { text: 'v2', value: 2 },
+            { text: 'w2', value: 4 }
+          ],
+
           pageSizes: [
             { value: 5, text: '5' },
             { value: 10, text: '10' },
@@ -1268,7 +1288,7 @@
 
             this.sync.completed = 0;
             this.sync.total = blockNumbersToProcess.length;
-            this.sync.section = 'Timestamps';
+            this.sync.section = 'Block Timestamps';
             const BATCHSIZE = 1000;
             for (let i = 0; i < blockNumbersToProcess.length; i += BATCHSIZE) {
               const batch = blockNumbersToProcess.slice(i, parseInt(i) + BATCHSIZE);
@@ -1307,7 +1327,7 @@
 
           saveSettings() {
             localStorage.cryptoPunksDataSettings = JSON.stringify(this.settings);
-            // console.log("saveSettings: " + JSON.stringify(this.settings));
+            console.log("saveSettings: " + JSON.stringify(this.settings));
           },
 
           toggleUTCMode() {
@@ -1505,7 +1525,7 @@
           },
 
           async loadCurrentData() {
-            // console.log(moment().format("HH:mm:ss") + " loadCurrentData BEGIN");
+            console.log(moment().format("HH:mm:ss") + " loadCurrentData BEGIN: " + JSON.stringify(this.settings.selectedContracts));
             const db = new Dexie(this.db.name);
             db.version(this.db.version).stores(this.db.schemaDefinition);
             const indexToAddressDataItems = await db.cache.where("objectName").equals(this.chainId + "_indexToAddress").toArray();
@@ -1531,36 +1551,36 @@
               // console.log(moment().format("HH:mm:ss") + " loadCurrentData - processing: " + process.name);
               const contractIndex = this.addressToIndex[process.address];
 
-              const eventsDataItems = await db.cache.where("objectName").equals(this.chainId + "_" + process.address + "_events").toArray();
-              if (eventsDataItems.length == 1) {
-                events = eventsDataItems[0].object;
-                // console.log("events: " + JSON.stringify(events, null, 2).substring(0, 1000));
-                // Object.keys(events).forEach(function (key) {
-                //   if ('unconfirmed' in events[key]) {
-                //     console.log("DELETING: " + key + " => " + JSON.stringify(events[key]));
-                //     delete events[key];
-                //   }
-                // });
-                for (const [blockNumber, txIndexes] of Object.entries(events)) {
-                  const timestamp = this.blockTimestamps[blockNumber] || "(unknown)";
-                  for (const [txIndex, txHashes] of Object.entries(txIndexes)) {
-                    for (const [txHash, logIndexes] of Object.entries(txHashes)) {
-                      if (!(txHash in txs)) {
-                        txs[txHash] = [ parseInt(blockNumber), parseInt(timestamp), parseInt(txIndex), [] ];
-                      }
-                      for (const [logIndex, txInfo] of Object.entries(logIndexes)) {
-                        txs[txHash][3].push([ parseInt(logIndex), contractIndex, ...txInfo ]);
-                        // if ((count % 10000) == 0) {
-                        //   console.log(count + " " + blockNumber + "/" + txIndex + "/" + txHash + "/" + logIndex + " => " + JSON.stringify(txInfo));
-                        // }
-                        // count++
+              if (this.settings.selectedContracts.length == 0 || this.settings.selectedContracts.includes(contractIndex)) {
+                const eventsDataItems = await db.cache.where("objectName").equals(this.chainId + "_" + process.address + "_events").toArray();
+                if (eventsDataItems.length == 1) {
+                  events = eventsDataItems[0].object;
+                  // console.log("events: " + JSON.stringify(events, null, 2).substring(0, 1000));
+                  // Object.keys(events).forEach(function (key) {
+                  //   if ('unconfirmed' in events[key]) {
+                  //     console.log("DELETING: " + key + " => " + JSON.stringify(events[key]));
+                  //     delete events[key];
+                  //   }
+                  // });
+                  for (const [blockNumber, txIndexes] of Object.entries(events)) {
+                    const timestamp = this.blockTimestamps[blockNumber] || "(unknown)";
+                    for (const [txIndex, txHashes] of Object.entries(txIndexes)) {
+                      for (const [txHash, logIndexes] of Object.entries(txHashes)) {
+                        if (!(txHash in txs)) {
+                          txs[txHash] = [ parseInt(blockNumber), parseInt(timestamp), parseInt(txIndex), [] ];
+                        }
+                        for (const [logIndex, txInfo] of Object.entries(logIndexes)) {
+                          txs[txHash][3].push([ parseInt(logIndex), contractIndex, ...txInfo ]);
+                          // if ((count % 10000) == 0) {
+                          //   console.log(count + " " + blockNumber + "/" + txIndex + "/" + txHash + "/" + logIndex + " => " + JSON.stringify(txInfo));
+                          // }
+                          // count++
+                        }
                       }
                     }
                   }
                 }
-
               }
-
             }
             // console.log(moment().format("HH:mm:ss") + " txs: " + JSON.stringify(txs));
             this.txs = txs;
@@ -1733,7 +1753,7 @@
             navigator.clipboard.writeText(str);
           },
           async connectToWeb3() {
-            // console.log(moment().format("HH:mm:ss") + " connectToWeb3");
+            console.log(moment().format("HH:mm:ss") + " connectToWeb3");
             if (!window.ethereum) {
               this.connected = false;
             } else {
