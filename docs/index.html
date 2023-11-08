@@ -393,7 +393,7 @@
 
                           <span v-if="event[2] == 0">
                             Assign
-                            <b-link :href="'https://etherscan.io/address/' + indexToAddress[event[3]]" v-b-popover.hover.bottom="'Assigned to. Click to view in etherscan.io'" target="_blank">
+                            <b-link :href="'https://etherscan.io/address/' + indexToAddress[event[3]]" v-b-popover.hover.bottom="'to. Click to view in etherscan.io'" target="_blank">
                               <b-badge pill variant="warning">{{ ensOrAddress(event[3], 10) }}</b-badge>
                             </b-link>
                            <b-link :href="'https://cryptopunks.app/cryptopunks/details/' + event[4]" v-b-popover.hover.bottom="'punkId. Click to view in cryptopunks.app'" target="_blank">
@@ -402,10 +402,10 @@
                           </span>
                           <span v-else-if="event[2] == 1">
                             Transfer
-                            <b-link :href="'https://etherscan.io/address/' + indexToAddress[event[3]]" v-b-popover.hover.bottom="'From. Click to view in etherscan.io'" target="_blank">
+                            <b-link :href="'https://etherscan.io/address/' + indexToAddress[event[3]]" v-b-popover.hover.bottom="'from. Click to view in etherscan.io'" target="_blank">
                               <b-badge pill variant="warning">{{ ensOrAddress(event[3], 10) }}</b-badge>
                             </b-link>
-                            <b-link :href="'https://etherscan.io/address/' + indexToAddress[event[4]]" v-b-popover.hover.bottom="'To. Click to view in etherscan.io'" target="_blank">
+                            <b-link :href="'https://etherscan.io/address/' + indexToAddress[event[4]]" v-b-popover.hover.bottom="'to. Click to view in etherscan.io'" target="_blank">
                               <b-badge pill variant="warning">{{ ensOrAddress(event[4], 10) }}</b-badge>
                             </b-link>
                             <span v-if="event[1] <= 2">
@@ -437,6 +437,13 @@
                           </span>
                           <span v-else-if="event[2] == 3">
                             PunkBidEntered
+                            <b-link :href="'https://cryptopunks.app/cryptopunks/details/' + event[3]" v-b-popover.hover.bottom="'punkId. Click to view in cryptopunks.app'" target="_blank">
+                              <b-badge pill variant="info">{{ event[3] }}</b-badge>
+                            </b-link>
+                            <b-badge pill variant="light" v-b-popover.hover="'Amount in ETH'">{{ formatETH(event[4]) }}</b-badge>
+                            <b-link :href="'https://etherscan.io/address/' + indexToAddress[event[5]]" v-b-popover.hover.bottom="'from. Click to view in etherscan.io'" target="_blank">
+                              <b-badge pill variant="warning">{{ ensOrAddress(event[5], 10) }}</b-badge>
+                            </b-link>
                             <!-- //    v2 event PunkBidEntered(uint indexed punkIndex, uint value, address indexed fromAddress); -->
                           </span>
                           <span v-else-if="event[2] == 4">
@@ -452,10 +459,10 @@
                               <b-badge pill variant="info">{{ event[3] }}</b-badge>
                             </b-link>
                             <b-badge pill variant="light" v-b-popover.hover="'Amount in ETH'">{{ formatETH(event[4]) }}</b-badge>
-                            <b-link :href="'https://etherscan.io/address/' + indexToAddress[event[5]]" v-b-popover.hover.bottom="'From. Click to view in etherscan.io'" target="_blank">
+                            <b-link :href="'https://etherscan.io/address/' + indexToAddress[event[5]]" v-b-popover.hover.bottom="'from. Click to view in etherscan.io'" target="_blank">
                               <b-badge pill variant="warning">{{ ensOrAddress(event[5], 10) }}</b-badge>
                             </b-link>
-                            <b-link :href="'https://etherscan.io/address/' + indexToAddress[event[6]]" v-b-popover.hover.bottom="'To. Click to view in etherscan.io'" target="_blank">
+                            <b-link :href="'https://etherscan.io/address/' + indexToAddress[event[6]]" v-b-popover.hover.bottom="'to. Click to view in etherscan.io'" target="_blank">
                               <b-badge pill variant="warning">{{ ensOrAddress(event[6], 10) }}</b-badge>
                             </b-link>
                             <!-- // v1 v2 event PunkBought(uint indexed punkIndex, uint value, address indexed fromAddress, address indexed toAddress); -->
@@ -466,14 +473,35 @@
                           </span>
                           <span v-else-if="event[2] == 7">
                             PunkTransfer
+                            <b-link :href="'https://etherscan.io/address/' + indexToAddress[event[3]]" v-b-popover.hover.bottom="'from. Click to view in etherscan.io'" target="_blank">
+                              <b-badge pill variant="warning">{{ ensOrAddress(event[3], 10) }}</b-badge>
+                            </b-link>
+                            <b-link :href="'https://etherscan.io/address/' + indexToAddress[event[4]]" v-b-popover.hover.bottom="'to. Click to view in etherscan.io'" target="_blank">
+                              <b-badge pill variant="warning">{{ ensOrAddress(event[4], 10) }}</b-badge>
+                            </b-link>
+                            <b-badge pill variant="light" v-b-popover.hover="'punkId'">{{ event[5] }}</b-badge>
                             <!-- // v1 v2 event PunkTransfer(address indexed from, address indexed to, uint256 punkIndex); -->
                           </span>
                           <span v-else-if="event[2] == 8">
                             Approval
+                            <b-link :href="'https://etherscan.io/address/' + indexToAddress[event[3]]" v-b-popover.hover.bottom="'owner. Click to view in etherscan.io'" target="_blank">
+                              <b-badge pill variant="warning">{{ ensOrAddress(event[3], 10) }}</b-badge>
+                            </b-link>
+                            <b-link :href="'https://etherscan.io/address/' + indexToAddress[event[4]]" v-b-popover.hover.bottom="'approved. Click to view in etherscan.io'" target="_blank">
+                              <b-badge pill variant="warning">{{ ensOrAddress(event[4], 10) }}</b-badge>
+                            </b-link>
+                            <b-badge pill variant="light" v-b-popover.hover="'punkId'">{{ event[5] }}</b-badge>
                             <!-- // w1 w2 event Approval(address indexed owner, address indexed approved, uint256 indexed tokenId); -->
                           </span>
                           <span v-else-if="event[2] == 9">
                             ApprovalForAll
+                            <b-link :href="'https://etherscan.io/address/' + indexToAddress[event[3]]" v-b-popover.hover.bottom="'owner. Click to view in etherscan.io'" target="_blank">
+                              <b-badge pill variant="warning">{{ ensOrAddress(event[3], 10) }}</b-badge>
+                            </b-link>
+                            <b-link :href="'https://etherscan.io/address/' + indexToAddress[event[4]]" v-b-popover.hover.bottom="'operator. Click to view in etherscan.io'" target="_blank">
+                              <b-badge pill variant="warning">{{ ensOrAddress(event[4], 10) }}</b-badge>
+                            </b-link>
+                            <b-badge pill variant="light" v-b-popover.hover="'approved'">{{ event[5] }}</b-badge>
                             <!-- // w1 w2 event ApprovalForAll(address indexed owner, address indexed operator, bool approved); -->
                           </span>
                           <span v-else-if="event[2] == 10">
