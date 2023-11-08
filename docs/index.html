@@ -379,8 +379,8 @@
                     </template>
 
                     <template #cell(events)="data">
-                      {{ data.item[4] }}
-                      <br />
+                      <!-- {{ data.item[4] }} -->
+                      <!-- <br /> -->
                       <font size="-1">
                         <span v-for="event in data.item[4]">
                           <b-badge pill variant="light" v-b-popover.hover="'logIndex'">{{ event[0] }}</b-badge>
@@ -393,6 +393,12 @@
 
                           <span v-if="event[2] == 0">
                             Assign
+                            <b-link :href="'https://etherscan.io/address/' + indexToAddress[event[3]]" v-b-popover.hover.bottom="'View address in etherscan.io'" target="_blank">
+                              {{ ensOrAddress(event[3], 10) }}
+                            </b-link>
+                           <b-link :href="'https://cryptopunks.app/cryptopunks/details/' + event[4]" v-b-popover.hover.bottom="'View punk in cryptopunks.app'" target="_blank">
+                             <b-badge pill variant="info">{{ event[4] }}</b-badge>
+                           </b-link>
                           </span>
                           <span v-else-if="event[2] == 1">
                             Transfer
@@ -430,7 +436,25 @@
                           <span v-else-if="event[2] == 12">
                             ProxyRegistered
                           </span>
+                          &nbsp;&nbsp;&nbsp;&nbsp;
 
+                          <!--
+                          // v1 v2 event Assign(address indexed to, uint256 punkIndex);
+                          // v1 v2 event Transfer(address indexed from, address indexed to, uint256 value);
+                          // v1 v2 event PunkTransfer(address indexed from, address indexed to, uint256 punkIndex);
+                          // v1 v2 event PunkOffered(uint indexed punkIndex, uint minValue, address indexed toAddress);
+                          // v1 v2 event PunkBought(uint indexed punkIndex, uint value, address indexed fromAddress, address indexed toAddress);
+                          // v1 v2 event PunkNoLongerForSale(uint indexed punkIndex);
+                          //    v2 event PunkBidEntered(uint indexed punkIndex, uint value, address indexed fromAddress);
+                          //    v2 event PunkBidWithdrawn(uint indexed punkIndex, uint value, address indexed fromAddress);
+                          // w1 w2 event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+                          // w1 w2 event Transfer(address indexed from, address indexed to, uint256 indexed tokenId);
+                          // w1 w2 event Approval(address indexed owner, address indexed approved, uint256 indexed tokenId);
+                          // w1 w2 event ApprovalForAll(address indexed owner, address indexed operator, bool approved);
+                          //    w2 event Paused(address account);
+                          //    w2 event Unpaused(address account);
+                          //    w2 event ProxyRegistered(address user, address proxy);
+                          -->
                           <!-- indexToEventTypes: [
                             "Assign",
                             "Transfer",
@@ -442,7 +466,6 @@
                             "PunkBidWithdrawn",
                             "PunkTransfer",
                             "Approval",
-
                             "ApprovalForAll",
                             "OwnershipTransferred",
                             "ProxyRegistered",
@@ -1535,7 +1558,8 @@
           ensOrAddress(addressOrAddressIndex, length = 0) {
             let result = null;
             if (new RegExp('^[0-9,]+$').test(addressOrAddressIndex)) {
-              result = this.indexToName[addressOrAddressIndex];
+              // result = this.indexToName[addressOrAddressIndex];
+              result = this.indexToAddress[addressOrAddressIndex];
             } else {
               result = this.indexToName[this.addressToIndex[addressOrAddressIndex]] || addressOrAddressIndex;
             }
