@@ -428,7 +428,9 @@
                               <b-badge pill variant="light" v-b-popover.hover="'Amount'">{{ event[5] }}</b-badge>
                             </span>
                             <span v-else>
-                              <b-badge pill variant="light" v-b-popover.hover="'punkId'">{{ event[5] }}</b-badge>
+                              <b-link :href="'https://cryptopunks.app/cryptopunks/details/' + event[5]" v-b-popover.hover.bottom="'punkId. Click to view in cryptopunks.app'" target="_blank">
+                                <b-badge pill variant="info">{{ event[5] }}</b-badge>
+                              </b-link>
                             </span>
                           </span>
                           <span v-else-if="event[2] == 2">
