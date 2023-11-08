@@ -357,10 +357,32 @@
                   </b-card>
                 </b-col>
                 <b-col class="m-0 p-0 pl-1">
-                  <b-table small fixed striped responsive hover :items="pagedFilteredSortedActivity" show-empty empty-html="Click Sync above to retrieve punk activity" head-variant="light" class="mx-0 my-1">
-                  </b-table>
-                  <!-- <b-table small fixed striped responsive hover :fields="activityFields" :items="pagedFilteredSortedActivity" show-empty empty-html="Click Sync above to retrieve punk history" head-variant="light" class="mx-0 my-1">
-                    <template #cell(punkId)="data">
+                  <b-table small fixed striped responsive hover :fields="activityFields" :items="pagedFilteredSortedActivity" show-empty empty-html="Click Sync above to retrieve punk history" head-variant="light" class="mx-0 my-1">
+
+                    <template #cell(number)="data">
+                      {{ parseInt(data.index) + ((settings.activityTable.currentPage - 1) * settings.activityTable.pageSize) + 1 }}
+                    </template>
+
+                    <template #cell(timestamp)="data">
+                      <font size="-1">
+                        <b-link :href="'https://etherscan.io/tx/' + data.item[0]" v-b-popover.hover.bottom="'View tx in etherscan.io'" target="_blank">
+                          {{ formatTimestamp(data.item[2]) }}
+                        </b-link>
+                        <!-- <font size="-2">
+                          <b-link @click="showModalTxDetails(data.item);">🔍</b-link>
+                        </font> -->
+                      </font>
+                      <br />
+                      <font size="-2">
+                        {{ data.item[1] + ':' + data.item[3] + ':' + data.item[0] }}
+                      </font>
+                    </template>
+
+                    <template #cell(events)="data">
+                      {{ data.item[4] }}
+                    </template>
+
+                    <!-- <template #cell(punkId)="data">
                       <b-link :href="'https://cryptopunks.app/cryptopunks/details/' + data.item.punkId" v-b-popover.hover.bottom="'View in original website'" target="_blank">
                         {{ data.item.punkId }}
                       </b-link>
@@ -374,7 +396,9 @@
                       <span v-for="(attribute, attributeIndex) in data.item.attributes" v-bind:key="attributeIndex">
                         <b-badge size="sm" pill variant="light" v-b-popover.hover.bottom="slugToTitle(attribute.trait_type)" class="mr-1">{{ slugToTitle(attribute.value) }}</b-badge>
                       </span>
-                    </template>
+                    </template> -->
+                  </b-table>
+                  <!-- <b-table small fixed striped responsive hover :items="pagedFilteredSortedActivity" show-empty empty-html="Click Sync above to retrieve punk activity" head-variant="light" class="mx-0 my-1">
                   </b-table> -->
                 </b-col>
               </b-row>
@@ -565,9 +589,12 @@
             { key: 'attribute', label: 'Attributes', sortable: false, thStyle: 'width: 50%;', thClass: 'text-left', tdClass: 'text-left' },
           ],
           activityFields: [
-            { key: 'punkId', label: 'PunkId', sortable: false, thStyle: 'width: 15%;', thClass: 'text-right', tdClass: 'text-right' },
-            { key: 'image', label: 'Image', sortable: false, thStyle: 'width: 45%;', thClass: 'text-left', tdClass: 'text-left' },
-            { key: 'attribute', label: 'Attributes', sortable: false, thStyle: 'width: 50%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
+            { key: 'timestamp', label: 'When', sortable: false, thStyle: 'width: 25%;', tdClass: 'text-truncate' },
+            // { key: 'punkId', label: 'PunkId', sortable: false, thStyle: 'width: 15%;', thClass: 'text-right', tdClass: 'text-right' },
+            // { key: 'image', label: 'Image', sortable: false, thStyle: 'width: 45%;', thClass: 'text-left', tdClass: 'text-left' },
+            // { key: 'attribute', label: 'Attributes', sortable: false, thStyle: 'width: 50%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'events', label: 'Events', sortable: false, thStyle: 'width: 70%;', thClass: 'text-left', tdClass: 'text-left' },
           ],
           punkAttributesFields: [
             { key: 'select', label: '', thStyle: 'width: 10%;' },
