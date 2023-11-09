@@ -768,7 +768,8 @@
           activityFields: [
             { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
             { key: 'timestamp', label: 'When', sortable: false, thStyle: 'width: 20%;', tdClass: 'text-truncate' },
-            { key: 'events', label: 'Events', sortable: false, thStyle: 'width: 75%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'info', label: 'Info', sortable: false, thStyle: 'width: 35%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'events', label: 'Events', sortable: false, thStyle: 'width: 40%;', thClass: 'text-left', tdClass: 'text-left' },
           ],
           punkAttributesFields: [
             { key: 'select', label: '', thStyle: 'width: 10%;' },
@@ -1338,24 +1339,7 @@
             } else {
               Vue.set(this.settings, 'utcMode', true);
             }
-            console.log("toggleUTCMode: " + this.settings.utcMode);
-            // let someFalse = false;
-            // let someTrue = false;
-            // for (const item of items) {
-            //   if (this.settings.selectedTransactions[item.txHash]) {
-            //     someTrue = true;
-            //   } else {
-            //     someFalse = true;
-            //   }
-            // }
-            // for (const item of items) {
-            //   if (!(someTrue && !someFalse)) {
-            //     Vue.set(this.settings.selectedTransactions, item.txHash, true);
-            //   } else {
-            //     Vue.delete(this.settings.selectedTransactions, item.txHash);
-            //   }
-            // }
-            // this.saveSettings();
+            this.saveSettings();
           },
 
           filterChanged(dataType, option) {
@@ -1590,7 +1574,7 @@
             // console.log(moment().format("HH:mm:ss") + " this.txs: " +  JSON.stringify(this.txs).substring(0, 1000));
             // console.log(moment().format("HH:mm:ss") + " Unique txHashes: " + Object.keys(this.txs).length);
 
-            // console.log(moment().format("HH:mm:ss") + " loadCurrentData END");
+            console.log(moment().format("HH:mm:ss") + " loadCurrentData END");
           },
 
           async halt() {
