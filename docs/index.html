@@ -23,6 +23,7 @@
     <script src="globals.js"></script>
     <script src="deploymentData.js"></script>
     <script src="punkAttributes.js"></script>
+    <script src="parsePunkTx.js"></script>
     <script src="txparser.js"></script>
 
     <link rel="apple-touch-icon" sizes="57x57" href="/images/apple-icon-57x57.png">
@@ -371,10 +372,7 @@
                   <b-table small fixed striped responsive hover :fields="activityFields" :items="pagedFilteredSortedActivity" show-empty empty-html="Click Sync above to retrieve punk history" head-variant="light" class="mx-0 my-1">
 
                     <template #head(timestamp)="data">
-                      When
-                      <font size="-2">
-                        <b-link size="sm" @click="toggleUTCMode" variant="link" v-b-popover.hover.top="'Switch between local time or UTC time'">{{ settings.utcMode ? 'UTC' : 'Local' }}</b-link>
-                      </font>
+                      <b-link size="sm" @click="toggleUTCMode" variant="link" v-b-popover.hover.top="'Switch between local time or UTC time'">{{ settings.utcMode ? 'UTC Time' : 'Local Time' }}</b-link>
                     </template>
 
                     <template #cell(number)="data">
@@ -895,9 +893,13 @@
             const results = [];
             // console.log("filteredActivity - this.settings.filters: " + JSON.stringify(this.settings.filters));
             // console.log(JSON.stringify(this.txs).substring(0, 1000));
+            let count = 0;
             for (const [txHash, txInfo] of Object.entries(this.txs)) {
-              results.push([ txHash, ...txInfo ]);
+              const txSummary = count < 10 ? parsePunkTx(txHash, txInfo) : undefined;
+              results.push([ txHash, ...txInfo, txSummary ]);
+              count++;
             }
+            console.log("results[0..10]: " + JSON.stringify(results.slice(0, 5)));
             // let stage1Data = this.punkAttributes;
             // if (Object.keys(this.settings.filters).length == 0) {
             //   for (const [punkId, attributes] of this.punkAttributes.entries()) {
