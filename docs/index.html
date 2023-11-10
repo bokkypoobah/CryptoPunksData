@@ -302,10 +302,7 @@
                 </div>
 
                 <div class="mt-0 pr-1">
-                  <b-form-checkbox-group size="sm" @input="saveSettings(); loadCurrentData();" v-model="settings.selectedContracts" :options="contractOptions" buttons button-variant="outline-primary" v-b-popover.hover.top="'[Un]Wrapped CryptoPunks V1 & V2'"></b-form-checkbox-group>
-                  <!-- <font size="-2">
-                    {{ settings.selectedContracts }}
-                  </font> -->
+                  <b-form-checkbox-group size="sm" @input="saveSettings(); loadCurrentData();" v-model="settings.selectedContracts" :options="contractOptions" buttons button-variant="outline-primary" v-b-popover.hover.top="'Filter by [Wrapped] CryptoPunks V1 & V2'"></b-form-checkbox-group>
                 </div>
 
                 <div class="mt-0 flex-grow-1">
