@@ -1308,12 +1308,11 @@
           },
 
           async processData(db) {
-            console.log(moment().format("HH:mm:ss") + " processData BEGIN: " + JSON.stringify(this.settings.selectedContracts));
+            console.log(moment().format("HH:mm:ss") + " processData BEGIN");
             let count = 0;
             const txs = {};
             for (const process of this.contracts) {
               const contractIndex = this.addressToIndex[process.address];
-              console.log(moment().format("HH:mm:ss") + " processData - processing: " + contractIndex + ' ' + process.name);
               const eventsDataItems = await db.cache.where("objectName").equals(this.chainId + "_" + process.address + "_events").toArray();
               if (eventsDataItems.length == 1) {
                 events = eventsDataItems[0].object;
@@ -1333,7 +1332,8 @@
                 }
               }
             }
-            console.log(moment().format("HH:mm:ss") + " processData - txs: " + JSON.stringify(txs));
+            console.log(moment().format("HH:mm:ss") + " processData - Object.keys(txs).length: " + Object.keys(txs).length);
+
 
             // for (const [txHash, txInfo] of Object.entries(this.txs)) {
             //   // const txSummary = count < 20 ? parsePunkTx(txHash, txInfo, this.addressToIndex) : undefined;
@@ -1344,7 +1344,7 @@
             //   // }
             //   count++;
             // }
-
+            console.log(moment().format("HH:mm:ss") + " processData END");
           },
 
           async loadCurrentData(db) {
