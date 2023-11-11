@@ -1251,7 +1251,7 @@
             }
             await this.processData(db);
             if (!devMode) {
-              await this.loadCurrentData(db);
+              await this.loadCurrentData();
             }
             this.sync.section = null;
             this.sync.halt = false;
@@ -1347,7 +1347,9 @@
             console.log(moment().format("HH:mm:ss") + " processData END");
           },
 
-          async loadCurrentData(db) {
+          async loadCurrentData() {
+            const db = new Dexie(this.db.name);
+            db.version(this.db.version).stores(this.db.schemaDefinition);
             console.log(moment().format("HH:mm:ss") + " loadCurrentData BEGIN: " + JSON.stringify(this.settings.selectedContracts));
             const indexToAddressDataItems = await db.cache.where("objectName").equals(this.chainId + "_indexToAddress").toArray();
             if (indexToAddressDataItems.length == 1) {
@@ -1398,6 +1400,7 @@
               }
             }
             this.txs = txs;
+            db.close();
             console.log(moment().format("HH:mm:ss") + " loadCurrentData END");
           },
 
@@ -1430,6 +1433,8 @@
             Vue.set(this.settings, 'filters', {});
             this.saveSettings();
           },
+
+
           async syncAll(blockNumber) {
             console.log(moment().format("HH:mm:ss") + " syncAll - blockNumber: " + blockNumber + ", chainId: " + this.chainId);
             const provider = new ethers.providers.Web3Provider(window.ethereum);
