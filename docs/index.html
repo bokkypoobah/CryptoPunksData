@@ -1271,13 +1271,17 @@
               }
             }
 
-            await this.loadBlockTimestamps(db);
-            await this.loadCurrentData();
+            if (!devMode) {
+              await this.loadBlockTimestamps(db);
+            }
+            if (!devMode) {
+              await this.loadCurrentData();
+            }
             this.sync.section = null;
             this.sync.halt = false;
           },
 
-          async loadBlockTimestamps(db/*context, newBlocks*/) {
+          async loadBlockTimestamps(db) {
             // console.log(moment().format("HH:mm:ss") + " loadBlockTimestamps");
             // TODO: Handle blockTimestamp entries with unconfirmed blocks
             const blockNumbersToProcess = [];
@@ -1299,7 +1303,6 @@
             const BATCHSIZE = 1000;
             for (let i = 0; i < blockNumbersToProcess.length; i += BATCHSIZE) {
               const batch = blockNumbersToProcess.slice(i, parseInt(i) + BATCHSIZE);
-              // console.log(i + " " + JSON.stringify(batch.slice(0, 10)));
               const data = await fetch(BLOCKTIMESTAMPSUBGRAPHURL, {
                 method: 'POST',
                 headers: {
@@ -1327,6 +1330,74 @@
             });
             this.sync.section = null;
           },
+
+          async loadCurrentData() {
+            console.log(moment().format("HH:mm:ss") + " loadCurrentData BEGIN: " + JSON.stringify(this.settings.selectedContracts));
+            const db = new Dexie(this.db.name);
+            db.version(this.db.version).stores(this.db.schemaDefinition);
+            const indexToAddressDataItems = await db.cache.where("objectName").equals(this.chainId + "_indexToAddress").toArray();
+            if (indexToAddressDataItems.length == 1) {
+              Vue.set(this, 'indexToAddress', indexToAddressDataItems[0].object);
+              // console.log(moment().format("HH:mm:ss") + " " + "loadCurrentData - indexToAddress: " + JSON.stringify(this.indexToAddress.slice(0, 3)) + ", ...");
+            }
+            const addressToIndexDataItems = await db.cache.where("objectName").equals(this.chainId + "_addressToIndex").toArray();
+            if (addressToIndexDataItems.length == 1) {
+              Vue.set(this, 'addressToIndex', addressToIndexDataItems[0].object);
+              // console.log(moment().format("HH:mm:ss") + " " + "loadCurrentData - addressToIndex: " + JSON.stringify(Object.entries(this.addressToIndex).slice(0, 3)) + ", ...");
+            }
+
+            const blockTimestampsDataItems = await db.cache.where("objectName").equals(this.chainId + "_blockTimestamps").toArray();
+            if (blockTimestampsDataItems.length == 1) {
+              Vue.set(this, 'blockTimestamps', blockTimestampsDataItems[0].object);
+              // console.log(moment().format("HH:mm:ss") + " " + "loadCurrentData - Object.keys(blockTimestamps).length: " + Object.keys(this.blockTimestamps).length);
+            }
+
+            let count = 0;
+            const txs = {};
+            for (const process of this.contracts) {
+              // console.log(moment().format("HH:mm:ss") + " loadCurrentData - processing: " + process.name);
+              const contractIndex = this.addressToIndex[process.address];
+
+              if (this.settings.selectedContracts.length == 0 || this.settings.selectedContracts.includes(contractIndex)) {
+                const eventsDataItems = await db.cache.where("objectName").equals(this.chainId + "_" + process.address + "_events").toArray();
+                if (eventsDataItems.length == 1) {
+                  events = eventsDataItems[0].object;
+                  // console.log("events: " + JSON.stringify(events, null, 2).substring(0, 1000));
+                  // Object.keys(events).forEach(function (key) {
+                  //   if ('unconfirmed' in events[key]) {
+                  //     console.log("DELETING: " + key + " => " + JSON.stringify(events[key]));
+                  //     delete events[key];
+                  //   }
+                  // });
+                  for (const [blockNumber, txIndexes] of Object.entries(events)) {
+                    const timestamp = this.blockTimestamps[blockNumber] || "(unknown)";
+                    for (const [txIndex, txHashes] of Object.entries(txIndexes)) {
+                      for (const [txHash, logIndexes] of Object.entries(txHashes)) {
+                        if (!(txHash in txs)) {
+                          txs[txHash] = [ parseInt(blockNumber), parseInt(timestamp), parseInt(txIndex), [] ];
+                        }
+                        for (const [logIndex, txInfo] of Object.entries(logIndexes)) {
+                          txs[txHash][3].push([ parseInt(logIndex), contractIndex, ...txInfo ]);
+                          // if ((count % 10000) == 0) {
+                          //   console.log(count + " " + blockNumber + "/" + txIndex + "/" + txHash + "/" + logIndex + " => " + JSON.stringify(txInfo));
+                          // }
+                          // count++
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            // console.log(moment().format("HH:mm:ss") + " txs: " + JSON.stringify(txs));
+            this.txs = txs;
+            // console.log(moment().format("HH:mm:ss") + " this.txs: " + JSON.stringify(new Map(Array.from(this.txs).slice(0, 9))));
+            // console.log(moment().format("HH:mm:ss") + " this.txs: " +  JSON.stringify(this.txs).substring(0, 1000));
+            // console.log(moment().format("HH:mm:ss") + " Unique txHashes: " + Object.keys(this.txs).length);
+
+            console.log(moment().format("HH:mm:ss") + " loadCurrentData END");
+          },
+          
           saveSettings() {
             localStorage.cryptoPunksDataSettings = JSON.stringify(this.settings);
           },
@@ -1504,73 +1575,6 @@
             }).catch(function(error) {
               console.log("error: " + error);
             });
-          },
-
-          async loadCurrentData() {
-            console.log(moment().format("HH:mm:ss") + " loadCurrentData BEGIN: " + JSON.stringify(this.settings.selectedContracts));
-            const db = new Dexie(this.db.name);
-            db.version(this.db.version).stores(this.db.schemaDefinition);
-            const indexToAddressDataItems = await db.cache.where("objectName").equals(this.chainId + "_indexToAddress").toArray();
-            if (indexToAddressDataItems.length == 1) {
-              Vue.set(this, 'indexToAddress', indexToAddressDataItems[0].object);
-              // console.log(moment().format("HH:mm:ss") + " " + "loadCurrentData - indexToAddress: " + JSON.stringify(this.indexToAddress.slice(0, 3)) + ", ...");
-            }
-            const addressToIndexDataItems = await db.cache.where("objectName").equals(this.chainId + "_addressToIndex").toArray();
-            if (addressToIndexDataItems.length == 1) {
-              Vue.set(this, 'addressToIndex', addressToIndexDataItems[0].object);
-              // console.log(moment().format("HH:mm:ss") + " " + "loadCurrentData - addressToIndex: " + JSON.stringify(Object.entries(this.addressToIndex).slice(0, 3)) + ", ...");
-            }
-
-            const blockTimestampsDataItems = await db.cache.where("objectName").equals(this.chainId + "_blockTimestamps").toArray();
-            if (blockTimestampsDataItems.length == 1) {
-              Vue.set(this, 'blockTimestamps', blockTimestampsDataItems[0].object);
-              // console.log(moment().format("HH:mm:ss") + " " + "loadCurrentData - Object.keys(blockTimestamps).length: " + Object.keys(this.blockTimestamps).length);
-            }
-
-            let count = 0;
-            const txs = {};
-            for (const process of this.contracts) {
-              // console.log(moment().format("HH:mm:ss") + " loadCurrentData - processing: " + process.name);
-              const contractIndex = this.addressToIndex[process.address];
-
-              if (this.settings.selectedContracts.length == 0 || this.settings.selectedContracts.includes(contractIndex)) {
-                const eventsDataItems = await db.cache.where("objectName").equals(this.chainId + "_" + process.address + "_events").toArray();
-                if (eventsDataItems.length == 1) {
-                  events = eventsDataItems[0].object;
-                  // console.log("events: " + JSON.stringify(events, null, 2).substring(0, 1000));
-                  // Object.keys(events).forEach(function (key) {
-                  //   if ('unconfirmed' in events[key]) {
-                  //     console.log("DELETING: " + key + " => " + JSON.stringify(events[key]));
-                  //     delete events[key];
-                  //   }
-                  // });
-                  for (const [blockNumber, txIndexes] of Object.entries(events)) {
-                    const timestamp = this.blockTimestamps[blockNumber] || "(unknown)";
-                    for (const [txIndex, txHashes] of Object.entries(txIndexes)) {
-                      for (const [txHash, logIndexes] of Object.entries(txHashes)) {
-                        if (!(txHash in txs)) {
-                          txs[txHash] = [ parseInt(blockNumber), parseInt(timestamp), parseInt(txIndex), [] ];
-                        }
-                        for (const [logIndex, txInfo] of Object.entries(logIndexes)) {
-                          txs[txHash][3].push([ parseInt(logIndex), contractIndex, ...txInfo ]);
-                          // if ((count % 10000) == 0) {
-                          //   console.log(count + " " + blockNumber + "/" + txIndex + "/" + txHash + "/" + logIndex + " => " + JSON.stringify(txInfo));
-                          // }
-                          // count++
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-            // console.log(moment().format("HH:mm:ss") + " txs: " + JSON.stringify(txs));
-            this.txs = txs;
-            // console.log(moment().format("HH:mm:ss") + " this.txs: " + JSON.stringify(new Map(Array.from(this.txs).slice(0, 9))));
-            // console.log(moment().format("HH:mm:ss") + " this.txs: " +  JSON.stringify(this.txs).substring(0, 1000));
-            // console.log(moment().format("HH:mm:ss") + " Unique txHashes: " + Object.keys(this.txs).length);
-
-            console.log(moment().format("HH:mm:ss") + " loadCurrentData END");
           },
 
           async halt() {
