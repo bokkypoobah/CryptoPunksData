@@ -894,10 +894,11 @@
             let count = 0;
             for (const [txHash, txInfo] of Object.entries(this.txs)) {
               // const txSummary = count < 20 ? parsePunkTx(txHash, txInfo, this.addressToIndex) : undefined;
-              const txSummary = parsePunkTx(txHash, txInfo, this.addressToIndex);
-              if (txSummary) {
+              // const txSummary = parsePunkTx(txHash, txInfo, this.addressToIndex);
+              // if (txSummary) {
+                const txSummary = undefined;
                 results.push([ txHash, ...txInfo, txSummary ]);
-              }
+              // }
               count++;
             }
             // console.log("results[0..10]: " + JSON.stringify(results.slice(0, 5)));
@@ -1229,9 +1230,6 @@
               this.sync.completed = startBlock;
               if (!devMode) {
                 await getLogs(startBlock, latestBlockNumber, processLogs, process.name);
-                // console.log("addressToIndex: " + JSON.stringify(addressToIndex, null, 2));
-                // console.log("indexToAddress: " + JSON.stringify(indexToAddress, null, 2));
-                // console.log("events: " + JSON.stringify(events, null, 2));
                 Vue.set(this, "addressToIndex", addressToIndex);
                 Vue.set(this, "indexToAddress", indexToAddress);
                 await db.cache.put({ objectName: this.chainId + "_indexToAddress", object: indexToAddress }).then (function() {
@@ -1311,6 +1309,42 @@
 
           async processData(db) {
             console.log(moment().format("HH:mm:ss") + " processData BEGIN: " + JSON.stringify(this.settings.selectedContracts));
+            let count = 0;
+            const txs = {};
+            for (const process of this.contracts) {
+              const contractIndex = this.addressToIndex[process.address];
+              console.log(moment().format("HH:mm:ss") + " processData - processing: " + contractIndex + ' ' + process.name);
+              const eventsDataItems = await db.cache.where("objectName").equals(this.chainId + "_" + process.address + "_events").toArray();
+              if (eventsDataItems.length == 1) {
+                events = eventsDataItems[0].object;
+                for (const [blockNumber, txIndexes] of Object.entries(events)) {
+                  const timestamp = this.blockTimestamps[blockNumber] || "(unknown)";
+                  for (const [txIndex, txHashes] of Object.entries(txIndexes)) {
+                    for (const [txHash, logIndexes] of Object.entries(txHashes)) {
+                      if (!(txHash in txs)) {
+                        txs[txHash] = [ parseInt(blockNumber), parseInt(timestamp), parseInt(txIndex), [] ];
+                      }
+                      for (const [logIndex, txInfo] of Object.entries(logIndexes)) {
+                        txs[txHash][3].push([ parseInt(logIndex), contractIndex, ...txInfo ]);
+                        count++
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            console.log(moment().format("HH:mm:ss") + " processData - txs: " + JSON.stringify(txs));
+
+            // for (const [txHash, txInfo] of Object.entries(this.txs)) {
+            //   // const txSummary = count < 20 ? parsePunkTx(txHash, txInfo, this.addressToIndex) : undefined;
+            //   // const txSummary = parsePunkTx(txHash, txInfo, this.addressToIndex);
+            //   // if (txSummary) {
+            //     const txSummary = undefined;
+            //     results.push([ txHash, ...txInfo, txSummary ]);
+            //   // }
+            //   count++;
+            // }
+
           },
 
           async loadCurrentData(db) {
@@ -1332,7 +1366,6 @@
             for (const process of this.contracts) {
               // console.log(moment().format("HH:mm:ss") + " loadCurrentData - processing: " + process.name);
               const contractIndex = this.addressToIndex[process.address];
-
               if (this.settings.selectedContracts.length == 0 || this.settings.selectedContracts.includes(contractIndex)) {
                 const eventsDataItems = await db.cache.where("objectName").equals(this.chainId + "_" + process.address + "_events").toArray();
                 if (eventsDataItems.length == 1) {
