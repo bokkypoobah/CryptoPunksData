@@ -1000,7 +1000,7 @@
             //    w2 event ProxyRegistered(address user, address proxy);
 
             const CONFIRMATIONS = 100;
-            console.log(moment().format("HH:mm:ss") + " syncCryptoPunksData - chainId: " + this.chainId);
+            // console.log(moment().format("HH:mm:ss") + " syncCryptoPunksData - chainId: " + this.chainId);
             const db = new Dexie(this.db.name);
             db.version(this.db.version).stores(this.db.schemaDefinition);
             const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -1035,7 +1035,7 @@
               }
             }
             for (const process of this.contracts) {
-              console.log(moment().format("HH:mm:ss") + " Processing: " + process.name);
+              // console.log(moment().format("HH:mm:ss") + " Processing: " + process.name);
               // this.sync.section = process.name;
               const contract = new ethers.Contract(process.address, process.abi, provider);
               if (!(process.address in addressToIndex)) {
@@ -1274,8 +1274,9 @@
             if (!devMode) {
               await this.loadBlockTimestamps(db);
             }
+            await this.processData(db);
             if (!devMode) {
-              await this.loadCurrentData();
+              await this.loadCurrentData(db);
             }
             this.sync.section = null;
             this.sync.halt = false;
@@ -1331,10 +1332,14 @@
             this.sync.section = null;
           },
 
-          async loadCurrentData() {
+          async processData(db) {
+            console.log(moment().format("HH:mm:ss") + " processData BEGIN: " + JSON.stringify(this.settings.selectedContracts));
+          },
+
+          async loadCurrentData(db) {
             console.log(moment().format("HH:mm:ss") + " loadCurrentData BEGIN: " + JSON.stringify(this.settings.selectedContracts));
-            const db = new Dexie(this.db.name);
-            db.version(this.db.version).stores(this.db.schemaDefinition);
+            // const db = new Dexie(this.db.name);
+            // db.version(this.db.version).stores(this.db.schemaDefinition);
             const indexToAddressDataItems = await db.cache.where("objectName").equals(this.chainId + "_indexToAddress").toArray();
             if (indexToAddressDataItems.length == 1) {
               Vue.set(this, 'indexToAddress', indexToAddressDataItems[0].object);
@@ -1397,7 +1402,7 @@
 
             console.log(moment().format("HH:mm:ss") + " loadCurrentData END");
           },
-          
+
           saveSettings() {
             localStorage.cryptoPunksDataSettings = JSON.stringify(this.settings);
           },
@@ -2078,14 +2083,14 @@
             }
           }
           (async() => {
-            const db0 = new Dexie(this.db.name);
-            db0.version(this.db.version).stores(this.db.schemaDefinition);
-            const blockTimestampsDataItems = await db0.cache.where("objectName").equals('blockTimestamps').toArray();
+            const db = new Dexie(this.db.name);
+            db.version(this.db.version).stores(this.db.schemaDefinition);
+            const blockTimestampsDataItems = await db.cache.where("objectName").equals('blockTimestamps').toArray();
             if (blockTimestampsDataItems.length == 1) {
               this.blockTimestamps = blockTimestampsDataItems[0].object;
             }
-            db0.close();
-            await this.loadCurrentData();
+            await this.loadCurrentData(db);
+            db.close();
           })();
         },
       })
