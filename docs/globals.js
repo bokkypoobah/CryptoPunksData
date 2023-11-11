@@ -7,14 +7,3 @@ function handleErrors(response) {
   }
   return response;
 }
-
-const TRANSFER = 1;
-
-const UNISWAPV2MINT = 21;
-const UNISWAPV2SWAP = 22;
-const UNISWAPV2BURN = 23;
-
-const UNISWAPV3MINT = 31;
-const UNISWAPV3SWAP = 32;
-const UNISWAPV3BURN = 33;
-const UNISWAPV3COLLECT = 34;

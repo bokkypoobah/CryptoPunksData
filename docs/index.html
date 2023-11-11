@@ -192,7 +192,10 @@
                 <div class="mt-0 flex-grow-1">
                 </div>
                 <div v-if="!sync.section" class="mt-0 pr-1">
-                  <b-button size="sm" @click="syncCryptoPunksData" variant="primary" v-b-popover.hover.top="'Sync CryptoPunksData. This will take ~10 minutes initially, and ~0.5 minutes subsequently'">Sync</b-button>
+                  <b-button size="sm" @click="syncCryptoPunksData(false)" variant="primary" v-b-popover.hover.top="'Sync CryptoPunksData. This will take ~10 minutes initially, and ~0.5 minutes subsequently'">Sync</b-button>
+                </div>
+                <div v-if="!sync.section" class="mt-0 pr-1">
+                  <b-button size="sm" @click="syncCryptoPunksData(true)" variant="outline-primary" v-b-popover.hover.top="'Sync CryptoPunksData. This will take ~10 minutes initially, and ~0.5 minutes subsequently'">Sync(devMode)</b-button>
                 </div>
                 <div class="mt-1" style="width: 350px;">
                   <b-progress v-if="sync.section != null" height="1.5rem" :max="sync.total" show-progress :animated="sync.section != null" :variant="sync.section != null ? 'success' : 'secondary'" v-b-popover.hover.top="'{processed blocked number}/{latest block number}. Click the button on the right to stop this process. This process can be continued later'">
@@ -308,7 +311,10 @@
                 <div class="mt-0 flex-grow-1">
                 </div>
                 <div v-if="!sync.section" class="mt-0 pr-1">
-                  <b-button size="sm" @click="syncCryptoPunksData" variant="primary" v-b-popover.hover.top="'Sync CryptoPunksData. This will take ~6 minutes initially, and ~10 seconds subsequently'">Sync</b-button>
+                  <b-button size="sm" @click="syncCryptoPunksData(false)" variant="primary" v-b-popover.hover.top="'Sync CryptoPunksData. This will take ~6 minutes initially, and ~10 seconds subsequently'">Sync</b-button>
+                </div>
+                <div v-if="!sync.section" class="mt-0 pr-1">
+                  <b-button size="sm" @click="syncCryptoPunksData(true)" variant="outline-primary" v-b-popover.hover.top="'Sync CryptoPunksData. This will take ~6 minutes initially, and ~10 seconds subsequently'">Sync(devMode)</b-button>
                 </div>
                 <div class="mt-1" style="width: 350px;">
                   <b-progress v-if="sync.section != null" height="1.5rem" :max="sync.total" show-progress :animated="sync.section != null" :variant="sync.section != null ? 'success' : 'secondary'" v-b-popover.hover.top="'{processed blocked number}/{latest block number}. Click the button on the right to stop this process. This process can be continued later'">
@@ -892,11 +898,15 @@
             // console.log(JSON.stringify(this.txs).substring(0, 1000));
             let count = 0;
             for (const [txHash, txInfo] of Object.entries(this.txs)) {
-              const txSummary = count < 10 ? parsePunkTx(txHash, txInfo) : undefined;
-              results.push([ txHash, ...txInfo, txSummary ]);
+              // const txSummary = count < 20 ? parsePunkTx(txHash, txInfo, this.addressToIndex) : undefined;
+              const txSummary = parsePunkTx(txHash, txInfo, this.addressToIndex);
+              if (txSummary) {
+                results.push([ txHash, ...txInfo, txSummary ]);
+              }
               count++;
             }
-            console.log("results[0..10]: " + JSON.stringify(results.slice(0, 5)));
+            // console.log("results[0..10]: " + JSON.stringify(results.slice(0, 5)));
+
             // let stage1Data = this.punkAttributes;
             // if (Object.keys(this.settings.filters).length == 0) {
             //   for (const [punkId, attributes] of this.punkAttributes.entries()) {
@@ -971,7 +981,7 @@
             }).join(' ');
           },
 
-          async syncCryptoPunksData(section) {
+          async syncCryptoPunksData(devMode) {
 
             // v1 v2 event Assign(address indexed to, uint256 punkIndex);
             // v1 v2 event Transfer(address indexed from, address indexed to, uint256 value);
@@ -1222,12 +1232,10 @@
                 }
               }
 
-              // TODO
-              const DEVMODE = false;
               const eventsDataItems = await db.cache.where("objectName").equals(this.chainId + "_" + process.address + "_events").toArray();
               if (eventsDataItems.length == 1) {
                 events = eventsDataItems[0].object;
-                if (!DEVMODE) {
+                if (!devMode) {
                   Object.keys(events).forEach(function (key) {
                     if ('unconfirmed' in events[key]) {
                       console.log("DELETING: " + key + " => " + JSON.stringify(events[key]));
@@ -1241,7 +1249,7 @@
 
               this.sync.total = latestBlockNumber;
               this.sync.completed = startBlock;
-              if (!DEVMODE) {
+              if (!devMode) {
                 await getLogs(startBlock, latestBlockNumber, processLogs, process.name);
                 // console.log("addressToIndex: " + JSON.stringify(addressToIndex, null, 2));
                 // console.log("indexToAddress: " + JSON.stringify(indexToAddress, null, 2));
@@ -1262,19 +1270,18 @@
                 });
               }
             }
-            this.sync.section = null;
-            this.sync.halt = false;
 
             await this.loadBlockTimestamps(db);
             await this.loadCurrentData();
+            this.sync.section = null;
+            this.sync.halt = false;
           },
 
           async loadBlockTimestamps(db/*context, newBlocks*/) {
             // console.log(moment().format("HH:mm:ss") + " loadBlockTimestamps");
-            // TODO: Remove blockTimestamp entries with unconfirmed blocks
+            // TODO: Handle blockTimestamp entries with unconfirmed blocks
             const blockNumbersToProcess = [];
             for (const process of this.contracts) {
-              // console.log(moment().format("HH:mm:ss") + " loadCurrentData - processing: " + process.name);
               const contractIndex = this.addressToIndex[process.address];
               const eventsDataItems = await db.cache.where("objectName").equals(this.chainId + "_" + process.address + "_events").toArray();
               if (eventsDataItems.length == 1) {
@@ -1286,15 +1293,13 @@
                 }
               }
             }
-            // console.log("blockNumbersToProcess.length: " + blockNumbersToProcess.length);
-
             this.sync.completed = 0;
             this.sync.total = blockNumbersToProcess.length;
             this.sync.section = 'Block Timestamps';
             const BATCHSIZE = 1000;
             for (let i = 0; i < blockNumbersToProcess.length; i += BATCHSIZE) {
               const batch = blockNumbersToProcess.slice(i, parseInt(i) + BATCHSIZE);
-              console.log(i + " " + JSON.stringify(batch.slice(0, 10)));
+              // console.log(i + " " + JSON.stringify(batch.slice(0, 10)));
               const data = await fetch(BLOCKTIMESTAMPSUBGRAPHURL, {
                 method: 'POST',
                 headers: {
@@ -1310,28 +1315,21 @@
                 console.log("error: " + e);
               });
               const timestamps = data.data && data.data.blocks || [];
-              // console.log(i + " " + JSON.stringify(timestamps));
               for (const timestampItem of timestamps) {
                 Vue.set(this.blockTimestamps, timestampItem.number, parseInt(timestampItem.timestamp));
               }
               this.sync.completed += timestamps.length;
               console.log(moment().format("HH:mm:ss") + " loadBlockTimestamps " + this.sync.completed + " of " + blockNumbersToProcess.length);
             }
-
-            console.log(moment().format("HH:mm:ss") + " Object.keys(this.blockTimestamps).length: " + Object.keys(this.blockTimestamps).length);
-
             await db.cache.put({ objectName: this.chainId + "_blockTimestamps", object: this.blockTimestamps }).then (function() {
             }).catch(function(error) {
               console.log("error: " + error);
             });
             this.sync.section = null;
           },
-
           saveSettings() {
             localStorage.cryptoPunksDataSettings = JSON.stringify(this.settings);
-            // console.log("saveSettings: " + JSON.stringify(this.settings));
           },
-
           toggleUTCMode() {
             if (this.settings.utcMode) {
               Vue.set(this.settings, 'utcMode', false);
@@ -1340,7 +1338,6 @@
             }
             this.saveSettings();
           },
-
           filterChanged(dataType, option) {
             if (!this.settings.filters[dataType]) {
               Vue.set(this.settings.filters, dataType, {});
