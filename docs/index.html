@@ -1393,13 +1393,17 @@
               }
             }
 
-            for (const blockNumber of Object.keys(combined).sort()) {
+            for (const blockNumber of Object.keys(combined).sort((a, b) => parseInt(a) - parseInt(b))) {
               const txIndexes = combined[blockNumber];
-              for (const txIndex of Object.keys(txIndexes).sort()) {
+              for (const txIndex of Object.keys(txIndexes).sort((a, b) => parseInt(a) - parseInt(b))) {
                 const txData = txIndexes[txIndex];
-                if (Object.keys(txData[1]).length > 2) {
-                  const [txHash, logs] = txData;
-                  console.log(blockNumber + " " + txIndex + " " + txHash + " " + JSON.stringify(logs));
+                const [txHash, logs] = txData;
+                if (Object.keys(logs).length > 3) {
+                  // console.log(blockNumber + " " + txIndex + " " + txHash + " " + JSON.stringify(logs));
+                  for (const logIndex of Object.keys(logs).sort((a, b) => parseInt(a) - parseInt(b))) {
+                    const event = logs[logIndex];
+                    console.log(blockNumber + " " + txIndex + " " + txHash + " " + logIndex + " " + JSON.stringify(event));
+                  }
                 }
               }
             }
