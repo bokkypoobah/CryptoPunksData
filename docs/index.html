@@ -431,6 +431,14 @@
                       </font>
                     </template>
 
+                    <template #cell(info)="data">
+                      <font size="-2">
+                        <pre>
+{{ data.item }}
+                        </pre>
+                      </font>
+                    </template>
+
                     <template #cell(events)="data">
                       <!-- {{ data.item[4] }} -->
                       <!-- <br /> -->
@@ -907,8 +915,8 @@
             let count = 0;
             for (const tx of this.txs) {
               const timestamp = this.blockTimestamps[tx[0]] || "(unknown)";
-              if (count < 10) {
-                console.log([ timestamp, ...tx ]);
+              if (count < 3) {
+                console.log(JSON.stringify([ timestamp, ...tx ]));
               }
               results.push([ timestamp, ...tx ]);
               count++;
@@ -1389,7 +1397,7 @@
                     if (parseInt(punkId) > 9999 || punkId.length > 5) {
                       console.log("  v1 Invalid punkId" + " " + blockNumber + " " + txIndex + " " + txHash + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
                     }
-                    events.push([ contractIndex, eventType, event[2], event[3] ]);
+                    events.push([ logIndex, contractIndex, eventType, event[2], event[3] ]);
 
                   // Transfer - W1 & W2
                   } else if (eventType == 1) {
@@ -1406,7 +1414,7 @@
                       const [ fromOwnerIndex, toOwnerIndex, punkId ] = [ event[2], event[3], event[4].toString() ];
                       lastToOwnerIndex = toOwnerIndex;
                     }
-                    events.push([ contractIndex, eventType, event[2], event[3], event[4] ]);
+                    events.push([ logIndex, contractIndex, eventType, event[2], event[3], event[4] ]);
 
                   // PunkTransfer - V1 & V2 only
                   } else if (eventType == 2) {
@@ -1415,7 +1423,7 @@
                       tokens[contractIndex][punkId] = toOwnerIndex;
                     }
                     // console.log(blockNumber + " " + txIndex + " " + txHash + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
-                    events.push([ contractIndex, eventType, event[2], event[3], event[4] ]);
+                    events.push([ logIndex, contractIndex, eventType, event[2], event[3], event[4] ]);
 
                   // PunkOffered - V1 & V2
                   } else if (eventType == 3) {
@@ -1425,7 +1433,7 @@
                       console.log("PunkOffered " + blockNumber + " " + txIndex + " " + txHash + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
                       console.log("  offers[contractIndex][7144]: " + JSON.stringify(offers[contractIndex][7144]));
                     }
-                    events.push([ contractIndex, eventType, event[2], event[3], event[4] ]);
+                    events.push([ logIndex, contractIndex, eventType, event[2], event[3], event[4] ]);
 
                   // PunkNoLongerForSale - V1 & V2
                   } else if (eventType == 4) {
@@ -1435,7 +1443,7 @@
                       console.log("PunkNoLongerForSale " + blockNumber + " " + txIndex + " " + txHash + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
                       console.log("  offers[contractIndex][7144]: " + JSON.stringify(offers[contractIndex][7144]));
                     }
-                    events.push([ contractIndex, eventType, event[2] ]);
+                    events.push([ logIndex, contractIndex, eventType, event[2] ]);
 
                   // PunkBidEntered - V2
                   } else if (eventType == 5) {
@@ -1445,7 +1453,7 @@
                     //   console.log("PunkBidEntered " + blockNumber + " " + txIndex + " " + txHash + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
                     //   console.log("  v2Bids[0]: " + JSON.stringify(v2Bids[0]));
                     // }
-                    events.push([ contractIndex, eventType, event[2], event[3], event[4] ]);
+                    events.push([ logIndex, contractIndex, eventType, event[2], event[3], event[4] ]);
 
                   // PunkBidWithdrawn - V2
                   } else if (eventType == 6) {
@@ -1455,7 +1463,7 @@
                     //   console.log("PunkBidWithdrawn " + blockNumber + " " + txIndex + " " + txHash + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
                     //   console.log("  v2Bids[0]: " + JSON.stringify(v2Bids[0]));
                     // }
-                    events.push([ contractIndex, eventType, event[2], event[3], event[4] ]);
+                    events.push([ logIndex, contractIndex, eventType, event[2], event[3], event[4] ]);
 
                   // PunkBought - V1 & V2
                   } else if (eventType == 7) {
@@ -1469,7 +1477,7 @@
                     if (parseInt(punkId) < 10000) {
                       tokens[contractIndex][punkId] = toOwnerIndex;
                     }
-                    events.push([ contractIndex, eventType, event[2], value, fromOwnerIndex, toOwnerIndex ]);
+                    events.push([ logIndex, contractIndex, eventType, event[2], value, fromOwnerIndex, toOwnerIndex ]);
                     // if (punkId == 0) {
                     //   console.log("PunkBought " + blockNumber + " " + txIndex + " " + txHash + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
                     //   console.log("  v2Bids[0]: " + JSON.stringify(v2Bids[0]));
