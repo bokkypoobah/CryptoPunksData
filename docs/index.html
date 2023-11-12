@@ -787,7 +787,7 @@
             "ProxyRegistered",
           ],
           db: {
-            name: "cryptopunksdata088e",
+            name: "cryptopunksdata088f",
             version: 1,
             schemaDefinition: {
               cache: '&objectName',
@@ -1180,16 +1180,18 @@
                     if (record) {
                       const confirmations = latestBlockNumber - blockNumber;
                       if (!(blockNumber in events)) {
-                        events[blockNumber] = confirmations < CONFIRMATIONS ? { unconfirmed: true } : {};
+                        // TODO: Handle with storage of latestBlockNumber
+                        // events[blockNumber] = confirmations < CONFIRMATIONS ? { unconfirmed: true } : {};
+                        events[blockNumber] = {};
                       }
                       if (!(transactionIndex in events[blockNumber])) {
-                        events[blockNumber][transactionIndex] = {};
+                        events[blockNumber][transactionIndex] = [ txHash, {} ];
                       }
-                      if (!(txHash in events[blockNumber][transactionIndex])) {
-                        events[blockNumber][transactionIndex][txHash] = {};
-                      }
-                      if (!(logIndex in events[blockNumber][transactionIndex][txHash])) {
-                        events[blockNumber][transactionIndex][txHash][logIndex] = record;
+                      // if (!(txHash in events[blockNumber][transactionIndex])) {
+                      //   events[blockNumber][transactionIndex][txHash] = {};
+                      // }
+                      if (!(logIndex in events[blockNumber][transactionIndex][1])) {
+                        events[blockNumber][transactionIndex][1][logIndex] = record;
                         newEvents++;
                       }
                     }
@@ -1214,11 +1216,15 @@
               }
               const eventsDataItems = await db.cache.where("objectName").equals(this.chainId + "_" + process.address + "_events").toArray();
               if (eventsDataItems.length == 1) {
-                events = eventsDataItems[0].object;
+                const storedLatestBlockNumber = eventsDataItems[0].object.latestBlockNumber;
+                events = eventsDataItems[0].object.events;
+                // console.log(moment().format("HH:mm:ss") + " syncCryptoPunksData - storedLatestBlockNumber: " + storedLatestBlockNumber);
+                // console.log(moment().format("HH:mm:ss") + " syncCryptoPunksData - events: " + JSON.stringify(events).substring(0, 1000));
                 if (!devMode) {
                   Object.keys(events).forEach(function (key) {
-                    if ('unconfirmed' in events[key]) {
-                      console.log("DELETING: " + key + " => " + JSON.stringify(events[key]));
+                    const confirmations = storedLatestBlockNumber - key;
+                    if (confirmations < CONFIRMATIONS) {
+                      console.log("DELETING: " + key + " => " + confirmations + " " + JSON.stringify(events[key]));
                       delete events[key];
                     }
                   });
@@ -1240,7 +1246,8 @@
                 }).catch(function(error) {
                   console.log("error: " + error);
                 });
-                await db.cache.put({ objectName: this.chainId + "_" + process.address + "_events", object: events }).then (function() {
+                console.log(moment().format("HH:mm:ss") + " syncCryptoPunksData - events: " + JSON.stringify(events));
+                await db.cache.put({ objectName: this.chainId + "_" + process.address + "_events", object: { latestBlockNumber, events } }).then (function() {
                 }).catch(function(error) {
                   console.log("error: " + error);
                 });
@@ -1258,14 +1265,15 @@
           },
 
           async loadBlockTimestamps(db) {
-            // console.log(moment().format("HH:mm:ss") + " loadBlockTimestamps");
-            // TODO: Handle blockTimestamp entries with unconfirmed blocks
+            console.log(moment().format("HH:mm:ss") + " loadBlockTimestamps");
+            // TODO: Low priority - Handle blockTimestamp entries with unconfirmed blocks to handle reorgs
             const blockNumbersToProcess = [];
             for (const process of this.contracts) {
               const contractIndex = this.addressToIndex[process.address];
               const eventsDataItems = await db.cache.where("objectName").equals(this.chainId + "_" + process.address + "_events").toArray();
               if (eventsDataItems.length == 1) {
-                events = eventsDataItems[0].object;
+                const storedLatestBlockNumber = eventsDataItems[0].object.latestBlockNumber;
+                events = eventsDataItems[0].object.events;
                 for (const [blockNumber, txIndexes] of Object.entries(events)) {
                   if (!(blockNumber in this.blockTimestamps)) {
                     blockNumbersToProcess.push(blockNumber);
@@ -1315,29 +1323,40 @@
               const contractIndex = this.addressToIndex[process.address];
               const eventsDataItems = await db.cache.where("objectName").equals(this.chainId + "_" + process.address + "_events").toArray();
               if (eventsDataItems.length == 1) {
-                events = eventsDataItems[0].object;
+                const storedLatestBlockNumber = eventsDataItems[0].object.latestBlockNumber;
+                events = eventsDataItems[0].object.events;
                 for (const [blockNumber, txIndexes] of Object.entries(events)) {
                   if (!(blockNumber in txs)) {
                     txs[blockNumber] = {};
                   }
                   const timestamp = this.blockTimestamps[blockNumber] || "(unknown)";
-                  for (const [txIndex, txHashes] of Object.entries(txIndexes)) {
-                    if (!(txIndex in txs[blockNumber])) {
-                      txs[blockNumber][txIndex] = {};
-                    }
-                    for (const [txHash, logIndexes] of Object.entries(txHashes)) {
-                      if (!(txHash in txs[blockNumber][txIndex])) {
-                        txs[blockNumber][txIndex][txHash] = {};
-                      }
-                      // if (!(txHash in txs)) {
-                      //   txs[txHash] = [ parseInt(blockNumber), parseInt(timestamp), parseInt(txIndex), [] ];
-                      // }
-                      // for (const [logIndex, txInfo] of Object.entries(logIndexes)) {
-                      //   txs[txHash][3].push([ parseInt(logIndex), contractIndex, ...txInfo ]);
-                      //   count++
-                      // }
-                    }
-                  }
+                  // for (const [txIndex, txData] of Object.entries(txIndexes)) {
+                  //   console.log(txIndex + " => " + JSON.stringify(txData));
+                  //   if (!(txData[0] in txs)) {
+                  //     txs[txData[0]] = [ parseInt(blockNumber), parseInt(timestamp), parseInt(txIndex), [] ];
+                  //   }
+                  //   for (const [logIndex, eventInfo] of Object.entries(txData[1])) {
+                  //     // txs[txData[0]][3].push([ parseInt(logIndex), contractIndex, ...eventInfo ]);
+                  //   }
+                  // }
+
+                  // for (const [txIndex, txHashes] of Object.entries(txIndexes)) {
+                  //   if (!(txIndex in txs[blockNumber])) {
+                  //     txs[blockNumber][txIndex] = {};
+                  //   }
+                  //   for (const [txHash, logIndexes] of Object.entries(txHashes)) {
+                  //     if (!(txHash in txs[blockNumber][txIndex])) {
+                  //       txs[blockNumber][txIndex][txHash] = {};
+                  //     }
+                  //     // if (!(txHash in txs)) {
+                  //     //   txs[txHash] = [ parseInt(blockNumber), parseInt(timestamp), parseInt(txIndex), [] ];
+                  //     // }
+                  //     // for (const [logIndex, txInfo] of Object.entries(logIndexes)) {
+                  //     //   txs[txHash][3].push([ parseInt(logIndex), contractIndex, ...txInfo ]);
+                  //     //   count++
+                  //     // }
+                  //   }
+                  // }
                 }
               }
             }
@@ -1381,8 +1400,10 @@
               if (this.settings.selectedContracts.length == 0 || this.settings.selectedContracts.includes(contractIndex)) {
                 const eventsDataItems = await db.cache.where("objectName").equals(this.chainId + "_" + process.address + "_events").toArray();
                 if (eventsDataItems.length == 1) {
-                  events = eventsDataItems[0].object;
-                  // console.log("events: " + JSON.stringify(events, null, 2).substring(0, 1000));
+                  const storedLatestBlockNumber = eventsDataItems[0].object.latestBlockNumber;
+                  events = eventsDataItems[0].object.events;
+                  // console.log(moment().format("HH:mm:ss") + " loadCurrentData - storedLatestBlockNumber: " + storedLatestBlockNumber);
+                  // console.log(moment().format("HH:mm:ss") + " loadCurrentData - events: " + JSON.stringify(events).substring(0, 1000));
                   // Object.keys(events).forEach(function (key) {
                   //   if ('unconfirmed' in events[key]) {
                   //     console.log("DELETING: " + key + " => " + JSON.stringify(events[key]));
@@ -1391,18 +1412,16 @@
                   // });
                   for (const [blockNumber, txIndexes] of Object.entries(events)) {
                     const timestamp = this.blockTimestamps[blockNumber] || "(unknown)";
-                    for (const [txIndex, txHashes] of Object.entries(txIndexes)) {
-                      for (const [txHash, logIndexes] of Object.entries(txHashes)) {
-                        if (!(txHash in txs)) {
-                          txs[txHash] = [ parseInt(blockNumber), parseInt(timestamp), parseInt(txIndex), [] ];
+                    for (const [txIndex, txData] of Object.entries(txIndexes)) {
+                      if (!(txData[0] in txs)) {
+                        txs[txData[0]] = [ parseInt(blockNumber), parseInt(timestamp), parseInt(txIndex), [] ];
+                      }
+                      for (const [logIndex, eventInfo] of Object.entries(txData[1])) {
+                        txs[txData[0]][3].push([ parseInt(logIndex), contractIndex, ...eventInfo ]);
+                        if ((count % 10000) == 0) {
+                          console.log(count + " " + blockNumber + "/" + txIndex + "/" + txData[0] + "/" + logIndex + " => " + JSON.stringify(eventInfo));
                         }
-                        for (const [logIndex, txInfo] of Object.entries(logIndexes)) {
-                          txs[txHash][3].push([ parseInt(logIndex), contractIndex, ...txInfo ]);
-                          // if ((count % 10000) == 0) {
-                          //   console.log(count + " " + blockNumber + "/" + txIndex + "/" + txHash + "/" + logIndex + " => " + JSON.stringify(txInfo));
-                          // }
-                          // count++
-                        }
+                        count++
                       }
                     }
                   }
