@@ -1483,6 +1483,22 @@
                     //   console.log("  v2Bids[0]: " + JSON.stringify(v2Bids[0]));
                     // }
 
+                  // Approval - W1 & W2
+                  } else if (eventType == 8) {
+                    events.push([ logIndex, contractIndex, eventType, event[2], event[3], event[4] ]);
+
+                  // ApprovalForAll - W1 & W2
+                  } else if (eventType == 9) {
+                    events.push([ logIndex, contractIndex, eventType, event[2], event[3], event[4] ]);
+
+                  // OwnershipTransferred - ? W1 & W2
+                  } else if (eventType == 10) {
+                    // Not captured
+
+                  // ProxyRegistered - W2
+                  } else if (eventType == 11) {
+                    events.push([ logIndex, contractIndex, eventType, event[2], event[3] ]);
+
                   }
                 }
                 txs.push([ blockNumber, txIndex, txHash, events ]);
