@@ -1317,22 +1317,32 @@
               if (eventsDataItems.length == 1) {
                 events = eventsDataItems[0].object;
                 for (const [blockNumber, txIndexes] of Object.entries(events)) {
+                  if (!(blockNumber in txs)) {
+                    txs[blockNumber] = {};
+                  }
                   const timestamp = this.blockTimestamps[blockNumber] || "(unknown)";
                   for (const [txIndex, txHashes] of Object.entries(txIndexes)) {
+                    if (!(txIndex in txs[blockNumber])) {
+                      txs[blockNumber][txIndex] = {};
+                    }
                     for (const [txHash, logIndexes] of Object.entries(txHashes)) {
-                      if (!(txHash in txs)) {
-                        txs[txHash] = [ parseInt(blockNumber), parseInt(timestamp), parseInt(txIndex), [] ];
+                      if (!(txHash in txs[blockNumber][txIndex])) {
+                        txs[blockNumber][txIndex][txHash] = {};
                       }
-                      for (const [logIndex, txInfo] of Object.entries(logIndexes)) {
-                        txs[txHash][3].push([ parseInt(logIndex), contractIndex, ...txInfo ]);
-                        count++
-                      }
+                      // if (!(txHash in txs)) {
+                      //   txs[txHash] = [ parseInt(blockNumber), parseInt(timestamp), parseInt(txIndex), [] ];
+                      // }
+                      // for (const [logIndex, txInfo] of Object.entries(logIndexes)) {
+                      //   txs[txHash][3].push([ parseInt(logIndex), contractIndex, ...txInfo ]);
+                      //   count++
+                      // }
                     }
                   }
                 }
               }
             }
-            console.log(moment().format("HH:mm:ss") + " processData - Object.keys(txs).length: " + Object.keys(txs).length);
+            console.log(moment().format("HH:mm:ss") + " processData - txs: " + JSON.stringify(txs));
+            // console.log(moment().format("HH:mm:ss") + " processData - Object.keys(txs).length: " + Object.keys(txs).length);
 
 
             // for (const [txHash, txInfo] of Object.entries(this.txs)) {
