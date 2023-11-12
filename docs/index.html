@@ -1330,16 +1330,13 @@
                   // }
                   const timestamp = this.blockTimestamps[blockNumber] || "(unknown)";
                   for (const [txIndex, txData] of Object.entries(txIndexes)) {
+                    const [txHash, logs] = txData;
                     if (!(txIndex in combined[blockNumber])) {
-                      combined[blockNumber][txIndex] = txData;
-                    } else {
-                      const [txHash, logs] = txData;
-                      // TODO
-                      // console.log("--- --- --- COMBINING " + blockNumber + " => " + JSON.stringify(logs) + " --- --- ---");
-                      for (const [logIndex, eventData] of Object.entries(logs)) {
-                        // console.log("  " + logIndex + " => " + eventData);
-                        combined[blockNumber][txIndex][1][logIndex] = eventData;
-                      }
+                      combined[blockNumber][txIndex] = [ txHash, {} ];
+                    }
+                    for (const [logIndex, eventData] of Object.entries(logs)) {
+                      // console.log("  " + logIndex + " => " + eventData);
+                      combined[blockNumber][txIndex][1][logIndex] = [ contractIndex, ...eventData ];
                     }
                     // count++;
                     // const [txHash, logs] = txData;
@@ -1393,16 +1390,17 @@
               }
             }
 
+            const tokens = {};
             for (const blockNumber of Object.keys(combined).sort((a, b) => parseInt(a) - parseInt(b))) {
               const txIndexes = combined[blockNumber];
               for (const txIndex of Object.keys(txIndexes).sort((a, b) => parseInt(a) - parseInt(b))) {
                 const txData = txIndexes[txIndex];
                 const [txHash, logs] = txData;
-                if (Object.keys(logs).length > 3) {
-                  // console.log(blockNumber + " " + txIndex + " " + txHash + " " + JSON.stringify(logs));
-                  for (const logIndex of Object.keys(logs).sort((a, b) => parseInt(a) - parseInt(b))) {
-                    const event = logs[logIndex];
-                    console.log(blockNumber + " " + txIndex + " " + txHash + " " + logIndex + " " + JSON.stringify(event));
+                // console.log(blockNumber + " " + txIndex + " " + txHash + " " + JSON.stringify(logs));
+                for (const logIndex of Object.keys(logs).sort((a, b) => parseInt(a) - parseInt(b))) {
+                  const event = logs[logIndex];
+                  if (blockNumber == 18527112) {
+                    console.log(blockNumber + " " + txIndex + " " + txHash + " " + logIndex + " " + JSON.stringify(event));                    
                   }
                 }
               }
@@ -1410,7 +1408,7 @@
 
 
             // console.log(moment().format("HH:mm:ss") + " processData - combined: " + JSON.stringify(combined));
-            // console.log(moment().format("HH:mm:ss") + " processData - combined['18527112']: " + JSON.stringify(combined['18527112']));
+            console.log(moment().format("HH:mm:ss") + " processData - combined['18527112']: " + JSON.stringify(combined['18527112']));
             // console.log(moment().format("HH:mm:ss") + " processData - Object.keys(combined).length: " + Object.keys(combined).length);
 
 
