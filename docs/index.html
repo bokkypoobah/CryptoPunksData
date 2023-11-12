@@ -1399,12 +1399,67 @@
                 // console.log(blockNumber + " " + txIndex + " " + txHash + " " + JSON.stringify(logs));
                 for (const logIndex of Object.keys(logs).sort((a, b) => parseInt(a) - parseInt(b))) {
                   const event = logs[logIndex];
-                  if (blockNumber == 18527112) {
-                    console.log(blockNumber + " " + txIndex + " " + txHash + " " + logIndex + " " + JSON.stringify(event));                    
+                  const [ contractIndex, eventType ] = [ event[0], event[1] ];
+                  // if (blockNumber == 18527112) {
+                  //   console.log(blockNumber + " " + txIndex + " " + txHash + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
+                  // }
+                  // Assign
+                  if (eventType == 0) {
+                    if (!(contractIndex in tokens)) {
+                      tokens[contractIndex] = {};
+                    }
+                    const [ ownerIndex, punkId ] = [ event[2], event[3].toString() ];
+                    if (parseInt(punkId) < 10000) {
+                      tokens[contractIndex][punkId] = ownerIndex;
+                    }
+                    if (parseInt(punkId) > 9999 || punkId.length > 5) {
+                      console.log("  v1 Invalid punkId" + " " + blockNumber + " " + txIndex + " " + txHash + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
+                    }
+                  // PunkBought - V1 - check V2
+                  } else if (eventType == 5) {
+                    const [ punkId, value, fromOwnerIndex, toOwnerIndex ] = [ event[2].toString(), event[3].toString(), event[4], event[5] ];
+                    if (parseInt(punkId) < 10000) {
+                      tokens[contractIndex][punkId] = toOwnerIndex;
+                    }
+                    // if (punkId == 9478) {
+                    //   console.log(blockNumber + " " + txIndex + " " + txHash + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
+                    // }
+
+                  // PunkTransfer - V1 & V2 only
+                  } else if (eventType == 7) {
+                    const [ fromOwnerIndex, toOwnerIndex, punkId ] = [ event[2], event[3], event[4].toString() ];
+                    if (parseInt(punkId) < 10000) {
+                      tokens[contractIndex][punkId] = toOwnerIndex;
+                    }
+                    // console.log(blockNumber + " " + txIndex + " " + txHash + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
                   }
                 }
               }
             }
+            // V1 1416, 1838 and 1841 are unclaimed, Due to claim of invalid punkIds 9845944 (0x39d77a95637640b6291bea0b015be4f6578c95f9a57af6a9399dabd70b56d50c), 76623 (0xdc37a82d43eb253077abd4618683efea615fc8573bfc669568fab04098ab24b1) and 0xffff...ffff (0x7da83b5002251ca83537aef8833f443263a9109a1ccca502b0b03a0529813aa2)
+            // V2 1416, 1838 and 1841 were assigned to 0x5b098b00621eda6a96b7a476220661ad265f083f
+            for (let punkId = 0; punkId < 10000; punkId++) {
+              if (!(punkId in tokens[1])) {
+                // console.log("Not found - punkId: " + punkId);
+                tokens[1][punkId] = 0; // 0x0000...0000
+              }
+            }
+            console.log("tokens[2][9478]: " + JSON.stringify(this.indexToAddress[tokens[2][9478]], null, 2));
+
+            // indexToEventTypes: [
+            //   "Assign", 0
+            //   "Transfer", 1
+            //   "PunkOffered", 2
+            //   "PunkBidEntered", 3
+            //   "PunkNoLongerForSale", 4
+            //   "PunkBought", 5
+            //   "PunkBidWithdrawn", 6
+            //   "PunkTransfer", 7
+            //   "Approval", 8
+            //   "ApprovalForAll", 9
+            //   "OwnershipTransferred", 10
+            //   "ProxyRegistered", 11
+            // ],
 
 
             // console.log(moment().format("HH:mm:ss") + " processData - combined: " + JSON.stringify(combined));
