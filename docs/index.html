@@ -266,6 +266,40 @@
                         <b-img-lazy width="100%" :src="'images/punks/punk' + data.item.punkId.toString().padStart(4, '0') + '.png'" style="background-color: #638596"/>
                       </b-link>
                     </template>
+                    <template #cell(owner)="data">
+                      <b-row v-if="tokens[1] && tokens[1][data.item.punkId]">
+                        <b-col cols="1" class="m-0 p-0">v1</b-col>
+                        <b-col>
+                          <b-link :href="'https://etherscan.io/address/' + indexToAddress[tokens[1][data.item.punkId]]" v-b-popover.hover.bottom="'View tx in etherscan.io'" target="_blank">
+                            {{ ensOrAddress(tokens[1][data.item.punkId], 10) }}
+                          </b-link>
+                        </b-col>
+                      </b-row>
+                      <b-row v-if="tokens[2] && tokens[2][data.item.punkId]">
+                        <b-col cols="1" class="m-0 p-0">v2</b-col>
+                        <b-col>
+                          <b-link :href="'https://etherscan.io/address/' + indexToAddress[tokens[2][data.item.punkId]]" v-b-popover.hover.bottom="'View tx in etherscan.io'" target="_blank">
+                            {{ ensOrAddress(tokens[2][data.item.punkId], 10) }}
+                          </b-link>
+                        </b-col>
+                      </b-row>
+                      <b-row v-if="tokens[3] && tokens[3][data.item.punkId]">
+                        <b-col cols="1" class="m-0 p-0">w1</b-col>
+                        <b-col>
+                          <b-link :href="'https://etherscan.io/address/' + indexToAddress[tokens[3][data.item.punkId]]" v-b-popover.hover.bottom="'View tx in etherscan.io'" target="_blank">
+                            {{ ensOrAddress(tokens[3][data.item.punkId], 10) }}
+                          </b-link>
+                        </b-col>
+                      </b-row>
+                      <b-row v-if="tokens[4] && tokens[4][data.item.punkId]">
+                        <b-col cols="1" class="m-0 p-0">w2</b-col>
+                        <b-col>
+                          <b-link :href="'https://etherscan.io/address/' + indexToAddress[tokens[4][data.item.punkId]]" v-b-popover.hover.bottom="'View tx in etherscan.io'" target="_blank">
+                            {{ ensOrAddress(tokens[4][data.item.punkId], 10) }}
+                          </b-link>
+                        </b-col>
+                      </b-row>
+                    </template>
                     <template #cell(attribute)="data">
                       <span v-for="(attribute, attributeIndex) in data.item.attributes" v-bind:key="attributeIndex">
                         <!-- {{ /*slugToTitle(attribute.trait_type) + ':' +*/ slugToTitle(attribute.value) }} -->
@@ -718,16 +752,11 @@
           indexToSymbols: {},
           indexToDecimals: {},
 
-          // pairs: {},
-          // pair: {},
           tokens: {},
           events: {}, // TODO: Only load relevant events to reduce memory load, in loadCurrentData()
 
           transfers: {},
-          // pools: {},
-          // trades: {},
           blockTimestamps: {},
-          // collections: {},
 
           punksSortOptions: [
             { value: 'punkidasc', text: '▲ PunkId' },
@@ -758,7 +787,8 @@
           ],
           punksFields: [
             { key: 'punkId', label: 'PunkId', sortable: false, thStyle: 'width: 15%;', thClass: 'text-right', tdClass: 'text-right' },
-            { key: 'image', label: 'Image', sortable: false, thStyle: 'width: 45%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'image', label: 'Image', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'owner', label: 'Owner', sortable: false, thStyle: 'width: 25%;', thClass: 'text-left', tdClass: 'text-left' },
             { key: 'attribute', label: 'Attributes', sortable: false, thStyle: 'width: 50%;', thClass: 'text-left', tdClass: 'text-left' },
           ],
           activityFields: [
