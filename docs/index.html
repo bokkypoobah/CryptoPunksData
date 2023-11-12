@@ -720,19 +720,20 @@
             { name: "WrappedCryptoPunks V2", address: WRAPPEDCRYPTOPUNKSV2ADDRESS, abi: WRAPPEDCRYPTOPUNKSV2ABI, deploymentBlockNumber: WRAPPEDCRYPTOPUNKSV2DEPLOYMENTBLOCKNUMBER },
           ],
 
-          txs: {},
-
-          newCoinAddress: null,
-          newAddress: null,
-
-          restoreFile: null,
-          restoreAddresses: null,
           sync: {
             section: null,
             total: null,
             completed: null,
             halt: false,
           },
+          blockTimestamps: {},
+          addressToIndex: {},
+          indexToAddress: [],
+          indexToName: {},
+          txs: {},
+          tokens: {},
+          events: {},
+
           modalTxDetails: {
             item: null,
             tx: null,
@@ -742,22 +743,6 @@
             collection: null,
           },
 
-          addressToIndex: {},
-          indexToAddress: [],
-
-          pairToIndex: {},
-          indexToPair: [],
-
-          indexToName: {},
-          indexToSymbols: {},
-          indexToDecimals: {},
-
-          tokens: {},
-          events: {}, // TODO: Only load relevant events to reduce memory load, in loadCurrentData()
-
-          transfers: {},
-          blockTimestamps: {},
-
           punksSortOptions: [
             { value: 'punkidasc', text: '▲ PunkId' },
             { value: 'punkiddsc', text: '▼ PunkId' },
@@ -766,14 +751,12 @@
             { value: 'txorderasc', text: '▲ TxOrder' },
             { value: 'txorderdsc', text: '▼ TxOrder' },
           ],
-
           contractOptions: [
             { text: 'v1', value: 1 },
             { text: 'v2', value: 2 },
             { text: 'w1', value: 3 },
             { text: 'w2', value: 4 }
           ],
-
           pageSizes: [
             { value: 5, text: '5' },
             { value: 10, text: '10' },
@@ -802,21 +785,6 @@
             { key: 'attributeOption', label: 'Attribute' /*, sortable: true*/ },
             { key: 'attributeTotal', label: 'Count', /*sortable: true,*/ thStyle: 'width: 30%;', thClass: 'text-right', tdClass: 'text-right' },
           ],
-          // Old
-          // indexToEventTypes: [
-          //   "Assign", // 0
-          //   "Transfer", // 1
-          //   "PunkOffered", // 2 => 3
-          //   "PunkBidEntered", // 3 => 5
-          //   "PunkNoLongerForSale", // 4
-          //   "PunkBought", // 5 => 7
-          //   "PunkBidWithdrawn", // 6
-          //   "PunkTransfer", // 7 => 2
-          //   "Approval", // 8
-          //   "ApprovalForAll", // 9
-          //   "OwnershipTransferred", // 10
-          //   "ProxyRegistered", // 11
-          // ],
           indexToEventTypes: [
             "Assign", // 0
             "Transfer", // 1
@@ -831,16 +799,6 @@
             "OwnershipTransferred", // 10
             "ProxyRegistered", // 11
           ],
-
-          // event Assign(address indexed to, uint256 punkIndex);
-          // event Transfer(address indexed from, address indexed to, uint256 value);
-          // event PunkTransfer(address indexed from, address indexed to, uint256 punkIndex);
-          // event PunkOffered(uint indexed punkIndex, uint minValue, address indexed toAddress);
-          // event PunkBidEntered(uint indexed punkIndex, uint value, address indexed fromAddress);
-          // event PunkBidWithdrawn(uint indexed punkIndex, uint value, address indexed fromAddress);
-          // event PunkBought(uint indexed punkIndex, uint value, address indexed fromAddress, address indexed toAddress);
-          // event PunkNoLongerForSale(uint indexed punkIndex);
-
           db: {
             name: "cryptopunksdata088g",
             version: 1,
