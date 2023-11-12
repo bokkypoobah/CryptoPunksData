@@ -418,8 +418,8 @@
 
                     <template #cell(timestamp)="data">
                       <font size="-1">
-                        <b-link :href="'https://etherscan.io/tx/' + data.item[0]" v-b-popover.hover.bottom="'View tx in etherscan.io'" target="_blank">
-                          {{ formatTimestamp(data.item[2]) }}
+                        <b-link :href="'https://etherscan.io/tx/' + data.item[3]" v-b-popover.hover.bottom="'View tx in etherscan.io'" target="_blank">
+                          {{ formatTimestamp(data.item[0]) }}
                         </b-link>
                         <!-- <font size="-2">
                           <b-link @click="showModalTxDetails(data.item);">🔍</b-link>
@@ -427,7 +427,7 @@
                       </font>
                       <br />
                       <font size="-2">
-                        {{ data.item[1] + ':' + data.item[3] + ':' + data.item[0] }}
+                        {{ data.item[1] + ':' + data.item[2] + ':' + data.item[3] }}
                       </font>
                     </template>
 
@@ -730,7 +730,7 @@
           addressToIndex: {},
           indexToAddress: [],
           indexToName: {},
-          txs: {},
+          txs: [],
           tokens: {},
           events: {},
 
@@ -903,17 +903,28 @@
           filteredActivity() {
             const results = [];
             // console.log("filteredActivity - this.settings.filters: " + JSON.stringify(this.settings.filters));
-            // console.log(JSON.stringify(this.txs).substring(0, 1000));
+            console.log(JSON.stringify(this.txs).substring(0, 1000));
             let count = 0;
-            for (const [txHash, txInfo] of Object.entries(this.txs)) {
-              // const txSummary = count < 20 ? parsePunkTx(txHash, txInfo, this.addressToIndex) : undefined;
-              // const txSummary = parsePunkTx(txHash, txInfo, this.addressToIndex);
-              // if (txSummary) {
-                const txSummary = undefined;
-                results.push([ txHash, ...txInfo, txSummary ]);
-              // }
+            for (const tx of this.txs) {
+              const timestamp = this.blockTimestamps[tx[0]] || "(unknown)";
+              if (count < 10) {
+                console.log([ timestamp, ...tx ]);
+              }
+              results.push([ timestamp, ...tx ]);
               count++;
             }
+            // console.log(JSON.stringify(results));
+
+
+            // for (const [txHash, txInfo] of Object.entries(this.txs)) {
+            //   // const txSummary = count < 20 ? parsePunkTx(txHash, txInfo, this.addressToIndex) : undefined;
+            //   // const txSummary = parsePunkTx(txHash, txInfo, this.addressToIndex);
+            //   // if (txSummary) {
+            //     const txSummary = undefined;
+            //     results.push([ txHash, ...txInfo, txSummary ]);
+            //   // }
+            //   count++;
+            // }
             // console.log("results[0..10]: " + JSON.stringify(results.slice(0, 5)));
 
             // let stage1Data = this.punkAttributes;
@@ -1351,6 +1362,8 @@
               }
             }
 
+            // TODO: Handle w1 and w2
+            const txs = [];
             const tokens = {};
             const offers = { "1": {}, "2": {} };
             const v2Bids = {};
@@ -1360,6 +1373,7 @@
               for (const txIndex of Object.keys(txIndexes).sort((a, b) => parseInt(a) - parseInt(b))) {
                 const txData = txIndexes[txIndex];
                 const [txHash, logs] = txData;
+                const events = [];
                 for (const logIndex of Object.keys(logs).sort((a, b) => parseInt(a) - parseInt(b))) {
                   const event = logs[logIndex];
                   const [ contractIndex, eventType ] = [ event[0], event[1] ];
@@ -1375,6 +1389,8 @@
                     if (parseInt(punkId) > 9999 || punkId.length > 5) {
                       console.log("  v1 Invalid punkId" + " " + blockNumber + " " + txIndex + " " + txHash + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
                     }
+                    events.push([ contractIndex, eventType, event[2], event[3] ]);
+
                   // Transfer - W1 & W2
                   } else if (eventType == 1) {
                     if (contractIndex == 3 || contractIndex == 4) {
@@ -1390,6 +1406,7 @@
                       const [ fromOwnerIndex, toOwnerIndex, punkId ] = [ event[2], event[3], event[4].toString() ];
                       lastToOwnerIndex = toOwnerIndex;
                     }
+                    events.push([ contractIndex, eventType, event[2], event[3], event[4] ]);
 
                   // PunkTransfer - V1 & V2 only
                   } else if (eventType == 2) {
@@ -1398,6 +1415,7 @@
                       tokens[contractIndex][punkId] = toOwnerIndex;
                     }
                     // console.log(blockNumber + " " + txIndex + " " + txHash + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
+                    events.push([ contractIndex, eventType, event[2], event[3], event[4] ]);
 
                   // PunkOffered - V1 & V2
                   } else if (eventType == 3) {
@@ -1407,6 +1425,7 @@
                       console.log("PunkOffered " + blockNumber + " " + txIndex + " " + txHash + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
                       console.log("  offers[contractIndex][7144]: " + JSON.stringify(offers[contractIndex][7144]));
                     }
+                    events.push([ contractIndex, eventType, event[2], event[3], event[4] ]);
 
                   // PunkNoLongerForSale - V1 & V2
                   } else if (eventType == 4) {
@@ -1416,6 +1435,7 @@
                       console.log("PunkNoLongerForSale " + blockNumber + " " + txIndex + " " + txHash + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
                       console.log("  offers[contractIndex][7144]: " + JSON.stringify(offers[contractIndex][7144]));
                     }
+                    events.push([ contractIndex, eventType, event[2] ]);
 
                   // PunkBidEntered - V2
                   } else if (eventType == 5) {
@@ -1425,6 +1445,7 @@
                     //   console.log("PunkBidEntered " + blockNumber + " " + txIndex + " " + txHash + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
                     //   console.log("  v2Bids[0]: " + JSON.stringify(v2Bids[0]));
                     // }
+                    events.push([ contractIndex, eventType, event[2], event[3], event[4] ]);
 
                   // PunkBidWithdrawn - V2
                   } else if (eventType == 6) {
@@ -1434,6 +1455,7 @@
                     //   console.log("PunkBidWithdrawn " + blockNumber + " " + txIndex + " " + txHash + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
                     //   console.log("  v2Bids[0]: " + JSON.stringify(v2Bids[0]));
                     // }
+                    events.push([ contractIndex, eventType, event[2], event[3], event[4] ]);
 
                   // PunkBought - V1 & V2
                   } else if (eventType == 7) {
@@ -1447,6 +1469,7 @@
                     if (parseInt(punkId) < 10000) {
                       tokens[contractIndex][punkId] = toOwnerIndex;
                     }
+                    events.push([ contractIndex, eventType, event[2], value, fromOwnerIndex, toOwnerIndex ]);
                     // if (punkId == 0) {
                     //   console.log("PunkBought " + blockNumber + " " + txIndex + " " + txHash + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
                     //   console.log("  v2Bids[0]: " + JSON.stringify(v2Bids[0]));
@@ -1454,8 +1477,17 @@
 
                   }
                 }
+                txs.push([ blockNumber, txIndex, txHash, events ]);
               }
             }
+
+            console.log(moment().format("HH:mm:ss") + " processData - txs: " + JSON.stringify(txs));
+            await db.cache.put({ objectName: this.chainId + "_txs", object: txs }).then (function() {
+            }).catch(function(error) {
+              console.log("error: " + error);
+            });
+            this.txs = txs;
+
             // V1 1416, 1838 and 1841 are unclaimed, Due to claim of invalid punkIds 9845944 (0x39d77a95637640b6291bea0b015be4f6578c95f9a57af6a9399dabd70b56d50c), 76623 (0xdc37a82d43eb253077abd4618683efea615fc8573bfc669568fab04098ab24b1) and 0xffff...ffff (0x7da83b5002251ca83537aef8833f443263a9109a1ccca502b0b03a0529813aa2)
             // V2 1416, 1838 and 1841 were assigned to 0x5b098b00621eda6a96b7a476220661ad265f083f
             for (let punkId = 0; punkId < 10000; punkId++) {
@@ -1498,43 +1530,47 @@
             if (tokensDataItems.length == 1) {
               Vue.set(this, 'tokens', tokensDataItems[0].object);
             }
-            let count = 0;
-            const txs = {};
-            for (const process of this.contracts) {
-              // console.log(moment().format("HH:mm:ss") + " loadCurrentData - processing: " + process.name);
-              const contractIndex = this.addressToIndex[process.address];
-              if (this.settings.selectedContracts.length == 0 || this.settings.selectedContracts.includes(contractIndex)) {
-                const eventsDataItems = await db.cache.where("objectName").equals(this.chainId + "_" + process.address + "_events").toArray();
-                if (eventsDataItems.length == 1) {
-                  const storedLatestBlockNumber = eventsDataItems[0].object.latestBlockNumber;
-                  events = eventsDataItems[0].object.events;
-                  // console.log(moment().format("HH:mm:ss") + " loadCurrentData - storedLatestBlockNumber: " + storedLatestBlockNumber);
-                  // console.log(moment().format("HH:mm:ss") + " loadCurrentData - events: " + JSON.stringify(events).substring(0, 1000));
-                  // Object.keys(events).forEach(function (key) {
-                  //   if ('unconfirmed' in events[key]) {
-                  //     console.log("DELETING: " + key + " => " + JSON.stringify(events[key]));
-                  //     delete events[key];
-                  //   }
-                  // });
-                  for (const [blockNumber, txIndexes] of Object.entries(events)) {
-                    const timestamp = this.blockTimestamps[blockNumber] || "(unknown)";
-                    for (const [txIndex, txData] of Object.entries(txIndexes)) {
-                      if (!(txData[0] in txs)) {
-                        txs[txData[0]] = [ parseInt(blockNumber), parseInt(timestamp), parseInt(txIndex), [] ];
-                      }
-                      for (const [logIndex, eventInfo] of Object.entries(txData[1])) {
-                        txs[txData[0]][3].push([ parseInt(logIndex), contractIndex, ...eventInfo ]);
-                        // if ((count % 10000) == 0) {
-                        //   console.log(count + " " + blockNumber + "/" + txIndex + "/" + txData[0] + "/" + logIndex + " => " + JSON.stringify(eventInfo));
-                        // }
-                        count++
-                      }
-                    }
-                  }
-                }
-              }
+            const txsDataItems = await db.cache.where("objectName").equals(this.chainId + "_txs").toArray();
+            if (txsDataItems.length == 1) {
+              Vue.set(this, 'txs', txsDataItems[0].object);
             }
-            this.txs = txs;
+            // let count = 0;
+            // const txs = {};
+            // for (const process of this.contracts) {
+            //   // console.log(moment().format("HH:mm:ss") + " loadCurrentData - processing: " + process.name);
+            //   const contractIndex = this.addressToIndex[process.address];
+            //   if (this.settings.selectedContracts.length == 0 || this.settings.selectedContracts.includes(contractIndex)) {
+            //     const eventsDataItems = await db.cache.where("objectName").equals(this.chainId + "_" + process.address + "_events").toArray();
+            //     if (eventsDataItems.length == 1) {
+            //       const storedLatestBlockNumber = eventsDataItems[0].object.latestBlockNumber;
+            //       events = eventsDataItems[0].object.events;
+            //       // console.log(moment().format("HH:mm:ss") + " loadCurrentData - storedLatestBlockNumber: " + storedLatestBlockNumber);
+            //       // console.log(moment().format("HH:mm:ss") + " loadCurrentData - events: " + JSON.stringify(events).substring(0, 1000));
+            //       // Object.keys(events).forEach(function (key) {
+            //       //   if ('unconfirmed' in events[key]) {
+            //       //     console.log("DELETING: " + key + " => " + JSON.stringify(events[key]));
+            //       //     delete events[key];
+            //       //   }
+            //       // });
+            //       for (const [blockNumber, txIndexes] of Object.entries(events)) {
+            //         const timestamp = this.blockTimestamps[blockNumber] || "(unknown)";
+            //         for (const [txIndex, txData] of Object.entries(txIndexes)) {
+            //           if (!(txData[0] in txs)) {
+            //             txs[txData[0]] = [ parseInt(blockNumber), parseInt(timestamp), parseInt(txIndex), [] ];
+            //           }
+            //           for (const [logIndex, eventInfo] of Object.entries(txData[1])) {
+            //             txs[txData[0]][3].push([ parseInt(logIndex), contractIndex, ...eventInfo ]);
+            //             // if ((count % 10000) == 0) {
+            //             //   console.log(count + " " + blockNumber + "/" + txIndex + "/" + txData[0] + "/" + logIndex + " => " + JSON.stringify(eventInfo));
+            //             // }
+            //             count++
+            //           }
+            //         }
+            //       }
+            //     }
+            //   }
+            // }
+            // this.txs = txs;
             db.close();
             console.log(moment().format("HH:mm:ss") + " loadCurrentData END");
           },
