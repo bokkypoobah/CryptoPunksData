@@ -1438,6 +1438,7 @@
                     if (!(contractIndex in tokens)) {
                       tokens[contractIndex] = {};
                     }
+                    // TODO: v2 punkId 0 ownership is not being set up
                     const [ ownerIndex, punkId ] = [ event[2], event[3].toString() ];
                     if (parseInt(punkId) < 10000) {
                       tokens[contractIndex][punkId] = ownerIndex;
