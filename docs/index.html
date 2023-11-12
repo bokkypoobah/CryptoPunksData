@@ -1490,6 +1490,10 @@
             }
             // console.log("tokens[2][9478]: " + JSON.stringify(this.indexToAddress[tokens[2][9478]], null, 2));
             console.log("tokens[4]: " + JSON.stringify(tokens[4], null, 2));
+            await db.cache.put({ objectName: this.chainId + "_tokens", object: tokens }).then (function() {
+            }).catch(function(error) {
+              console.log("error: " + error);
+            });
             this.tokens = tokens;
 
             // indexToEventTypes: [
@@ -1539,6 +1543,10 @@
             const blockTimestampsDataItems = await db.cache.where("objectName").equals(this.chainId + "_blockTimestamps").toArray();
             if (blockTimestampsDataItems.length == 1) {
               Vue.set(this, 'blockTimestamps', blockTimestampsDataItems[0].object);
+            }
+            const tokensDataItems = await db.cache.where("objectName").equals(this.chainId + "_tokens").toArray();
+            if (tokensDataItems.length == 1) {
+              Vue.set(this, 'tokens', tokensDataItems[0].object);
             }
             let count = 0;
             const txs = {};
