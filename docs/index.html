@@ -275,7 +275,7 @@
                           </b-link>
                         </b-col>
                       </b-row>
-                      <b-row v-if="tokens[2] && tokens[2][data.item.punkId]">
+                      <b-row v-if="tokens[2] && (data.item.punkId in tokens[2])">
                         <b-col cols="1" class="m-0 p-0">v2</b-col>
                         <b-col>
                           <b-link :href="'https://etherscan.io/address/' + indexToAddress[tokens[2][data.item.punkId]]" v-b-popover.hover.bottom="'View tx in etherscan.io'" target="_blank">
@@ -1421,6 +1421,9 @@
             }
 
             const tokens = {};
+            const offers = { "1": {}, "2": {} };
+            const v2Bids = {};
+            let lastToOwnerIndex = 0;
             for (const blockNumber of Object.keys(combined).sort((a, b) => parseInt(a) - parseInt(b))) {
               const txIndexes = combined[blockNumber];
               for (const txIndex of Object.keys(txIndexes).sort((a, b) => parseInt(a) - parseInt(b))) {
@@ -1438,7 +1441,6 @@
                     if (!(contractIndex in tokens)) {
                       tokens[contractIndex] = {};
                     }
-                    // TODO: v2 punkId 0 ownership is not being set up
                     const [ ownerIndex, punkId ] = [ event[2], event[3].toString() ];
                     if (parseInt(punkId) < 10000) {
                       tokens[contractIndex][punkId] = ownerIndex;
@@ -1457,16 +1459,63 @@
                       if (parseInt(punkId) < 10000) {
                         tokens[contractIndex][punkId] = toOwnerIndex;
                       }
+                    } else {
+                      const [ fromOwnerIndex, toOwnerIndex, punkId ] = [ event[2], event[3], event[4].toString() ];
+                      lastToOwnerIndex = toOwnerIndex;
+                    }
+
+                  // PunkOffered - V1 & V2
+                  } else if (eventType == 2) {
+                    const [ punkId, minValue, toOwnerIndex ] = [ event[2], event[3].toString(), event[4] ];
+                    offers[contractIndex][punkId] = { minValue, toOwnerIndex };
+                    if (punkId == 7144) {
+                      console.log("PunkOffered " + blockNumber + " " + txIndex + " " + txHash + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
+                      console.log("  offers[contractIndex][7144]: " + JSON.stringify(offers[contractIndex][7144]));
+                    }
+
+                  // PunkBidEntered - V2
+                  } else if (eventType == 3) {
+                    const [ punkId, value, fromOwnerIndex ] = [ event[2], event[3].toString(), event[4] ];
+                    v2Bids[punkId] = { value, fromOwnerIndex };
+                    // if (punkId == 0) {
+                    //   console.log("PunkBidEntered " + blockNumber + " " + txIndex + " " + txHash + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
+                    //   console.log("  v2Bids[0]: " + JSON.stringify(v2Bids[0]));
+                    // }
+
+                  // PunkNoLongerForSale - V1 & V2
+                  } else if (eventType == 4) {
+                    const [ punkId ] = [ event[2] ];
+                    delete offers[contractIndex][punkId];
+                    if (punkId == 7144) {
+                      console.log("PunkNoLongerForSale " + blockNumber + " " + txIndex + " " + txHash + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
+                      console.log("  offers[contractIndex][7144]: " + JSON.stringify(offers[contractIndex][7144]));
                     }
 
                   // PunkBought - V1 & V2
                   } else if (eventType == 5) {
-                    const [ punkId, value, fromOwnerIndex, toOwnerIndex ] = [ event[2].toString(), event[3].toString(), event[4], event[5] ];
+                    let [ punkId, value, fromOwnerIndex, toOwnerIndex ] = [ event[2].toString(), event[3].toString(), event[4], event[5] ];
+                    // acceptBidForPunk() bug where value = 0 and fromOwner = 0x0
+                    if (value == 0 && toOwnerIndex == 0) {
+                      value = v2Bids[punkId].value;
+                      toOwnerIndex = v2Bids[punkId].fromOwnerIndex;
+                      delete v2Bids[punkId];
+                    }
                     if (parseInt(punkId) < 10000) {
                       tokens[contractIndex][punkId] = toOwnerIndex;
                     }
-                    // if (punkId == 9478) {
-                    //   console.log(blockNumber + " " + txIndex + " " + txHash + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
+                    // // TODO: v2 acceptBidForPunk does not fill in the toAddress
+                    // if (punkId == 0) {
+                    //   console.log("PunkBought " + blockNumber + " " + txIndex + " " + txHash + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
+                    //   console.log("  v2Bids[0]: " + JSON.stringify(v2Bids[0]));
+                    // }
+
+                  // PunkBidWithdrawn - V2
+                  } else if (eventType == 6) {
+                    const [ punkId, value, fromOwnerIndex ] = [ event[2], event[3].toString(), event[4] ];
+                    delete v2Bids[punkId];
+                    // if (punkId == 0) {
+                    //   console.log("PunkBidWithdrawn " + blockNumber + " " + txIndex + " " + txHash + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
+                    //   console.log("  v2Bids[0]: " + JSON.stringify(v2Bids[0]));
                     // }
 
                   // PunkTransfer - V1 & V2 only
@@ -1489,7 +1538,7 @@
               }
             }
             // console.log("tokens[2][9478]: " + JSON.stringify(this.indexToAddress[tokens[2][9478]], null, 2));
-            console.log("tokens[4]: " + JSON.stringify(tokens[4], null, 2));
+            // console.log("tokens[2]: " + JSON.stringify(tokens[2], null, 2));
             await db.cache.put({ objectName: this.chainId + "_tokens", object: tokens }).then (function() {
             }).catch(function(error) {
               console.log("error: " + error);
