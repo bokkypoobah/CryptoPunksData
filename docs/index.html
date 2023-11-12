@@ -718,16 +718,16 @@
           indexToSymbols: {},
           indexToDecimals: {},
 
-          pairs: {},
-          pair: {},
+          // pairs: {},
+          // pair: {},
           tokens: {},
           events: {}, // TODO: Only load relevant events to reduce memory load, in loadCurrentData()
 
           transfers: {},
-          pools: {},
-          trades: {},
+          // pools: {},
+          // trades: {},
           blockTimestamps: {},
-          collections: {},
+          // collections: {},
 
           punksSortOptions: [
             { value: 'punkidasc', text: '▲ PunkId' },
@@ -1415,7 +1415,20 @@
                     if (parseInt(punkId) > 9999 || punkId.length > 5) {
                       console.log("  v1 Invalid punkId" + " " + blockNumber + " " + txIndex + " " + txHash + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
                     }
-                  // PunkBought - V1 - check V2
+                  // Transfer - W1 & W2
+                  } else if (eventType == 1) {
+                    if (contractIndex == 3 || contractIndex == 4) {
+                      if (!(contractIndex in tokens)) {
+                        tokens[contractIndex] = {};
+                      }
+                      // console.log(blockNumber + " " + txIndex + " " + txHash + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
+                      const [ fromOwnerIndex, toOwnerIndex, punkId ] = [ event[2], event[3], event[4].toString() ];
+                      if (parseInt(punkId) < 10000) {
+                        tokens[contractIndex][punkId] = toOwnerIndex;
+                      }
+                    }
+
+                  // PunkBought - V1 & V2
                   } else if (eventType == 5) {
                     const [ punkId, value, fromOwnerIndex, toOwnerIndex ] = [ event[2].toString(), event[3].toString(), event[4], event[5] ];
                     if (parseInt(punkId) < 10000) {
@@ -1444,7 +1457,9 @@
                 tokens[1][punkId] = 0; // 0x0000...0000
               }
             }
-            console.log("tokens[2][9478]: " + JSON.stringify(this.indexToAddress[tokens[2][9478]], null, 2));
+            // console.log("tokens[2][9478]: " + JSON.stringify(this.indexToAddress[tokens[2][9478]], null, 2));
+            console.log("tokens[4]: " + JSON.stringify(tokens[4], null, 2));
+            this.tokens = tokens;
 
             // indexToEventTypes: [
             //   "Assign", 0
@@ -1460,7 +1475,6 @@
             //   "OwnershipTransferred", 10
             //   "ProxyRegistered", 11
             // ],
-
 
             // console.log(moment().format("HH:mm:ss") + " processData - combined: " + JSON.stringify(combined));
             console.log(moment().format("HH:mm:ss") + " processData - combined['18527112']: " + JSON.stringify(combined['18527112']));
