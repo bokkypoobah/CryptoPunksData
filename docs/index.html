@@ -1373,9 +1373,14 @@
                 const txData = txIndexes[txIndex];
                 const [txHash, logs] = txData;
                 const events = [];
+                const contractIndexes = {};
+                const punkIds = {};
                 for (const logIndex of Object.keys(logs).sort((a, b) => parseInt(a) - parseInt(b))) {
                   const event = logs[logIndex];
                   const [ contractIndex, eventType ] = [ event[0], event[1] ];
+                  if (!(contractIndex in contractIndexes)) {
+                    contractIndexes[contractIndex] = 1;
+                  }
                   // Assign
                   if (eventType == 0) {
                     if (!(contractIndex in tokens)) {
@@ -1384,6 +1389,9 @@
                     const [ ownerIndex, punkId ] = [ event[2], event[3].toString() ];
                     if (parseInt(punkId) < 10000) {
                       tokens[contractIndex][punkId] = ownerIndex;
+                      if (!(punkId in punkIds)) {
+                        punkIds[punkId] = 1;
+                      }
                     }
                     if (parseInt(punkId) > 9999 || punkId.length > 5) {
                       console.log("  v1 Invalid punkId" + " " + blockNumber + " " + txIndex + " " + txHash + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
@@ -1400,6 +1408,9 @@
                       const [ fromOwnerIndex, toOwnerIndex, punkId ] = [ event[2], event[3], event[4].toString() ];
                       if (parseInt(punkId) < 10000) {
                         tokens[contractIndex][punkId] = toOwnerIndex;
+                        if (!(punkId in punkIds)) {
+                          punkIds[punkId] = 1;
+                        }
                       }
                     } else {
                       const [ fromOwnerIndex, toOwnerIndex, punkId ] = [ event[2], event[3], event[4].toString() ];
@@ -1412,6 +1423,9 @@
                     const [ fromOwnerIndex, toOwnerIndex, punkId ] = [ event[2], event[3], event[4].toString() ];
                     if (parseInt(punkId) < 10000) {
                       tokens[contractIndex][punkId] = toOwnerIndex;
+                      if (!(punkId in punkIds)) {
+                        punkIds[punkId] = 1;
+                      }
                     }
                     // console.log(blockNumber + " " + txIndex + " " + txHash + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
                     events.push([ logIndex, contractIndex, eventType, event[2], event[3], event[4] ]);
@@ -1420,6 +1434,9 @@
                   } else if (eventType == 3) {
                     const [ punkId, minValue, toOwnerIndex ] = [ event[2], event[3].toString(), event[4] ];
                     offers[contractIndex][punkId] = { minValue, toOwnerIndex };
+                    if (!(punkId in punkIds)) {
+                      punkIds[punkId] = 1;
+                    }
                     if (punkId == 7144) {
                       console.log("PunkOffered " + blockNumber + " " + txIndex + " " + txHash + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
                       console.log("  offers[contractIndex][7144]: " + JSON.stringify(offers[contractIndex][7144]));
@@ -1430,6 +1447,9 @@
                   } else if (eventType == 4) {
                     const [ punkId ] = [ event[2] ];
                     delete offers[contractIndex][punkId];
+                    if (!(punkId in punkIds)) {
+                      punkIds[punkId] = 1;
+                    }
                     if (punkId == 7144) {
                       console.log("PunkNoLongerForSale " + blockNumber + " " + txIndex + " " + txHash + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
                       console.log("  offers[contractIndex][7144]: " + JSON.stringify(offers[contractIndex][7144]));
@@ -1440,6 +1460,9 @@
                   } else if (eventType == 5) {
                     const [ punkId, value, fromOwnerIndex ] = [ event[2], event[3].toString(), event[4] ];
                     v2Bids[punkId] = { value, fromOwnerIndex };
+                    if (!(punkId in punkIds)) {
+                      punkIds[punkId] = 1;
+                    }
                     // if (punkId == 0) {
                     //   console.log("PunkBidEntered " + blockNumber + " " + txIndex + " " + txHash + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
                     //   console.log("  v2Bids[0]: " + JSON.stringify(v2Bids[0]));
@@ -1450,6 +1473,9 @@
                   } else if (eventType == 6) {
                     const [ punkId, value, fromOwnerIndex ] = [ event[2], event[3].toString(), event[4] ];
                     delete v2Bids[punkId];
+                    if (!(punkId in punkIds)) {
+                      punkIds[punkId] = 1;
+                    }
                     // if (punkId == 0) {
                     //   console.log("PunkBidWithdrawn " + blockNumber + " " + txIndex + " " + txHash + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
                     //   console.log("  v2Bids[0]: " + JSON.stringify(v2Bids[0]));
@@ -1467,6 +1493,9 @@
                     }
                     if (parseInt(punkId) < 10000) {
                       tokens[contractIndex][punkId] = toOwnerIndex;
+                      if (!(punkId in punkIds)) {
+                        punkIds[punkId] = 1;
+                      }
                     }
                     events.push([ logIndex, contractIndex, eventType, event[2], value, fromOwnerIndex, toOwnerIndex ]);
                     // if (punkId == 0) {
@@ -1492,7 +1521,7 @@
 
                   }
                 }
-                txs.push([ blockNumber, txIndex, txHash, events ]);
+                txs.push([ blockNumber, txIndex, txHash, events, Object.keys(contractIndexes).map(e => parseInt(e)), Object.keys(punkIds).map(e => parseInt(e)) ]);
               }
             }
 
