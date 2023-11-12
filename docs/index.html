@@ -1038,7 +1038,7 @@
                     const logData = contract.interface.parseLog(event);
                     const txHash = event.transactionHash;
                     const blockNumber = event.blockNumber;
-                    const transactionIndex = event.transactionIndex;
+                    const txIndex = event.transactionIndex;
                     const logIndex = event.logIndex;
                     const eventType = logData.eventFragment.name;
                     const eventTypeIndex = t.eventTypesToIndex[eventType];
@@ -1176,22 +1176,17 @@
                     } else {
                       console.log("--- UNKNOWN eventType: " + eventType + " ---");
                     }
-                    console.log(blockNumber + "." + transactionIndex + " " + JSON.stringify(record));
+                    console.log(blockNumber + "." + txIndex + " " + JSON.stringify(record));
                     if (record) {
                       const confirmations = latestBlockNumber - blockNumber;
                       if (!(blockNumber in events)) {
-                        // TODO: Handle with storage of latestBlockNumber
-                        // events[blockNumber] = confirmations < CONFIRMATIONS ? { unconfirmed: true } : {};
                         events[blockNumber] = {};
                       }
-                      if (!(transactionIndex in events[blockNumber])) {
-                        events[blockNumber][transactionIndex] = [ txHash, {} ];
+                      if (!(txIndex in events[blockNumber])) {
+                        events[blockNumber][txIndex] = [ txHash, {} ];
                       }
-                      // if (!(txHash in events[blockNumber][transactionIndex])) {
-                      //   events[blockNumber][transactionIndex][txHash] = {};
-                      // }
-                      if (!(logIndex in events[blockNumber][transactionIndex][1])) {
-                        events[blockNumber][transactionIndex][1][logIndex] = record;
+                      if (!(logIndex in events[blockNumber][txIndex][1])) {
+                        events[blockNumber][txIndex][1][logIndex] = record;
                         newEvents++;
                       }
                     }
@@ -1319,7 +1314,7 @@
             console.log(moment().format("HH:mm:ss") + " processData BEGIN");
             let count = 0;
             const txs = {};
-            for (const process of this.contracts) {
+            for (const process of this.contracts.slice(0, 1)) {
               const contractIndex = this.addressToIndex[process.address];
               const eventsDataItems = await db.cache.where("objectName").equals(this.chainId + "_" + process.address + "_events").toArray();
               if (eventsDataItems.length == 1) {
@@ -1330,15 +1325,25 @@
                     txs[blockNumber] = {};
                   }
                   const timestamp = this.blockTimestamps[blockNumber] || "(unknown)";
-                  // for (const [txIndex, txData] of Object.entries(txIndexes)) {
-                  //   console.log(txIndex + " => " + JSON.stringify(txData));
-                  //   if (!(txData[0] in txs)) {
-                  //     txs[txData[0]] = [ parseInt(blockNumber), parseInt(timestamp), parseInt(txIndex), [] ];
-                  //   }
-                  //   for (const [logIndex, eventInfo] of Object.entries(txData[1])) {
-                  //     // txs[txData[0]][3].push([ parseInt(logIndex), contractIndex, ...eventInfo ]);
-                  //   }
+                  for (const [txIndex, txData] of Object.entries(txIndexes)) {
+                    console.log(blockNumber + ":" + txIndex + " => " + JSON.stringify(txData));
+                    if (!(txData[0] in txs)) {
+                      txs[txData[0]] = [ parseInt(blockNumber), parseInt(timestamp), parseInt(txIndex), [] ];
+                    }
+
+                    // for (const [logIndex, eventInfo] of Object.entries(txData[1])) {
+                    //   txs[txData[0]][3].push([ parseInt(logIndex), contractIndex, ...eventInfo ]);
+                    // }
+
+                  // for (const [logIndex, eventInfo] of Object.entries(txData[1])) {
+                  //   txs[txData[0]][3].push([ parseInt(logIndex), contractIndex, ...eventInfo ]);
+                  //   // if ((count % 10000) == 0) {
+                  //   //   console.log(count + " " + blockNumber + "/" + txIndex + "/" + txData[0] + "/" + logIndex + " => " + JSON.stringify(eventInfo));
+                  //   // }
+                  //   count++
                   // }
+
+                  }
 
                   // for (const [txIndex, txHashes] of Object.entries(txIndexes)) {
                   //   if (!(txIndex in txs[blockNumber])) {
@@ -1418,9 +1423,9 @@
                       }
                       for (const [logIndex, eventInfo] of Object.entries(txData[1])) {
                         txs[txData[0]][3].push([ parseInt(logIndex), contractIndex, ...eventInfo ]);
-                        if ((count % 10000) == 0) {
-                          console.log(count + " " + blockNumber + "/" + txIndex + "/" + txData[0] + "/" + logIndex + " => " + JSON.stringify(eventInfo));
-                        }
+                        // if ((count % 10000) == 0) {
+                        //   console.log(count + " " + blockNumber + "/" + txIndex + "/" + txData[0] + "/" + logIndex + " => " + JSON.stringify(eventInfo));
+                        // }
                         count++
                       }
                     }
