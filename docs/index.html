@@ -909,13 +909,13 @@
           filteredActivity() {
             const results = [];
             // console.log("filteredActivity - this.settings.filters: " + JSON.stringify(this.settings.filters));
-            console.log(JSON.stringify(this.txs).substring(0, 1000));
-            let count = 0;
+            // console.log(JSON.stringify(this.txs).substring(0, 1000));
+            // let count = 0;
             for (const tx of this.txs) {
               const timestamp = this.blockTimestamps[tx[0]] || "(unknown)";
-              if (count < 3) {
-                console.log(JSON.stringify([ timestamp, ...tx ]));
-              }
+              // if (count < 3) {
+              //   console.log(JSON.stringify([ timestamp, ...tx ]));
+              // }
               let include = true;
               if (this.settings.selectedContracts.length == 0 || this.settings.selectedContracts.length == 4) {
               } else {
@@ -931,7 +931,7 @@
               if (include) {
                 results.push([ timestamp, ...tx ]);
               }
-              count++;
+              // count++;
             }
             // console.log(JSON.stringify(results));
 
@@ -1586,12 +1586,12 @@
             const indexToAddressDataItems = await db.cache.where("objectName").equals(this.chainId + "_indexToAddress").toArray();
             if (indexToAddressDataItems.length == 1) {
               indexToAddress = indexToAddressDataItems[0].object;
-              console.log("indexToAddress: " + JSON.stringify(indexToAddress));
+              // console.log("indexToAddress: " + JSON.stringify(indexToAddress));
             }
             const addressToIndexDataItems = await db.cache.where("objectName").equals(this.chainId + "_addressToIndex").toArray();
             if (addressToIndexDataItems.length == 1) {
               addressToIndex = addressToIndexDataItems[0].object;
-              console.log("addressToIndex: " + JSON.stringify(addressToIndex));
+              // console.log("addressToIndex: " + JSON.stringify(addressToIndex));
             }
 
             const addresses = indexToAddress;
@@ -1679,43 +1679,6 @@
             if (txsDataItems.length == 1) {
               Vue.set(this, 'txs', txsDataItems[0].object);
             }
-            // let count = 0;
-            // const txs = {};
-            // for (const process of this.contracts) {
-            //   // console.log(moment().format("HH:mm:ss") + " loadCurrentData - processing: " + process.name);
-            //   const contractIndex = this.addressToIndex[process.address];
-            //   if (this.settings.selectedContracts.length == 0 || this.settings.selectedContracts.includes(contractIndex)) {
-            //     const eventsDataItems = await db.cache.where("objectName").equals(this.chainId + "_" + process.address + "_events").toArray();
-            //     if (eventsDataItems.length == 1) {
-            //       const storedLatestBlockNumber = eventsDataItems[0].object.latestBlockNumber;
-            //       events = eventsDataItems[0].object.events;
-            //       // console.log(moment().format("HH:mm:ss") + " loadCurrentData - storedLatestBlockNumber: " + storedLatestBlockNumber);
-            //       // console.log(moment().format("HH:mm:ss") + " loadCurrentData - events: " + JSON.stringify(events).substring(0, 1000));
-            //       // Object.keys(events).forEach(function (key) {
-            //       //   if ('unconfirmed' in events[key]) {
-            //       //     console.log("DELETING: " + key + " => " + JSON.stringify(events[key]));
-            //       //     delete events[key];
-            //       //   }
-            //       // });
-            //       for (const [blockNumber, txIndexes] of Object.entries(events)) {
-            //         const timestamp = this.blockTimestamps[blockNumber] || "(unknown)";
-            //         for (const [txIndex, txData] of Object.entries(txIndexes)) {
-            //           if (!(txData[0] in txs)) {
-            //             txs[txData[0]] = [ parseInt(blockNumber), parseInt(timestamp), parseInt(txIndex), [] ];
-            //           }
-            //           for (const [logIndex, eventInfo] of Object.entries(txData[1])) {
-            //             txs[txData[0]][3].push([ parseInt(logIndex), contractIndex, ...eventInfo ]);
-            //             // if ((count % 10000) == 0) {
-            //             //   console.log(count + " " + blockNumber + "/" + txIndex + "/" + txData[0] + "/" + logIndex + " => " + JSON.stringify(eventInfo));
-            //             // }
-            //             count++
-            //           }
-            //         }
-            //       }
-            //     }
-            //   }
-            // }
-            // this.txs = txs;
             db.close();
             console.log(moment().format("HH:mm:ss") + " loadCurrentData END");
           },
@@ -1750,92 +1713,16 @@
             this.saveSettings();
           },
 
-
           async syncAll(blockNumber) {
             console.log(moment().format("HH:mm:ss") + " syncAll - blockNumber: " + blockNumber + ", chainId: " + this.chainId);
             const provider = new ethers.providers.Web3Provider(window.ethereum);
             const block = await provider.getBlock();
             const latestBlockNumber = block && block.number || null;
             // console.log("latestBlockNumber: " + latestBlockNumber);
-            // const CONFIRMATIONS = 10;
-            // const confirmedBlockNumber = block && block.number && (block.number - CONFIRMATIONS) || null;
             const db = new Dexie(this.db.name);
             db.version(this.db.version).stores(this.db.schemaDefinition);
             const context = { provider, latestBlockNumber, db };
-            if (this.chainId == CHAINID_SEPOLIA) {
-              await this.syncChadexEvents(context);
-              await this.syncChadexPairs(context);
-              await this.syncChadexPair(context);
-            }
             db.close();
-          },
-          async syncENSNames(context, newAccounts) {
-            this.sync.completed = 0;
-            this.sync.total = newAccounts.length;
-            this.sync.section = context.symbol + ' ENS';
-            const ensReverseRecordsContract = new ethers.Contract(ENSREVERSERECORDSADDRESS, ENSREVERSERECORDSABI, context.provider);
-
-            const MAXBATCHSIZE = 1000;
-            let batchSize = MAXBATCHSIZE;
-            let completed = 0;
-            let start = completed;
-            do {
-              let end = parseInt(start) + batchSize - 1;
-              if (end > newAccounts.length) {
-                end = newAccounts.length;
-              }
-              try {
-                const batch = newAccounts.slice(start, end + 1);
-                const allnames = await ensReverseRecordsContract.getNames(batch);
-                for (let j = 0; j < batch.length; j++) {
-                  const account = batch[j];
-                  const name = allnames[j];
-                  // const normalized = normalize(account);
-                  if (name.length > 0) {
-                    // console.log(account + " => " + name);
-                    Vue.set(this.indexToName, this.addressToIndex[account], name);
-                  }
-                }
-                this.sync.completed += batch.length;
-                console.log(moment().format("HH:mm:ss") + " syncENSNames " + this.sync.completed + " of " + newAccounts.length);
-                start = parseInt(end) + 1;
-              } catch (e) {
-                if (batchSize > 1) {
-                  batchSize = parseInt(batchSize / 2);
-                } else {
-                  console.log("Skipping #" + start + " " + newAccounts[start]);
-                  start = parseInt(start) + 1;
-                  batchSize = MAXBATCHSIZE;
-                }
-              }
-            } while (start <= newAccounts.length);
-
-
-            //
-            //
-            // const BATCHSIZE = 5;
-            // for (let i = 0; i < newAccounts.length; i += BATCHSIZE) {
-            //   const batch = newAccounts.slice(i, parseInt(i) + BATCHSIZE);
-            //   console.log("batch: " + batch);
-            //   try {
-            //     const allnames = await ensReverseRecordsContract.getNames(batch);
-            //     console.log("allnames: " + allnames);
-            //     for (let j = 0; j < batch.length; j++) {
-            //       const account = batch[j];
-            //       const name = allnames[j];
-            //       // const normalized = normalize(account);
-            //       // console.log(account + " => " + name);
-            //       Vue.set(this.indexToName, account, name);
-            //     }
-            //     this.sync.completed += batch.length;
-            //   } catch (e) {
-            //     console.log("ENS getNames: " + e);
-            //   }
-            // }
-            await context.db.cache.put({ objectName: "indexToName", object: this.indexToName }).then (function() {
-            }).catch(function(error) {
-              console.log("error: " + error);
-            });
           },
 
           async halt() {
