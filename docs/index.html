@@ -445,6 +445,42 @@
                       <span v-else-if="data.item[4] == 3">
                         Transfer
                       </span>
+                      <span v-else-if="data.item[4] == 4">
+                        Offer
+                      </span>
+                      <span v-else-if="data.item[4] == 5">
+                        RemoveOffer
+                      </span>
+                      <span v-else-if="data.item[4] == 6">
+                        Purchase
+                      </span>
+                      <span v-else-if="data.item[4] == 7">
+                        Bid
+                      </span>
+                      <span v-else-if="data.item[4] == 8">
+                        RemoveBid
+                      </span>
+                      <span v-else-if="data.item[4] == 9">
+                        AcceptBid
+                      </span>
+                      <span v-else-if="data.item[4] == 10">
+                        Wrap
+                      </span>
+                      <span v-else-if="data.item[4] == 11">
+                        Unwrap
+                      </span>
+                      <span v-else-if="data.item[4] == 12">
+                        Approval
+                      </span>
+                      <span v-else-if="data.item[4] == 13">
+                        ApprovalForAll
+                      </span>
+                      <span v-else-if="data.item[4] == 14">
+                        OwnershipTransferred
+                      </span>
+                      <span v-else-if="data.item[4] == 15">
+                        ProxyRegistered
+                      </span>
                       <span v-else>
                         <font size="-2">
                           <pre>
@@ -837,7 +873,7 @@
             { name: "WrappedCryptoPunks V2", address: WRAPPEDCRYPTOPUNKSV2ADDRESS, abi: WRAPPEDCRYPTOPUNKSV2ABI, deploymentBlockNumber: WRAPPEDCRYPTOPUNKSV2DEPLOYMENTBLOCKNUMBER },
           ],
           db: {
-            name: "cryptopunksdata088g",
+            name: "cryptopunksdata088h",
             version: 1,
             schemaDefinition: {
               cache: '&objectName',
@@ -1536,6 +1572,7 @@
                   } else if (eventType == 7) {
                     let [ punkId, value, fromOwnerIndex, toOwnerIndex ] = [ event[2].toString(), event[3].toString(), event[4], event[5] ];
                     // acceptBidForPunk() bug where value = 0 and fromOwner = 0x0
+                    const bidAccepted = (value == 0 && toOwnerIndex == 0) ? 1 : 0;
                     if (value == 0 && toOwnerIndex == 0) {
                       value = v2Bids[punkId].value;
                       toOwnerIndex = v2Bids[punkId].fromOwnerIndex;
@@ -1547,7 +1584,7 @@
                         punkIds[punkId] = 1;
                       }
                     }
-                    events.push([ parseInt(logIndex), contractIndex, eventType, event[2], value, fromOwnerIndex, toOwnerIndex ]);
+                    events.push([ parseInt(logIndex), contractIndex, eventType, event[2], value, fromOwnerIndex, toOwnerIndex, bidAccepted ]);
                     // if (punkId == 0) {
                     //   console.log("PunkBought " + blockNumber + " " + txIndex + " " + txHash + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
                     //   console.log("  v2Bids[0]: " + JSON.stringify(v2Bids[0]));

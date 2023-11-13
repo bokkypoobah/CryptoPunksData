@@ -53,23 +53,38 @@ function parsePunkTx(txHash, events, addressToIndex) {
 
   const eventsLength = events.length;
   if (eventsLength > 0) {
-    if (events[0][EVENTFIELD_TYPE] == 0) { // Assign
-      if (events[0][EVENTFIELD_CONTRACT] == 1) {
-        if (events[0][3] == cryptoPunksDeployerIndex) {
+    const firstEvent = events[0];
+    if (firstEvent[EVENTFIELD_TYPE] == 0) { // Assign
+      if (firstEvent[EVENTFIELD_CONTRACT] == 1) {
+        if (firstEvent[3] == cryptoPunksDeployerIndex) {
           return 0; // Reserve
         } else {
           return 1; // Claim
         }
-      } else if (events[0][EVENTFIELD_CONTRACT] == 2) {
+      } else if (firstEvent[EVENTFIELD_CONTRACT] == 2) {
         return 2; // Airdrop
       }
     }
-  }
 
-  if (eventsLength == 2) {
-    if (events[0][EVENTFIELD_TYPE] == 1 && events[1][EVENTFIELD_TYPE] == 2) { // Transfer & PunkTransfer
-      return 3; // Transfer
+    if (eventsLength == 2) {
+      const secondEvent = events[1];
+      if (firstEvent[EVENTFIELD_TYPE] == 1 && secondEvent[EVENTFIELD_TYPE] == 2) { // Transfer & PunkTransfer
+        return 3; // Transfer
+      }
     }
+
+    if (eventsLength == 1) {
+      if (firstEvent[EVENTFIELD_TYPE] == 3) { // PunkOffered
+        return 4; // Offer
+      } else if (firstEvent[EVENTFIELD_TYPE] == 4) { // PunkNoLongerForSale
+        return 5; // Offer
+      } else if (firstEvent[EVENTFIELD_TYPE] == 5) { // PunkBidEntered
+        return 7; // Bid
+      } else if (firstEvent[EVENTFIELD_TYPE] == 6) { // PunkBidWithdrawn
+        return 8; // RemoveBid
+      }
+    }
+
   }
   return undefined;
 }
