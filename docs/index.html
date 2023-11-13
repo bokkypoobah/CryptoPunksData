@@ -271,7 +271,7 @@
                         <b-col cols="1" class="m-0 p-0">v1</b-col>
                         <b-col>
                           <b-link :href="'https://etherscan.io/address/' + indexToAddress[tokens[1][data.item.punkId]]" v-b-popover.hover.bottom="'View tx in etherscan.io'" target="_blank">
-                            {{ ensOrAddress(tokens[1][data.item.punkId], 10) }}
+                            {{ ensOrAddress(tokens[1][data.item.punkId], 16) }}
                           </b-link>
                         </b-col>
                       </b-row>
@@ -279,7 +279,7 @@
                         <b-col cols="1" class="m-0 p-0">v2</b-col>
                         <b-col>
                           <b-link :href="'https://etherscan.io/address/' + indexToAddress[tokens[2][data.item.punkId]]" v-b-popover.hover.bottom="'View tx in etherscan.io'" target="_blank">
-                            {{ ensOrAddress(tokens[2][data.item.punkId], 10) }}
+                            {{ ensOrAddress(tokens[2][data.item.punkId], 16) }}
                           </b-link>
                         </b-col>
                       </b-row>
@@ -287,7 +287,7 @@
                         <b-col cols="1" class="m-0 p-0">w1</b-col>
                         <b-col>
                           <b-link :href="'https://etherscan.io/address/' + indexToAddress[tokens[3][data.item.punkId]]" v-b-popover.hover.bottom="'View tx in etherscan.io'" target="_blank">
-                            {{ ensOrAddress(tokens[3][data.item.punkId], 10) }}
+                            {{ ensOrAddress(tokens[3][data.item.punkId], 16) }}
                           </b-link>
                         </b-col>
                       </b-row>
@@ -295,7 +295,7 @@
                         <b-col cols="1" class="m-0 p-0">w2</b-col>
                         <b-col>
                           <b-link :href="'https://etherscan.io/address/' + indexToAddress[tokens[4][data.item.punkId]]" v-b-popover.hover.bottom="'View tx in etherscan.io'" target="_blank">
-                            {{ ensOrAddress(tokens[4][data.item.punkId], 10) }}
+                            {{ ensOrAddress(tokens[4][data.item.punkId], 16) }}
                           </b-link>
                         </b-col>
                       </b-row>
@@ -935,18 +935,6 @@
             }
             // console.log(JSON.stringify(results));
 
-
-            // for (const [txHash, txInfo] of Object.entries(this.txs)) {
-            //   // const txSummary = count < 20 ? parsePunkTx(txHash, txInfo, this.addressToIndex) : undefined;
-            //   // const txSummary = parsePunkTx(txHash, txInfo, this.addressToIndex);
-            //   // if (txSummary) {
-            //     const txSummary = undefined;
-            //     results.push([ txHash, ...txInfo, txSummary ]);
-            //   // }
-            //   count++;
-            // }
-            // console.log("results[0..10]: " + JSON.stringify(results.slice(0, 5)));
-
             // let stage1Data = this.punkAttributes;
             // if (Object.keys(this.settings.filters).length == 0) {
             //   for (const [punkId, attributes] of this.punkAttributes.entries()) {
@@ -1295,7 +1283,10 @@
             if (!devMode) {
               await this.loadBlockTimestamps(db);
             }
-            await this.processData(db);
+            if (!devMode) {
+              await this.processData(db);
+            }
+            await this.syncAllENSNames(db, provider);
             if (!devMode) {
               await this.loadCurrentData();
             }
@@ -1578,6 +1569,76 @@
             console.log(moment().format("HH:mm:ss") + " processData END");
           },
 
+          async syncAllENSNames(db, provider) {
+            console.log(moment().format("HH:mm:ss") + " syncAllENSNames BEGIN");
+            const ensReverseRecordsContract = new ethers.Contract(ENSREVERSERECORDSADDRESS, ENSREVERSERECORDSABI, provider);
+
+            let indexToAddress = [];
+            let addressToIndex = {};
+            const indexToAddressDataItems = await db.cache.where("objectName").equals(this.chainId + "_indexToAddress").toArray();
+            if (indexToAddressDataItems.length == 1) {
+              indexToAddress = indexToAddressDataItems[0].object;
+              console.log("indexToAddress: " + JSON.stringify(indexToAddress));
+            }
+            const addressToIndexDataItems = await db.cache.where("objectName").equals(this.chainId + "_addressToIndex").toArray();
+            if (addressToIndexDataItems.length == 1) {
+              addressToIndex = addressToIndexDataItems[0].object;
+              console.log("addressToIndex: " + JSON.stringify(addressToIndex));
+            }
+
+            const addresses = indexToAddress;
+            // addresses.sort();
+            this.sync.completed = 0;
+            this.sync.total = addresses.length;
+            this.sync.section = 'ENS Names';
+
+            const MAXBATCHSIZE = 1000;
+            let batchSize = MAXBATCHSIZE;
+            let completed = 0;
+            let done = false;
+            let start = completed;
+            do {
+              let end = parseInt(start) + batchSize - 1;
+              if (end > addresses.length) {
+                end = addresses.length;
+              }
+              try {
+                const batch = addresses.slice(start, end + 1);
+                // console.log("batch: " + JSON.stringify(batch, null, 2));
+                const allnames = await ensReverseRecordsContract.getNames(batch);
+                // console.log("allnames: " + JSON.stringify(allnames, null, 2));
+                // console.log(start + " - " + end + " " + batch.length);
+                for (let j = 0; j < batch.length; j++) {
+                  const account = batch[j];
+                  const name = allnames[j];
+                  // const normalized = normalize(account);
+                  if (name.length > 0) {
+                    // console.log(account + " => " + name);
+                    Vue.set(this.indexToName, addressToIndex[account], name);
+                  }
+                }
+                start = parseInt(end) + 1;
+              } catch (e) {
+                if (batchSize > 1) {
+                  batchSize = parseInt(batchSize / 2);
+                } else {
+                  console.log("Skipping #" + start + " " + addresses[start]);
+                  start = parseInt(start) + 1;
+                  batchSize = MAXBATCHSIZE;
+                }
+              }
+              this.sync.completed = start;
+              done = start > indexToAddress.length;
+            } while (!done);
+            // console.log("this.indexToName: " + JSON.stringify(this.indexToName, null, 2));
+            await db.cache.put({ objectName: CHAINID_MAINNET + "_indexToName", object: this.indexToName }).then (function() {
+            }).catch(function(error) {
+              console.log("error: " + error);
+            });
+            console.log(moment().format("HH:mm:ss") + " syncAllENSNames END");
+            this.sync.section = null;
+          },
+
           async loadCurrentData() {
             const db = new Dexie(this.db.name);
             db.version(this.db.version).stores(this.db.schemaDefinition);
@@ -1589,6 +1650,10 @@
             const addressToIndexDataItems = await db.cache.where("objectName").equals(this.chainId + "_addressToIndex").toArray();
             if (addressToIndexDataItems.length == 1) {
               Vue.set(this, 'addressToIndex', addressToIndexDataItems[0].object);
+            }
+            const indexToNameDataItems = await db.cache.where("objectName").equals(this.chainId + "_indexToName").toArray();
+            if (indexToNameDataItems.length == 1) {
+              Vue.set(this, 'indexToName', indexToNameDataItems[0].object);
             }
             const blockTimestampsDataItems = await db.cache.where("objectName").equals(this.chainId + "_blockTimestamps").toArray();
             if (blockTimestampsDataItems.length == 1) {
@@ -1691,69 +1756,6 @@
               await this.syncChadexPair(context);
             }
             db.close();
-          },
-          async syncAllENSNames(context) {
-            console.log("syncAllENSNames");
-            const ensReverseRecordsContract = new ethers.Contract(ENSREVERSERECORDSADDRESS, ENSREVERSERECORDSABI, context.provider);
-
-            let indexToAddress = [];
-            let addressToIndex = {};
-            const indexToAddressDataItems = await context.db.cache.where("objectName").equals(CHAINID_SEPOLIA + "_indexToAddress").toArray();
-            if (indexToAddressDataItems.length == 1) {
-              indexToAddress = indexToAddressDataItems[0].object;
-              console.log("indexToAddress: " + JSON.stringify(indexToAddress));
-            }
-            const addressToIndexDataItems = await context.db.cache.where("objectName").equals(CHAINID_SEPOLIA + "_addressToIndex").toArray();
-            if (addressToIndexDataItems.length == 1) {
-              addressToIndex = addressToIndexDataItems[0].object;
-              console.log("addressToIndex: " + JSON.stringify(addressToIndex));
-            }
-
-            const addresses = indexToAddress;
-            // addresses.sort();
-
-            const MAXBATCHSIZE = 1000;
-            let batchSize = MAXBATCHSIZE;
-            let completed = 0;
-            let done = false;
-            let start = completed;
-            do {
-              let end = parseInt(start) + batchSize - 1;
-              if (end > addresses.length) {
-                end = addresses.length;
-              }
-              try {
-                const batch = addresses.slice(start, end + 1);
-                // console.log("batch: " + JSON.stringify(batch, null, 2));
-                const allnames = await ensReverseRecordsContract.getNames(batch);
-                // console.log("allnames: " + JSON.stringify(allnames, null, 2));
-                // console.log(start + " - " + end + " " + batch.length);
-                for (let j = 0; j < batch.length; j++) {
-                  const account = batch[j];
-                  const name = allnames[j];
-                  // const normalized = normalize(account);
-                  if (name.length > 0) {
-                    // console.log(account + " => " + name);
-                    Vue.set(this.indexToName, addressToIndex[account], name);
-                  }
-                }
-                start = parseInt(end) + 1;
-              } catch (e) {
-                if (batchSize > 1) {
-                  batchSize = parseInt(batchSize / 2);
-                } else {
-                  console.log("Skipping #" + start + " " + addresses[start]);
-                  start = parseInt(start) + 1;
-                  batchSize = MAXBATCHSIZE;
-                }
-              }
-              done = start > indexToAddress.length;
-            } while (!done);
-            // console.log("this.indexToName: " + JSON.stringify(this.indexToName, null, 2));
-            await context.db.cache.put({ objectName: CHAINID_MAINNET + "_indexToName", object: this.indexToName }).then (function() {
-            }).catch(function(error) {
-              console.log("error: " + error);
-            });
           },
           async syncENSNames(context, newAccounts) {
             this.sync.completed = 0;
@@ -1901,7 +1903,12 @@
             let result = null;
             if (new RegExp('^[0-9,]+$').test(addressOrAddressIndex)) {
               // result = this.indexToName[addressOrAddressIndex];
-              result = this.indexToAddress[addressOrAddressIndex];
+              // result = this.indexToAddress[addressOrAddressIndex];
+              if (addressOrAddressIndex in this.indexToName) {
+                result = this.indexToName[addressOrAddressIndex];
+              } else {
+                result = this.indexToAddress[addressOrAddressIndex];
+              }
             } else {
               result = this.indexToName[this.addressToIndex[addressOrAddressIndex]] || addressOrAddressIndex;
             }
