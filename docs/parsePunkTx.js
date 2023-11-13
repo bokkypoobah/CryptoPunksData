@@ -38,5 +38,5 @@ function parsePunkTx(txHash, events, addressToIndex) {
       }
     }
   }
-  return false;
+  return undefined;
 }
