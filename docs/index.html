@@ -472,6 +472,7 @@
                               <b-badge pill variant="light" v-b-popover.hover="'Amount'">{{ event[5] }}</b-badge>
                             </span>
                             <span v-else>
+                              <!-- TODO: Point to wrapped item -->
                               <b-link :href="'https://cryptopunks.app/cryptopunks/details/' + event[5]" v-b-popover.hover.bottom="'punkId. Click to view in cryptopunks.app'" target="_blank">
                                 <b-badge pill variant="info">{{ event[5] }}</b-badge>
                               </b-link>
@@ -485,7 +486,9 @@
                             <b-link :href="'https://etherscan.io/address/' + indexToAddress[event[4]]" v-b-popover.hover.bottom="'to. Click to view in etherscan.io'" target="_blank">
                               <b-badge pill variant="warning">{{ ensOrAddress(event[4], 10) }}</b-badge>
                             </b-link>
-                            <b-badge pill variant="light" v-b-popover.hover="'punkId'">{{ event[5] }}</b-badge>
+                            <b-link :href="'https://cryptopunks.app/cryptopunks/details/' + event[5]" v-b-popover.hover.bottom="'punkId. Click to view in cryptopunks.app'" target="_blank">
+                              <b-badge pill variant="info">{{ event[5] }}</b-badge>
+                            </b-link>
                             <!-- // v1 v2 event PunkTransfer(address indexed from, address indexed to, uint256 punkIndex); -->
                           </span>
                           <span v-else-if="event[2] == 3">
@@ -550,7 +553,10 @@
                             <b-link :href="'https://etherscan.io/address/' + indexToAddress[event[4]]" v-b-popover.hover.bottom="'approved. Click to view in etherscan.io'" target="_blank">
                               <b-badge pill variant="warning">{{ ensOrAddress(event[4], 10) }}</b-badge>
                             </b-link>
-                            <b-badge pill variant="light" v-b-popover.hover="'punkId'">{{ event[5] }}</b-badge>
+                            <b-link :href="'https://cryptopunks.app/cryptopunks/details/' + event[5]" v-b-popover.hover.bottom="'punkId. Click to view in cryptopunks.app'" target="_blank">
+                              <b-badge pill variant="info">{{ event[5] }}</b-badge>
+                            </b-link>
+
                             <!-- // w1 w2 event Approval(address indexed owner, address indexed approved, uint256 indexed tokenId); -->
                           </span>
                           <span v-else-if="event[2] == 9">
