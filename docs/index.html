@@ -719,13 +719,6 @@
             version: 7,
           },
 
-          contracts: [
-            { name: "CryptoPunks V1", address: CRYPTOPUNKSV1ADDRESS, abi: CRYPTOPUNKSV1ABI, deploymentBlockNumber: CRYPTOPUNKSV1DEPLOYMENTBLOCKNUMBER },
-            { name: "CryptoPunks V2", address: CRYPTOPUNKSV2ADDRESS, abi: CRYPTOPUNKSV2ABI, deploymentBlockNumber: CRYPTOPUNKSV2DEPLOYMENTBLOCKNUMBER },
-            { name: "WrappedCryptoPunks V1", address: WRAPPEDCRYPTOPUNKSV1ADDRESS, abi: WRAPPEDCRYPTOPUNKSV1ABI, deploymentBlockNumber: WRAPPEDCRYPTOPUNKSV1DEPLOYMENTBLOCKNUMBER },
-            { name: "WrappedCryptoPunks V2", address: WRAPPEDCRYPTOPUNKSV2ADDRESS, abi: WRAPPEDCRYPTOPUNKSV2ABI, deploymentBlockNumber: WRAPPEDCRYPTOPUNKSV2DEPLOYMENTBLOCKNUMBER },
-          ],
-
           sync: {
             section: null,
             total: null,
@@ -804,6 +797,30 @@
             "ApprovalForAll", // 9
             "OwnershipTransferred", // 10
             "ProxyRegistered", // 11
+          ],
+          indexToTransactionTypes: [
+            "Reserve", // 0
+            "Claim", // 1
+            "Airdrop", // 2
+            "Transfer", // 3
+            "Offer", // 4
+            "RemoveOffer", // 5
+            "Purchase", // 6
+            "Bid", // 7
+            "RemoveBid", // 8
+            "AcceptBid", // 9
+            "Wrap", // 10
+            "Unwrap", // 11
+            "Approval", // 12
+            "ApprovalForAll", // 13
+            "OwnershipTransferred", // 14
+            "ProxyRegistered", // 15
+          ],
+          contracts: [
+            { name: "CryptoPunks V1", address: CRYPTOPUNKSV1ADDRESS, abi: CRYPTOPUNKSV1ABI, deploymentBlockNumber: CRYPTOPUNKSV1DEPLOYMENTBLOCKNUMBER },
+            { name: "CryptoPunks V2", address: CRYPTOPUNKSV2ADDRESS, abi: CRYPTOPUNKSV2ABI, deploymentBlockNumber: CRYPTOPUNKSV2DEPLOYMENTBLOCKNUMBER },
+            { name: "WrappedCryptoPunks V1", address: WRAPPEDCRYPTOPUNKSV1ADDRESS, abi: WRAPPEDCRYPTOPUNKSV1ABI, deploymentBlockNumber: WRAPPEDCRYPTOPUNKSV1DEPLOYMENTBLOCKNUMBER },
+            { name: "WrappedCryptoPunks V2", address: WRAPPEDCRYPTOPUNKSV2ADDRESS, abi: WRAPPEDCRYPTOPUNKSV2ABI, deploymentBlockNumber: WRAPPEDCRYPTOPUNKSV2DEPLOYMENTBLOCKNUMBER },
           ],
           db: {
             name: "cryptopunksdata088g",
@@ -1641,6 +1658,9 @@
 
             Vue.set(this.indexToName, addressToIndex[CRYPTOPUNKSDEPLOYER], "LarvaLabs");
             Vue.set(this.indexToName, addressToIndex[YUGALABS], "YugaLabs");
+            Vue.set(this.indexToName, addressToIndex[DEAD], "0x0000...0000");
+            Vue.set(this.indexToName, addressToIndex[DEAD1], "0x0000...0001");
+            Vue.set(this.indexToName, addressToIndex[DEAD3], "0x0000...0003");
 
             // console.log("this.indexToName: " + JSON.stringify(this.indexToName, null, 2));
             await db.cache.put({ objectName: CHAINID_MAINNET + "_indexToName", object: this.indexToName }).then (function() {
