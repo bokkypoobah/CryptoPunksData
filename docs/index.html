@@ -1300,10 +1300,10 @@
             if (!devMode) {
               await this.loadBlockTimestamps(db);
             }
+            await this.processData(db);
             if (!devMode) {
-              await this.processData(db);
+              await this.syncAllENSNames(db, provider);
             }
-            await this.syncAllENSNames(db, provider);
             if (!devMode) {
               await this.loadCurrentData();
             }
@@ -1559,7 +1559,7 @@
                 }
                 const contractIndexList = Object.keys(contractIndexes).map(e => parseInt(e));
                 const punkIdList = Object.keys(punkIds).map(e => parseInt(e));
-                const txSummary = undefined; // TODO parsePunkTx(txHash, events, this.addressToIndex);
+                const txSummary = parsePunkTx(txHash, events, this.addressToIndex);
                 txs.push([ parseInt(blockNumber), parseInt(txIndex), txHash, txSummary, contractIndexList, punkIdList, events ]);
               }
               this.sync.completed++;
@@ -1661,6 +1661,8 @@
             Vue.set(this.indexToName, addressToIndex[DEAD], "0x0000...0000");
             Vue.set(this.indexToName, addressToIndex[DEAD1], "0x0000...0001");
             Vue.set(this.indexToName, addressToIndex[DEAD3], "0x0000...0003");
+            Vue.set(this.indexToName, addressToIndex[PUNKV1WRAPPER], "PunkV1Wrapper");
+            Vue.set(this.indexToName, addressToIndex[PUNKV2WRAPPER], "PunkV2Wrapper");
 
             // console.log("this.indexToName: " + JSON.stringify(this.indexToName, null, 2));
             await db.cache.put({ objectName: CHAINID_MAINNET + "_indexToName", object: this.indexToName }).then (function() {
