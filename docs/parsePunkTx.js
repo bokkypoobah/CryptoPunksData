@@ -66,9 +66,17 @@ function parsePunkTx(txHash, events, addressToIndex) {
       }
     }
 
-    if (eventsLength == 2) {
+    if (eventsLength == 2) { // V1 transferPunk and V2 without bids to cancel
       const secondEvent = events[1];
       if (firstEvent[EVENTFIELD_TYPE] == 1 && secondEvent[EVENTFIELD_TYPE] == 2) { // Transfer & PunkTransfer
+        return [3]; // Transfer
+      }
+    }
+
+    if (eventsLength == 3) { // V2 transferPunk with bids cancelled
+      const secondEvent = events[1];
+      const thirdEvent = events[2];
+      if (firstEvent[EVENTFIELD_TYPE] == 4 && secondEvent[EVENTFIELD_TYPE] == 1 && thirdEvent[EVENTFIELD_TYPE] == 2) { // PunkNoLongerForSale & Transfer & PunkTransfer
         return [3]; // Transfer
       }
     }
@@ -100,7 +108,8 @@ function parsePunkTx(txHash, events, addressToIndex) {
       }
     }
 
-    if (eventsLength == 4) {
+    if (eventsLength == 4) { // V1 Wrap
+      // TODO: Check 2 contracts
       const secondEvent = events[1];
       const thirdEvent = events[2];
       const fourthEvent = events[3];
@@ -109,12 +118,31 @@ function parsePunkTx(txHash, events, addressToIndex) {
       }
     }
 
-    if (eventsLength == 4) {
+    if (eventsLength == 4) { // V1 Unwrap
+      // TODO: Check 2 contracts
       const secondEvent = events[1];
       const thirdEvent = events[2];
       const fourthEvent = events[3];
       if (firstEvent[EVENTFIELD_TYPE] == 8 && secondEvent[EVENTFIELD_TYPE] == 1 && thirdEvent[EVENTFIELD_TYPE] == 1 && fourthEvent[EVENTFIELD_TYPE] == 2) { // Approval & Transfer & Transfer & PunkTransfer
         return [11]; // Unwrap (V1)
+      }
+    }
+
+    if (eventsLength == 3) { // V2 Wrap
+      // TODO: Check 2 contracts
+      const secondEvent = events[1];
+      const thirdEvent = events[2];
+      if (firstEvent[EVENTFIELD_TYPE] == 1 && secondEvent[EVENTFIELD_TYPE] == 2 && thirdEvent[EVENTFIELD_TYPE] == 1) { // Transfer & PunkTransfer & Transfer
+        return [10]; // Wrap (V2)
+      }
+    }
+
+    if (eventsLength == 3) { // V2 Unwrap
+      // TODO: Check 2 contracts
+      const secondEvent = events[1];
+      const thirdEvent = events[2];
+      if (firstEvent[EVENTFIELD_TYPE] == 1 && secondEvent[EVENTFIELD_TYPE] == 1 && thirdEvent[EVENTFIELD_TYPE] == 2) { // Transfer & Transfer & PunkTransfer
+        return [11]; // Unwrap (V2)
       }
     }
 
