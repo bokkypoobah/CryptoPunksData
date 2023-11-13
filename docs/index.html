@@ -1630,6 +1630,10 @@
               this.sync.completed = start;
               done = start > indexToAddress.length;
             } while (!done);
+
+            Vue.set(this.indexToName, addressToIndex[CRYPTOPUNKSDEPLOYER], "LarvaLabs");
+            Vue.set(this.indexToName, addressToIndex[YUGALABS], "YugaLabs");
+
             // console.log("this.indexToName: " + JSON.stringify(this.indexToName, null, 2));
             await db.cache.put({ objectName: CHAINID_MAINNET + "_indexToName", object: this.indexToName }).then (function() {
             }).catch(function(error) {
