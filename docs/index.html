@@ -1348,7 +1348,10 @@
           async processData(db) {
             console.log(moment().format("HH:mm:ss") + " processData BEGIN");
             const combined = {};
-            for (const process of this.contracts.slice(0, 4)) {
+            this.sync.completed = 0;
+            this.sync.total = 4;
+            this.sync.section = 'Process Data #1';
+            for (const process of this.contracts) {
               console.log(moment().format("HH:mm:ss") + " processData: " + process.name);
               const contractIndex = this.addressToIndex[process.address];
               const eventsDataItems = await db.cache.where("objectName").equals(this.chainId + "_" + process.address + "_events").toArray();
@@ -1371,6 +1374,7 @@
                   }
                 }
               }
+              this.sync.completed++;
             }
 
             // TODO: Handle w1 and w2
@@ -1379,6 +1383,9 @@
             const offers = { "1": {}, "2": {} };
             const v2Bids = {};
             let lastToOwnerIndex = 0;
+            this.sync.completed = 0;
+            this.sync.total = Object.keys(combined).length;
+            this.sync.section = 'Process Data #2';
             for (const blockNumber of Object.keys(combined).sort((a, b) => parseInt(a) - parseInt(b))) {
               const txIndexes = combined[blockNumber];
               for (const txIndex of Object.keys(txIndexes).sort((a, b) => parseInt(a) - parseInt(b))) {
@@ -1538,6 +1545,7 @@
                 const txSummary = undefined; // TODO parsePunkTx(txHash, events, this.addressToIndex);
                 txs.push([ parseInt(blockNumber), parseInt(txIndex), txHash, txSummary, contractIndexList, punkIdList, events ]);
               }
+              this.sync.completed++;
             }
 
             // console.log(moment().format("HH:mm:ss") + " processData - txs: " + JSON.stringify(txs));
