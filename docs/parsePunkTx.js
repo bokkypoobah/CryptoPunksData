@@ -85,6 +85,21 @@ function parsePunkTx(txHash, events, addressToIndex) {
       }
     }
 
+    if (eventsLength == 3) {
+      const secondEvent = events[1];
+      const thirdEvent = events[2];
+      if (firstEvent[EVENTFIELD_TYPE] == 1 && secondEvent[EVENTFIELD_TYPE] == 4 && thirdEvent[EVENTFIELD_TYPE] == 7) { // Transfer & PunkNoLongerForSale & PunkBought
+        return 6; // Purchase
+      }
+    }
+
+    if (eventsLength == 2) {
+      const secondEvent = events[1];
+      if (firstEvent[EVENTFIELD_TYPE] == 1 && secondEvent[EVENTFIELD_TYPE] == 7) { // Transfer & PunkBought
+        return 9; // AcceptBid
+      }
+    }
+
   }
   return undefined;
 }
