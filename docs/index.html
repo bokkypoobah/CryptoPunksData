@@ -433,11 +433,25 @@
                     </template>
 
                     <template #cell(info)="data">
-                      <font size="-2">
-                        <pre>
+                      <span v-if="data.item[4] == 0">
+                        Reserve
+                      </span>
+                      <span v-else-if="data.item[4] == 1">
+                        Claim
+                      </span>
+                      <span v-else-if="data.item[4] == 2">
+                        Airdrop
+                      </span>
+                      <span v-else-if="data.item[4] == 3">
+                        Transfer
+                      </span>
+                      <span v-else>
+                        <font size="-2">
+                          <pre>
 {{ data.item }}
-                        </pre>
-                      </font>
+                          </pre>
+                        </font>
+                      </span>
                     </template>
 
                     <template #cell(events)="data">
