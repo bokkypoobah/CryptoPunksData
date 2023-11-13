@@ -1523,7 +1523,7 @@
                 }
                 const contractIndexList = Object.keys(contractIndexes).map(e => parseInt(e));
                 const punkIdList = Object.keys(punkIds).map(e => parseInt(e));
-                const txSummary = parsePunkTx(txHash, events, this.addressToIndex);
+                const txSummary = undefined; // TODO parsePunkTx(txHash, events, this.addressToIndex);
                 txs.push([ parseInt(blockNumber), parseInt(txIndex), txHash, txSummary, contractIndexList, punkIdList, events ]);
               }
             }
