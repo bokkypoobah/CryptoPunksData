@@ -57,31 +57,31 @@ function parsePunkTx(txHash, events, addressToIndex) {
     if (firstEvent[EVENTFIELD_TYPE] == 0) { // Assign
       if (firstEvent[EVENTFIELD_CONTRACT] == 1) {
         if (firstEvent[3] == cryptoPunksDeployerIndex) {
-          return 0; // Reserve
+          return [0]; // Reserve
         } else {
-          return 1; // Claim
+          return [1]; // Claim
         }
       } else if (firstEvent[EVENTFIELD_CONTRACT] == 2) {
-        return 2; // Airdrop
+        return [2]; // Airdrop
       }
     }
 
     if (eventsLength == 2) {
       const secondEvent = events[1];
       if (firstEvent[EVENTFIELD_TYPE] == 1 && secondEvent[EVENTFIELD_TYPE] == 2) { // Transfer & PunkTransfer
-        return 3; // Transfer
+        return [3]; // Transfer
       }
     }
 
     if (eventsLength == 1) {
       if (firstEvent[EVENTFIELD_TYPE] == 3) { // PunkOffered
-        return 4; // Offer
+        return [4]; // Offer
       } else if (firstEvent[EVENTFIELD_TYPE] == 4) { // PunkNoLongerForSale
-        return 5; // Offer
+        return [5]; // Offer
       } else if (firstEvent[EVENTFIELD_TYPE] == 5) { // PunkBidEntered
-        return 7; // Bid
+        return [7]; // Bid
       } else if (firstEvent[EVENTFIELD_TYPE] == 6) { // PunkBidWithdrawn
-        return 8; // RemoveBid
+        return [8]; // RemoveBid
       }
     }
 
@@ -89,17 +89,35 @@ function parsePunkTx(txHash, events, addressToIndex) {
       const secondEvent = events[1];
       const thirdEvent = events[2];
       if (firstEvent[EVENTFIELD_TYPE] == 1 && secondEvent[EVENTFIELD_TYPE] == 4 && thirdEvent[EVENTFIELD_TYPE] == 7) { // Transfer & PunkNoLongerForSale & PunkBought
-        return 6; // Purchase
+        return [6]; // Purchase
       }
     }
 
     if (eventsLength == 2) {
       const secondEvent = events[1];
       if (firstEvent[EVENTFIELD_TYPE] == 1 && secondEvent[EVENTFIELD_TYPE] == 7) { // Transfer & PunkBought
-        return 9; // AcceptBid
+        return [9]; // AcceptBid
+      }
+    }
+
+    if (eventsLength == 4) {
+      const secondEvent = events[1];
+      const thirdEvent = events[2];
+      const fourthEvent = events[3];
+      if (firstEvent[EVENTFIELD_TYPE] == 1 && secondEvent[EVENTFIELD_TYPE] == 4 && thirdEvent[EVENTFIELD_TYPE] == 7 && fourthEvent[EVENTFIELD_TYPE] == 1) { // Transfer & PunkNoLongerForSale & PunkBought & Transfer
+        return [10]; // Wrap (V1)
+      }
+    }
+
+    if (eventsLength == 4) {
+      const secondEvent = events[1];
+      const thirdEvent = events[2];
+      const fourthEvent = events[3];
+      if (firstEvent[EVENTFIELD_TYPE] == 8 && secondEvent[EVENTFIELD_TYPE] == 1 && thirdEvent[EVENTFIELD_TYPE] == 1 && fourthEvent[EVENTFIELD_TYPE] == 2) { // Approval & Transfer & Transfer & PunkTransfer
+        return [11]; // Unwrap (V1)
       }
     }
 
   }
-  return undefined;
+  return [undefined];
 }

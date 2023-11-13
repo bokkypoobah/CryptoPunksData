@@ -433,52 +433,52 @@
                     </template>
 
                     <template #cell(info)="data">
-                      <span v-if="data.item[4] == 0">
+                      <span v-if="data.item[4][0] == 0">
                         Reserve
                       </span>
-                      <span v-else-if="data.item[4] == 1">
+                      <span v-else-if="data.item[4][0] == 1">
                         Claim
                       </span>
-                      <span v-else-if="data.item[4] == 2">
+                      <span v-else-if="data.item[4][0] == 2">
                         Airdrop
                       </span>
-                      <span v-else-if="data.item[4] == 3">
+                      <span v-else-if="data.item[4][0] == 3">
                         Transfer
                       </span>
-                      <span v-else-if="data.item[4] == 4">
+                      <span v-else-if="data.item[4][0] == 4">
                         Offer
                       </span>
-                      <span v-else-if="data.item[4] == 5">
+                      <span v-else-if="data.item[4][0] == 5">
                         RemoveOffer
                       </span>
-                      <span v-else-if="data.item[4] == 6">
+                      <span v-else-if="data.item[4][0] == 6">
                         Purchase
                       </span>
-                      <span v-else-if="data.item[4] == 7">
+                      <span v-else-if="data.item[4][0] == 7">
                         Bid
                       </span>
-                      <span v-else-if="data.item[4] == 8">
+                      <span v-else-if="data.item[4][0] == 8">
                         RemoveBid
                       </span>
-                      <span v-else-if="data.item[4] == 9">
+                      <span v-else-if="data.item[4][0] == 9">
                         AcceptBid
                       </span>
-                      <span v-else-if="data.item[4] == 10">
+                      <span v-else-if="data.item[4][0] == 10">
                         Wrap
                       </span>
-                      <span v-else-if="data.item[4] == 11">
+                      <span v-else-if="data.item[4][0] == 11">
                         Unwrap
                       </span>
-                      <span v-else-if="data.item[4] == 12">
+                      <span v-else-if="data.item[4][0] == 12">
                         Approval
                       </span>
-                      <span v-else-if="data.item[4] == 13">
+                      <span v-else-if="data.item[4][0] == 13">
                         ApprovalForAll
                       </span>
-                      <span v-else-if="data.item[4] == 14">
+                      <span v-else-if="data.item[4][0] == 14">
                         OwnershipTransferred
                       </span>
-                      <span v-else-if="data.item[4] == 15">
+                      <span v-else-if="data.item[4][0] == 15">
                         ProxyRegistered
                       </span>
                       <span v-else>
