@@ -5,13 +5,12 @@ const EVENTFIELD_CONTRACT = 1;
 const EVENTFIELD_TYPE = 2;
 const EVENTFIELD_FIELD_3 = 3;
 
-function parsePunkTx(txHash, txInfo, addressToIndex) {
+function parsePunkTx(txHash, events, addressToIndex) {
   // console.log("parsePunkTx: " + txHash); //  + " => " + JSON.stringify(txInfo));
   if (!cryptoPunksDeployerIndex) {
     cryptoPunksDeployerIndex = addressToIndex[CRYPTOPUNKSDEPLOYER];
   }
 
-  const events = txInfo[3];
   // console.log(" - events: " + JSON.stringify(events));
 
   if (events.length > 0) {

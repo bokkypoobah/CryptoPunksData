@@ -443,7 +443,7 @@
                       <!-- {{ data.item[4] }} -->
                       <!-- <br /> -->
                       <font size="-1">
-                        <span v-for="event in data.item[4]">
+                        <span v-for="event in data.item[7]">
                           <!-- <b-badge pill variant="light" v-b-popover.hover="'logIndex'">{{ event[0] }}</b-badge> -->
                           <b-badge v-if="event[1] == 1" pill variant="success" v-b-popover.hover="'CryptoPunks V1. log #' + event[0]">v1</b-badge>
                           <b-badge v-else-if="event[1] == 2" pill variant="primary" v-b-popover.hover="'CryptoPunks V2. log #' + event[0]">v2</b-badge>
@@ -1264,7 +1264,7 @@
                 }).catch(function(error) {
                   console.log("error: " + error);
                 });
-                console.log(moment().format("HH:mm:ss") + " syncCryptoPunksData - events: " + JSON.stringify(events));
+                // console.log(moment().format("HH:mm:ss") + " syncCryptoPunksData - events: " + JSON.stringify(events));
                 await db.cache.put({ objectName: this.chainId + "_" + process.address + "_events", object: { latestBlockNumber, events } }).then (function() {
                 }).catch(function(error) {
                   console.log("error: " + error);
@@ -1521,11 +1521,14 @@
 
                   }
                 }
-                txs.push([ blockNumber, txIndex, txHash, events, Object.keys(contractIndexes).map(e => parseInt(e)), Object.keys(punkIds).map(e => parseInt(e)) ]);
+                const contractIndexList = Object.keys(contractIndexes).map(e => parseInt(e));
+                const punkIdList = Object.keys(punkIds).map(e => parseInt(e));
+                const txSummary = parsePunkTx(txHash, events, this.addressToIndex);
+                txs.push([ parseInt(blockNumber), parseInt(txIndex), txHash, txSummary, contractIndexList, punkIdList, events ]);
               }
             }
 
-            console.log(moment().format("HH:mm:ss") + " processData - txs: " + JSON.stringify(txs));
+            // console.log(moment().format("HH:mm:ss") + " processData - txs: " + JSON.stringify(txs));
             await db.cache.put({ objectName: this.chainId + "_txs", object: txs }).then (function() {
             }).catch(function(error) {
               console.log("error: " + error);
