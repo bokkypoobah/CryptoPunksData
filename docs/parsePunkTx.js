@@ -82,7 +82,9 @@ function parsePunkTx(txHash, events, addressToIndex) {
     }
 
     if (eventsLength == 1) {
-      if (firstEvent[EVENTFIELD_TYPE] == 3) { // PunkOffered
+      if (firstEvent[EVENTFIELD_TYPE] == 1) { // Transfer (W1)
+        return [3]; // Transfer
+      } else if (firstEvent[EVENTFIELD_TYPE] == 3) { // PunkOffered
         return [4]; // Offer
       } else if (firstEvent[EVENTFIELD_TYPE] == 4) { // PunkNoLongerForSale
         return [5]; // Offer
@@ -90,6 +92,14 @@ function parsePunkTx(txHash, events, addressToIndex) {
         return [7]; // Bid
       } else if (firstEvent[EVENTFIELD_TYPE] == 6) { // PunkBidWithdrawn
         return [8]; // RemoveBid
+      } else if (firstEvent[EVENTFIELD_TYPE] == 8) { // Approval
+        return [12]; // Approval
+      } else if (firstEvent[EVENTFIELD_TYPE] == 9) { // ApprovalForAll
+        return [13]; // ApprovalForAll
+      } else if (firstEvent[EVENTFIELD_TYPE] == 10) { // OwnershipTransferred
+        return [14]; // OwnershipTransferred
+      } else if (firstEvent[EVENTFIELD_TYPE] == 11) { // ProxyRegistered
+        return [15]; // ProxyRegistered
       }
     }
 
