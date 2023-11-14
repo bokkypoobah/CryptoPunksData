@@ -57,11 +57,14 @@ function parsePunkTx(txHash, events, addressToIndex) {
     if (firstEvent[EVENTFIELD_TYPE] == 0) { // Assign
       if (firstEvent[EVENTFIELD_CONTRACT] == 1) {
         if (firstEvent[3] == cryptoPunksDeployerIndex) {
+          // TODO: Fix
           return [ 0, firstEvent[3], events.map(e => e[4]) ]; // Reserve
         } else {
+          // TODO: Fix
           return [ 1, firstEvent[3], firstEvent[4] ]; // Claim
         }
       } else if (firstEvent[EVENTFIELD_CONTRACT] == 2) {
+        // TODO: Fix
         return [ 2, events.map(e => [e[3], e[4]]) ]; // Airdrop
       }
     }
@@ -126,7 +129,7 @@ function parsePunkTx(txHash, events, addressToIndex) {
       const thirdEvent = events[2];
       const fourthEvent = events[3];
       if (firstEvent[EVENTFIELD_TYPE] == 1 && secondEvent[EVENTFIELD_TYPE] == 4 && thirdEvent[EVENTFIELD_TYPE] == 7 && fourthEvent[EVENTFIELD_TYPE] == 1) { // Transfer & PunkNoLongerForSale & PunkBought & Transfer
-        return [ 10, firstEvent[3], fourthEvent[5] ]; // [ Wrap(V1), owner, punkId ]
+        return [ 10, firstEvent[3], fourthEvent[5], , 1 ]; // [ Wrap(V1), owner, punkId ]
       }
     }
 
