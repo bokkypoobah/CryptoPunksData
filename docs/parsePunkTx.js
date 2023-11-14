@@ -58,14 +58,14 @@ function parsePunkTx(txHash, events, addressToIndex) {
       if (firstEvent[EVENTFIELD_CONTRACT] == 1) {
         if (firstEvent[3] == cryptoPunksDeployerIndex) {
           // TODO: Fix
-          return [ 0, firstEvent[3], events.map(e => e[4]) ]; // Reserve
+          return [ 0, 0, firstEvent[3], events.map(e => e[4]) ]; // [ Reserve, from, to, [punkIds]]
         } else {
           // TODO: Fix
-          return [ 1, firstEvent[3], firstEvent[4] ]; // Claim
+          return [ 1, 0, firstEvent[3], firstEvent[4] ]; // [ Claim, from, to, punkId ]
         }
       } else if (firstEvent[EVENTFIELD_CONTRACT] == 2) {
         // TODO: Fix
-        return [ 2, events.map(e => [e[3], e[4]]) ]; // Airdrop
+        return [ 2, 0, 0, events.map(e => [e[3], e[4]]) ]; // [ Airdrop, 0x0, 0x0, [to, punkId] ]
       }
     }
 
