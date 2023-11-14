@@ -498,16 +498,55 @@
                         </b-link>
                       </span>
                       <span v-else-if="data.item[4][0] == 6">
+                        <b-link :href="'https://etherscan.io/address/' + indexToAddress[data.item[4][1]]" v-b-popover.hover.bottom="'from. Click to view in etherscan.io'" target="_blank">
+                          <b-badge pill variant="warning">{{ ensOrAddress(data.item[4][1], 16) }}</b-badge>
+                        </b-link>
                         Purchase
+                        <b-link v-if="data.item[4][2] != 0" :href="'https://etherscan.io/address/' + indexToAddress[data.item[4][2]]" v-b-popover.hover.bottom="'to. Click to view in etherscan.io'" target="_blank">
+                          <b-badge pill variant="warning">{{ ensOrAddress(data.item[4][2], 16) }}</b-badge>
+                        </b-link>
+                        <b-link :href="'https://cryptopunks.app/cryptopunks/details/' + data.item[4][3]" v-b-popover.hover.bottom="'punkId. Click to view in cryptopunks.app'" target="_blank">
+                          <b-badge pill variant="info">{{ data.item[4][3] }}</b-badge>
+                        </b-link>
+                        <b-badge pill variant="light" v-b-popover.hover="'Amount in ETH'">{{ formatETH(data.item[4][4]) }}</b-badge>
                       </span>
                       <span v-else-if="data.item[4][0] == 7">
+                        <b-link :href="'https://etherscan.io/address/' + indexToAddress[data.item[4][1]]" v-b-popover.hover.bottom="'from. Click to view in etherscan.io'" target="_blank">
+                          <b-badge pill variant="warning">{{ ensOrAddress(data.item[4][1], 16) }}</b-badge>
+                        </b-link>
                         Bid
+                        <b-link :href="'https://cryptopunks.app/cryptopunks/details/' + data.item[4][2]" v-b-popover.hover.bottom="'punkId. Click to view in cryptopunks.app'" target="_blank">
+                          <b-badge pill variant="info">{{ data.item[4][2] }}</b-badge>
+                        </b-link>
+                        <b-badge pill variant="light" v-b-popover.hover="'Amount in ETH'">{{ formatETH(data.item[4][3]) }}</b-badge>
                       </span>
                       <span v-else-if="data.item[4][0] == 8">
+                        <b-link :href="'https://etherscan.io/address/' + indexToAddress[data.item[4][1]]" v-b-popover.hover.bottom="'from. Click to view in etherscan.io'" target="_blank">
+                          <b-badge pill variant="warning">{{ ensOrAddress(data.item[4][1], 16) }}</b-badge>
+                        </b-link>
                         RemoveBid
+                        <b-link :href="'https://cryptopunks.app/cryptopunks/details/' + data.item[4][2]" v-b-popover.hover.bottom="'punkId. Click to view in cryptopunks.app'" target="_blank">
+                          <b-badge pill variant="info">{{ data.item[4][2] }}</b-badge>
+                        </b-link>
+                        <b-badge pill variant="light" v-b-popover.hover="'Amount in ETH'">{{ formatETH(data.item[4][3]) }}</b-badge>
+                        <!-- <font size="-2">
+                          <pre>
+{{ data.item }}
+                          </pre>
+                        </font> -->
                       </span>
                       <span v-else-if="data.item[4][0] == 9">
+                        <b-link :href="'https://etherscan.io/address/' + indexToAddress[data.item[4][1]]" v-b-popover.hover.bottom="'from. Click to view in etherscan.io'" target="_blank">
+                          <b-badge pill variant="warning">{{ ensOrAddress(data.item[4][1], 16) }}</b-badge>
+                        </b-link>
                         AcceptBid
+                        <b-link v-if="data.item[4][2] != 0" :href="'https://etherscan.io/address/' + indexToAddress[data.item[4][2]]" v-b-popover.hover.bottom="'to. Click to view in etherscan.io'" target="_blank">
+                          <b-badge pill variant="warning">{{ ensOrAddress(data.item[4][2], 16) }}</b-badge>
+                        </b-link>
+                        <b-link :href="'https://cryptopunks.app/cryptopunks/details/' + data.item[4][3]" v-b-popover.hover.bottom="'punkId. Click to view in cryptopunks.app'" target="_blank">
+                          <b-badge pill variant="info">{{ data.item[4][3] }}</b-badge>
+                        </b-link>
+                        <b-badge pill variant="light" v-b-popover.hover="'Amount in ETH'">{{ formatETH(data.item[4][4]) }}</b-badge>
                       </span>
                       <span v-else-if="data.item[4][0] == 10">
                         <!-- TODO: v1 & v2 -->
@@ -541,11 +580,6 @@
                         <b-badge pill variant="warning">{{ ensOrAddress(data.item[4][1], 16) }}</b-badge>
                         ProxyRegistered
                         <b-badge v-if="data.item[4][2] != 0" pill v-b-popover.hover.bottom="'Proxy'" variant="warning">{{ ensOrAddress(data.item[4][2], 16) }}</b-badge>
-                        <!-- <font size="-2">
-                          <pre>
-{{ data.item }}
-                          </pre>
-                        </font> -->
                       </span>
                       <span v-else>
                         <font size="-2">

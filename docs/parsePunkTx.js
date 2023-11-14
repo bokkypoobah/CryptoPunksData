@@ -89,9 +89,9 @@ function parsePunkTx(txHash, events, addressToIndex) {
       } else if (firstEvent[EVENTFIELD_TYPE] == 4) { // PunkNoLongerForSale
         return [ 5, firstEvent[4], firstEvent[3] ]; // [ Offer, from, punkId ]
       } else if (firstEvent[EVENTFIELD_TYPE] == 5) { // PunkBidEntered
-        return [7]; // Bid
+        return [ 7, firstEvent[5], firstEvent[3], firstEvent[4] ]; // [ Bid, from, punkId, amount ]
       } else if (firstEvent[EVENTFIELD_TYPE] == 6) { // PunkBidWithdrawn
-        return [8]; // RemoveBid
+        return [ 8, firstEvent[5], firstEvent[3], firstEvent[4] ]; // [ RemoveBid, from, punkId, amount ]
       } else if (firstEvent[EVENTFIELD_TYPE] == 8) { // Approval
         return [12]; // Approval
       } else if (firstEvent[EVENTFIELD_TYPE] == 9) { // ApprovalForAll
@@ -107,14 +107,14 @@ function parsePunkTx(txHash, events, addressToIndex) {
       const secondEvent = events[1];
       const thirdEvent = events[2];
       if (firstEvent[EVENTFIELD_TYPE] == 1 && secondEvent[EVENTFIELD_TYPE] == 4 && thirdEvent[EVENTFIELD_TYPE] == 7) { // Transfer & PunkNoLongerForSale & PunkBought
-        return [6]; // Purchase
+        return [ 6, thirdEvent[6], thirdEvent[5], thirdEvent[3], thirdEvent[4] ]; // [ Purchase, from, to, punkId, amount ]
       }
     }
 
     if (eventsLength == 2) {
       const secondEvent = events[1];
       if (firstEvent[EVENTFIELD_TYPE] == 1 && secondEvent[EVENTFIELD_TYPE] == 7) { // Transfer & PunkBought
-        return [9]; // AcceptBid
+        return [ 9, secondEvent[5], secondEvent[6], secondEvent[3], secondEvent[4]]; // [ AcceptBid, from, to, punkId, amount ]
       }
     }
 
