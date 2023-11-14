@@ -57,12 +57,12 @@ function parsePunkTx(txHash, events, addressToIndex) {
     if (firstEvent[EVENTFIELD_TYPE] == 0) { // Assign
       if (firstEvent[EVENTFIELD_CONTRACT] == 1) {
         if (firstEvent[3] == cryptoPunksDeployerIndex) {
-          return [0]; // Reserve
+          return [ 0, firstEvent[3], events.map(e => e[4]) ]; // Reserve
         } else {
-          return [1]; // Claim
+          return [ 1, firstEvent[3], firstEvent[4] ]; // Claim
         }
       } else if (firstEvent[EVENTFIELD_CONTRACT] == 2) {
-        return [2]; // Airdrop
+        return [ 2, events.map(e => [e[3], e[4]]) ]; // Airdrop
       }
     }
 

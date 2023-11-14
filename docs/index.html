@@ -434,16 +434,40 @@
 
                     <template #cell(info)="data">
                       <span v-if="data.item[4][0] == 0">
+                        <b-badge pill variant="warning">{{ ensOrAddress(data.item[4][1], 16) }}</b-badge>
                         Reserve
+                        <!-- {{ data.item[4][2].join(", ") }} -->
+                        <span v-for="punkId of data.item[4][2]">
+                          <b-link :href="'https://cryptopunks.app/cryptopunks/details/' + punkId" v-b-popover.hover.bottom="'punkId. Click to view in cryptopunks.app'" target="_blank" class="pr-2">
+                            <b-badge pill variant="info">{{ punkId }}</b-badge>
+                          </b-link>
+                        </span>
+
                       </span>
                       <span v-else-if="data.item[4][0] == 1">
+                        <b-badge pill variant="warning">{{ ensOrAddress(data.item[4][1], 16) }}</b-badge>
                         Claim
+                        <b-link :href="'https://cryptopunks.app/cryptopunks/details/' + data.item[4][2]" v-b-popover.hover.bottom="'punkId. Click to view in cryptopunks.app'" target="_blank">
+                          <b-badge pill variant="info">{{ data.item[4][2] }}</b-badge>
+                        </b-link>
                       </span>
                       <span v-else-if="data.item[4][0] == 2">
                         Airdrop
+                        <!-- {{ data.item[4][2].join(", ") }} -->
+                        <span v-for="item of data.item[4][1]">
+                          <b-badge pill variant="warning">{{ ensOrAddress(item[0], 16) }}</b-badge>
+                          <b-link :href="'https://cryptopunks.app/cryptopunks/details/' + item[1]" v-b-popover.hover.bottom="'punkId. Click to view in cryptopunks.app'" target="_blank" class="pr-2">
+                            <b-badge pill variant="info">{{ item[1] }}</b-badge>
+                          </b-link>
+                        </span>
                       </span>
                       <span v-else-if="data.item[4][0] == 3">
                         Transfer
+                        <!-- <font size="-2">
+                          <pre>
+{{ data.item }}
+                          </pre>
+                        </font> -->
                       </span>
                       <span v-else-if="data.item[4][0] == 4">
                         Offer
