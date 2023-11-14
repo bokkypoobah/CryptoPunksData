@@ -87,7 +87,7 @@ function parsePunkTx(txHash, events, addressToIndex) {
       } else if (firstEvent[EVENTFIELD_TYPE] == 3) { // PunkOffered
         return [ 4, firstEvent[6], firstEvent[5], firstEvent[3], firstEvent[4] ]; // [ Offer, from, to, punkId, amount ]
       } else if (firstEvent[EVENTFIELD_TYPE] == 4) { // PunkNoLongerForSale
-        return [5, firstEvent[4], firstEvent[3]]; // [ Offer, from, punkId ]
+        return [ 5, firstEvent[4], firstEvent[3] ]; // [ Offer, from, punkId ]
       } else if (firstEvent[EVENTFIELD_TYPE] == 5) { // PunkBidEntered
         return [7]; // Bid
       } else if (firstEvent[EVENTFIELD_TYPE] == 6) { // PunkBidWithdrawn
@@ -99,7 +99,7 @@ function parsePunkTx(txHash, events, addressToIndex) {
       } else if (firstEvent[EVENTFIELD_TYPE] == 10) { // OwnershipTransferred
         return [14]; // OwnershipTransferred
       } else if (firstEvent[EVENTFIELD_TYPE] == 11) { // ProxyRegistered
-        return [15]; // ProxyRegistered
+        return [ 15, firstEvent[4], firstEvent[3] ]; // [ ProxyRegistered, user, proxy ]
       }
     }
 
