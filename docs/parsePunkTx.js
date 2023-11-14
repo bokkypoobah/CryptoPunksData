@@ -85,7 +85,7 @@ function parsePunkTx(txHash, events, addressToIndex) {
       if (firstEvent[EVENTFIELD_TYPE] == 1) { // Transfer (W1)
         return [3]; // Transfer
       } else if (firstEvent[EVENTFIELD_TYPE] == 3) { // PunkOffered
-        return [4]; // Offer
+        return [ 4, firstEvent[6], firstEvent[5], firstEvent[3], firstEvent[4] ]; // [Offer, from, to, punkId, amount]
       } else if (firstEvent[EVENTFIELD_TYPE] == 4) { // PunkNoLongerForSale
         return [5]; // Offer
       } else if (firstEvent[EVENTFIELD_TYPE] == 5) { // PunkBidEntered

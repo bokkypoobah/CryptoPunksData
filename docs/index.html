@@ -463,14 +463,20 @@
                       </span>
                       <span v-else-if="data.item[4][0] == 3">
                         Transfer
-                        <!-- <font size="-2">
+                      </span>
+                      <span v-else-if="data.item[4][0] == 4">
+                        <b-badge pill v-b-popover.hover.bottom="'Owner'" variant="warning">{{ ensOrAddress(data.item[4][1], 16) }}</b-badge>
+                        Offer
+                        <b-link :href="'https://cryptopunks.app/cryptopunks/details/' + data.item[4][3]" v-b-popover.hover.bottom="'punkId. Click to view in cryptopunks.app'" target="_blank">
+                          <b-badge pill variant="info">{{ data.item[4][3] }}</b-badge>
+                        </b-link>
+                        <b-badge v-if="data.item[4][2] != 0" pill v-b-popover.hover.bottom="'To'" variant="warning">{{ ensOrAddress(data.item[4][2], 16) }}</b-badge>
+                        <b-badge pill variant="light" v-b-popover.hover="'Amount in ETH'">{{ formatETH(data.item[4][4]) }}</b-badge>
+                        <font size="-2">
                           <pre>
 {{ data.item }}
                           </pre>
-                        </font> -->
-                      </span>
-                      <span v-else-if="data.item[4][0] == 4">
-                        Offer
+                        </font>
                       </span>
                       <span v-else-if="data.item[4][0] == 5">
                         RemoveOffer
@@ -897,7 +903,7 @@
             { name: "WrappedCryptoPunks V2", address: WRAPPEDCRYPTOPUNKSV2ADDRESS, abi: WRAPPEDCRYPTOPUNKSV2ABI, deploymentBlockNumber: WRAPPEDCRYPTOPUNKSV2DEPLOYMENTBLOCKNUMBER },
           ],
           db: {
-            name: "cryptopunksdata088h",
+            name: "cryptopunksdata088i",
             version: 1,
             schemaDefinition: {
               cache: '&objectName',
@@ -1551,7 +1557,7 @@
                       console.log("PunkOffered " + blockNumber + " " + txIndex + " " + txHash + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
                       console.log("  offers[contractIndex][7144]: " + JSON.stringify(offers[contractIndex][7144]));
                     }
-                    events.push([ parseInt(logIndex), contractIndex, eventType, event[2], event[3], event[4] ]);
+                    events.push([ parseInt(logIndex), contractIndex, eventType, event[2], event[3], event[4], tokens[contractIndex][punkId] ]);
 
                   // PunkNoLongerForSale - V1 & V2
                   } else if (eventType == 4) {
@@ -1564,7 +1570,7 @@
                       console.log("PunkNoLongerForSale " + blockNumber + " " + txIndex + " " + txHash + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
                       console.log("  offers[contractIndex][7144]: " + JSON.stringify(offers[contractIndex][7144]));
                     }
-                    events.push([ parseInt(logIndex), contractIndex, eventType, event[2] ]);
+                    events.push([ parseInt(logIndex), contractIndex, eventType, event[2], tokens[contractIndex][punkId] ]);
 
                   // PunkBidEntered - V2
                   } else if (eventType == 5) {
