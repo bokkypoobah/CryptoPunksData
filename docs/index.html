@@ -529,11 +529,6 @@
                           <b-badge pill variant="info">{{ data.item[4][2] }}</b-badge>
                         </b-link>
                         <b-badge pill variant="light" v-b-popover.hover="'Amount in ETH'">{{ formatETH(data.item[4][3]) }}</b-badge>
-                        <!-- <font size="-2">
-                          <pre>
-{{ data.item }}
-                          </pre>
-                        </font> -->
                       </span>
                       <span v-else-if="data.item[4][0] == 9">
                         <b-link :href="'https://etherscan.io/address/' + indexToAddress[data.item[4][1]]" v-b-popover.hover.bottom="'from. Click to view in etherscan.io'" target="_blank">
@@ -568,13 +563,40 @@
                         </b-link>
                       </span>
                       <span v-else-if="data.item[4][0] == 12">
+                        <b-link :href="'https://etherscan.io/address/' + indexToAddress[data.item[4][1]]" v-b-popover.hover.bottom="'owner. Click to view in etherscan.io'" target="_blank">
+                          <b-badge pill variant="warning">{{ ensOrAddress(data.item[4][1], 16) }}</b-badge>
+                        </b-link>
                         Approval
+                        <b-link :href="'https://etherscan.io/address/' + indexToAddress[data.item[4][2]]" v-b-popover.hover.bottom="'approved. Click to view in etherscan.io'" target="_blank">
+                          <b-badge pill variant="warning">{{ ensOrAddress(data.item[4][2], 16) }}</b-badge>
+                        </b-link>
+                        <b-link :href="'https://cryptopunks.app/cryptopunks/details/' + data.item[4][3]" v-b-popover.hover.bottom="'punkId. Click to view in cryptopunks.app'" target="_blank">
+                          <b-badge pill variant="info">{{ data.item[4][3] }}</b-badge>
+                        </b-link>
                       </span>
                       <span v-else-if="data.item[4][0] == 13">
+                        <b-link :href="'https://etherscan.io/address/' + indexToAddress[data.item[4][1]]" v-b-popover.hover.bottom="'owner. Click to view in etherscan.io'" target="_blank">
+                          <b-badge pill variant="warning">{{ ensOrAddress(data.item[4][1], 16) }}</b-badge>
+                        </b-link>
                         ApprovalForAll
+                        <b-link :href="'https://etherscan.io/address/' + indexToAddress[data.item[4][2]]" v-b-popover.hover.bottom="'approved. Click to view in etherscan.io'" target="_blank">
+                          <b-badge pill variant="warning">{{ ensOrAddress(data.item[4][2], 16) }}</b-badge>
+                        </b-link>
+                        <b-badge pill variant="info">{{ data.item[4][3] }}</b-badge>
                       </span>
                       <span v-else-if="data.item[4][0] == 14">
                         OwnershipTransferred
+                        <b-link :href="'https://etherscan.io/address/' + indexToAddress[data.item[4][1]]" v-b-popover.hover.bottom="'previousOwner. Click to view in etherscan.io'" target="_blank">
+                          <b-badge pill variant="warning">{{ ensOrAddress(data.item[4][1], 16) }}</b-badge>
+                        </b-link>
+                        <b-link :href="'https://etherscan.io/address/' + indexToAddress[data.item[4][2]]" v-b-popover.hover.bottom="'newOwner. Click to view in etherscan.io'" target="_blank">
+                          <b-badge pill variant="warning">{{ ensOrAddress(data.item[4][2], 16) }}</b-badge>
+                        </b-link>
+                        <!-- <font size="-2">
+                          <pre>
+{{ data.item }}
+                          </pre>
+                        </font> -->
                       </span>
                       <span v-else-if="data.item[4][0] == 15">
                         <b-badge pill variant="warning">{{ ensOrAddress(data.item[4][1], 16) }}</b-badge>
@@ -1331,7 +1353,7 @@
                       }
                       const ownerIndex = addressToIndex[owner];
                       const approvedIndex = addressToIndex[approved];
-                      record = [ eventTypeIndex, ownerIndex, approvedIndex, tokenId.toString() ];
+                      record = [ eventTypeIndex, ownerIndex, approvedIndex, parseInt(tokenId) ];
                     } else if (eventType == "ApprovalForAll") {
                       const [owner, operator, approved] = logData.args;
                       for (const address of [owner, operator]) {
@@ -1804,16 +1826,12 @@
                 }
               }
               this.sync.completed = start;
-              done = start > indexToAddress.length;
+              done = start > addresses.length;
             } while (!done);
 
-            Vue.set(this.indexToName, addressToIndex[CRYPTOPUNKSDEPLOYER], "LarvaLabs");
-            Vue.set(this.indexToName, addressToIndex[YUGALABS], "YugaLabs");
-            Vue.set(this.indexToName, addressToIndex[DEAD], "0x0000...0000");
-            Vue.set(this.indexToName, addressToIndex[DEAD1], "0x0000...0001");
-            Vue.set(this.indexToName, addressToIndex[DEAD3], "0x0000...0003");
-            Vue.set(this.indexToName, addressToIndex[PUNKV1WRAPPER], "PunkV1Wrapper");
-            Vue.set(this.indexToName, addressToIndex[PUNKV2WRAPPER], "PunkV2Wrapper");
+            for (const [address, name] of Object.entries(CUSTOMNAMES)) {
+              Vue.set(this.indexToName, addressToIndex[address], name);
+            }
 
             // console.log("this.indexToName: " + JSON.stringify(this.indexToName, null, 2));
             await db.cache.put({ objectName: CHAINID_MAINNET + "_indexToName", object: this.indexToName }).then (function() {

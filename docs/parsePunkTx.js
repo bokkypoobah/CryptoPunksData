@@ -93,13 +93,15 @@ function parsePunkTx(txHash, events, addressToIndex) {
       } else if (firstEvent[EVENTFIELD_TYPE] == 6) { // PunkBidWithdrawn
         return [ 8, firstEvent[5], firstEvent[3], firstEvent[4] ]; // [ RemoveBid, from, punkId, amount ]
       } else if (firstEvent[EVENTFIELD_TYPE] == 8) { // Approval
-        return [12]; // Approval
+        return [ 12, firstEvent[3], firstEvent[4], firstEvent[5] ]; // [ Approval, owner, approved, tokenId ]
+        // w1 w2 event Approval(address indexed owner, address indexed approved, uint256 indexed tokenId);
       } else if (firstEvent[EVENTFIELD_TYPE] == 9) { // ApprovalForAll
-        return [13]; // ApprovalForAll
+        return [ 13, firstEvent[3], firstEvent[4], firstEvent[5] ]; // [ ApprovalForAll, owner, operator, approved ]
+        // w1 w2 event ApprovalForAll(address indexed owner, address indexed operator, bool approved);
       } else if (firstEvent[EVENTFIELD_TYPE] == 10) { // OwnershipTransferred
-        return [14]; // OwnershipTransferred
+        return [ 14, firstEvent[3], firstEvent[4] ]; // [ OwnershipTransferred, from, to ]
       } else if (firstEvent[EVENTFIELD_TYPE] == 11) { // ProxyRegistered
-        return [ 15, firstEvent[4], firstEvent[3] ]; // [ ProxyRegistered, user, proxy ]
+        return [ 15, firstEvent[3], firstEvent[4] ]; // [ ProxyRegistered, user, proxy ]
       }
     }
 
