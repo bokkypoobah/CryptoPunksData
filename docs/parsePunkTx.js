@@ -134,7 +134,7 @@ function parsePunkTx(txHash, events, addressToIndex) {
       const thirdEvent = events[2];
       const fourthEvent = events[3];
       if (firstEvent[EVENTFIELD_TYPE] == 8 && secondEvent[EVENTFIELD_TYPE] == 1 && thirdEvent[EVENTFIELD_TYPE] == 1 && fourthEvent[EVENTFIELD_TYPE] == 2) { // Approval & Transfer & Transfer & PunkTransfer
-        return [11]; // Unwrap (V1)
+        return [11, fourthEvent[4], fourthEvent[5] ]; // [ Unwrap(V1), owner, punkId ]
       }
     }
 
@@ -143,7 +143,7 @@ function parsePunkTx(txHash, events, addressToIndex) {
       const secondEvent = events[1];
       const thirdEvent = events[2];
       if (firstEvent[EVENTFIELD_TYPE] == 1 && secondEvent[EVENTFIELD_TYPE] == 2 && thirdEvent[EVENTFIELD_TYPE] == 1) { // Transfer & PunkTransfer & Transfer
-        return [10]; // Wrap (V2)
+        return [ 10, thirdEvent[4], thirdEvent[5] ]; // [ Wrap(V2), owner, punkId ]
       }
     }
 
@@ -152,7 +152,7 @@ function parsePunkTx(txHash, events, addressToIndex) {
       const secondEvent = events[1];
       const thirdEvent = events[2];
       if (firstEvent[EVENTFIELD_TYPE] == 1 && secondEvent[EVENTFIELD_TYPE] == 1 && thirdEvent[EVENTFIELD_TYPE] == 2) { // Transfer & Transfer & PunkTransfer
-        return [11]; // Unwrap (V2)
+        return [ 11, thirdEvent[4], thirdEvent[5] ]; // [ Unwrap(V2), owner, punkId ]
       }
     }
 
