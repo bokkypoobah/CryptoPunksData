@@ -1303,10 +1303,9 @@
             const indexToAddressDataItems = await db.cache.where("objectName").equals(this.chainId + "_indexToAddress").toArray();
             if (indexToAddressDataItems.length == 1) {
               indexToAddress = indexToAddressDataItems[0].object;
-            }
-            const addressToIndexDataItems = await db.cache.where("objectName").equals(this.chainId + "_addressToIndex").toArray();
-            if (addressToIndexDataItems.length == 1) {
-              addressToIndex = addressToIndexDataItems[0].object;
+              for (const [index, address] of indexToAddress.entries()) {
+                addressToIndex[address] = index;
+              }
             }
             for (const address of [ADDRESS0, CRYPTOPUNKSV1ADDRESS, CRYPTOPUNKSV2ADDRESS, WRAPPEDCRYPTOPUNKSV1ADDRESS, WRAPPEDCRYPTOPUNKSV2ADDRESS, this.coinbase]) {
               if (!(address in addressToIndex)) {
@@ -1528,10 +1527,6 @@
                 Vue.set(this, "addressToIndex", addressToIndex);
                 Vue.set(this, "indexToAddress", indexToAddress);
                 await db.cache.put({ objectName: this.chainId + "_indexToAddress", object: indexToAddress }).then (function() {
-                }).catch(function(error) {
-                  console.log("error: " + error);
-                });
-                await db.cache.put({ objectName: this.chainId + "_addressToIndex", object: addressToIndex }).then (function() {
                 }).catch(function(error) {
                   console.log("error: " + error);
                 });
@@ -1849,12 +1844,9 @@
             const indexToAddressDataItems = await db.cache.where("objectName").equals(this.chainId + "_indexToAddress").toArray();
             if (indexToAddressDataItems.length == 1) {
               indexToAddress = indexToAddressDataItems[0].object;
-              // console.log("indexToAddress: " + JSON.stringify(indexToAddress));
-            }
-            const addressToIndexDataItems = await db.cache.where("objectName").equals(this.chainId + "_addressToIndex").toArray();
-            if (addressToIndexDataItems.length == 1) {
-              addressToIndex = addressToIndexDataItems[0].object;
-              // console.log("addressToIndex: " + JSON.stringify(addressToIndex));
+              for (const [index, address] of indexToAddress.entries()) {
+                addressToIndex[address] = index;
+              }
             }
 
             const addresses = indexToAddress;
@@ -1922,10 +1914,11 @@
             const indexToAddressDataItems = await db.cache.where("objectName").equals(this.chainId + "_indexToAddress").toArray();
             if (indexToAddressDataItems.length == 1) {
               Vue.set(this, 'indexToAddress', indexToAddressDataItems[0].object);
-            }
-            const addressToIndexDataItems = await db.cache.where("objectName").equals(this.chainId + "_addressToIndex").toArray();
-            if (addressToIndexDataItems.length == 1) {
-              Vue.set(this, 'addressToIndex', addressToIndexDataItems[0].object);
+              let addressToIndex = {};
+              for (const [index, address] of this.indexToAddress.entries()) {
+                addressToIndex[address] = index;
+              }
+              Vue.set(this, 'addressToIndex', addressToIndex);
             }
             const indexToNameDataItems = await db.cache.where("objectName").equals(this.chainId + "_indexToName").toArray();
             if (indexToNameDataItems.length == 1) {
