@@ -7,14 +7,14 @@ const EVENTFIELD_FIELD_3 = 3;
 
 let myCounter = 0;
 
-function parsePunkTx(txHash, events, addressToIndex) {
-  // console.log("parsePunkTx: " + txHash); //  + " => " + JSON.stringify(txInfo));
+function parsePunkTx(txHashIndex, events, addressToIndex) {
+  // console.log("parsePunkTx: " + txHashIndex); //  + " => " + JSON.stringify(txInfo));
   if (!cryptoPunksDeployerIndex) {
     cryptoPunksDeployerIndex = addressToIndex[CRYPTOPUNKSDEPLOYER];
   }
 
   if (myCounter++ < 10) {
-    console.log("  " + txHash + ": " + JSON.stringify(events));
+    console.log("  " + txHashIndex + ": " + JSON.stringify(events));
   }
 
   // indexToEventTypes: [

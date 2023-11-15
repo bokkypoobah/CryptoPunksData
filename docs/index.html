@@ -428,7 +428,7 @@
                       </font>
                       <br />
                       <font size="-2">
-                        {{ data.item[1] + ':' + data.item[2] + ':' + data.item[3] }}
+                        {{ data.item[1] + ':' + data.item[2] + ':' + indexToTxHash[data.item[3]] }}
                       </font>
                     </template>
 
@@ -969,6 +969,8 @@
           blockTimestamps: {},
           addressToIndex: {},
           indexToAddress: [],
+          txHashToIndex: {},
+          indexToTxHash: [],
           indexToName: {},
           txs: [],
           tokens: {},
@@ -1068,7 +1070,7 @@
             { name: "WrappedCryptoPunks V2", address: WRAPPEDCRYPTOPUNKSV2ADDRESS, abi: WRAPPEDCRYPTOPUNKSV2ABI, deploymentBlockNumber: WRAPPEDCRYPTOPUNKSV2DEPLOYMENTBLOCKNUMBER },
           ],
           db: {
-            name: "cryptopunksdata088i",
+            name: "cryptopunksdata088j",
             version: 1,
             schemaDefinition: {
               cache: '&objectName',
@@ -1307,6 +1309,15 @@
                 addressToIndex[address] = index;
               }
             }
+            let indexToTxHash = [];
+            let txHashToIndex = {};
+            const indexToTxHashDataItems = await db.cache.where("objectName").equals(this.chainId + "_indexToTxHash").toArray();
+            if (indexToTxHashDataItems.length == 1) {
+              indexToTxHash = indexToTxHashDataItems[0].object;
+              for (const [index, txHash] of indexToTxHash.entries()) {
+                txHashToIndex[txHash] = index;
+              }
+            }
             for (const address of [ADDRESS0, CRYPTOPUNKSV1ADDRESS, CRYPTOPUNKSV2ADDRESS, WRAPPEDCRYPTOPUNKSV1ADDRESS, WRAPPEDCRYPTOPUNKSV2ADDRESS, this.coinbase]) {
               if (!(address in addressToIndex)) {
                 addressToIndex[address] = indexToAddress.length;
@@ -1330,6 +1341,11 @@
                   if (!event.removed) {
                     const logData = contract.interface.parseLog(event);
                     const txHash = event.transactionHash;
+                    if (!(txHash in txHashToIndex)) {
+                      txHashToIndex[txHash] = indexToTxHash.length;
+                      indexToTxHash.push(txHash);
+                    }
+                    const txHashIndex = txHashToIndex[txHash];
                     const blockNumber = event.blockNumber;
                     const txIndex = event.transactionIndex;
                     const logIndex = event.logIndex;
@@ -1476,7 +1492,7 @@
                         events[blockNumber] = {};
                       }
                       if (!(txIndex in events[blockNumber])) {
-                        events[blockNumber][txIndex] = [ txHash, {} ];
+                        events[blockNumber][txIndex] = [ txHashIndex, {} ];
                       }
                       if (!(logIndex in events[blockNumber][txIndex][1])) {
                         events[blockNumber][txIndex][1][logIndex] = record;
@@ -1530,6 +1546,12 @@
                 }).catch(function(error) {
                   console.log("error: " + error);
                 });
+                Vue.set(this, "txHashToIndex", txHashToIndex);
+                Vue.set(this, "indexToTxHash", indexToTxHash);
+                await db.cache.put({ objectName: this.chainId + "_indexToTxHash", object: indexToTxHash }).then (function() {
+                }).catch(function(error) {
+                  console.log("error: " + error);
+                });
                 // console.log(moment().format("HH:mm:ss") + " syncCryptoPunksData - events: " + JSON.stringify(events));
                 await db.cache.put({ objectName: this.chainId + "_" + process.address + "_events", object: { latestBlockNumber, events } }).then (function() {
                 }).catch(function(error) {
@@ -1537,6 +1559,9 @@
                 });
               }
             }
+            // console.log(moment().format("HH:mm:ss") + " syncCryptoPunksData - indexToTxHash: " + JSON.stringify(indexToTxHash));
+            // console.log(moment().format("HH:mm:ss") + " syncCryptoPunksData - txHashToIndex: " + JSON.stringify(txHashToIndex));
+
             if (!devMode) {
               await this.loadBlockTimestamps(db);
             }
@@ -1621,9 +1646,9 @@
                   }
                   const timestamp = this.blockTimestamps[blockNumber] || "(unknown)";
                   for (const [txIndex, txData] of Object.entries(txIndexes)) {
-                    const [txHash, logs] = txData;
+                    const [txHashIndex, logs] = txData;
                     if (!(txIndex in combined[blockNumber])) {
-                      combined[blockNumber][txIndex] = [ txHash, {} ];
+                      combined[blockNumber][txIndex] = [ txHashIndex, {} ];
                     }
                     for (const [logIndex, eventData] of Object.entries(logs)) {
                       combined[blockNumber][txIndex][1][logIndex] = [ contractIndex, ...eventData ];
@@ -1647,7 +1672,7 @@
               const txIndexes = combined[blockNumber];
               for (const txIndex of Object.keys(txIndexes).sort((a, b) => parseInt(a) - parseInt(b))) {
                 const txData = txIndexes[txIndex];
-                const [txHash, logs] = txData;
+                const [txHashIndex, logs] = txData;
                 const events = [];
                 const contractIndexes = {};
                 const punkIds = {};
@@ -1670,7 +1695,7 @@
                       }
                     }
                     if (parseInt(punkId) > 9999 || punkId.length > 5) {
-                      console.log("  v1 Invalid punkId" + " " + blockNumber + " " + txIndex + " " + txHash + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
+                      console.log("  v1 Invalid punkId" + " " + blockNumber + " " + txIndex + " " + txHashIndex + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
                     }
                     events.push([ parseInt(logIndex), contractIndex, eventType, event[2], event[3] ]);
 
@@ -1680,7 +1705,7 @@
                       if (!(contractIndex in tokens)) {
                         tokens[contractIndex] = {};
                       }
-                      // console.log(blockNumber + " " + txIndex + " " + txHash + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
+                      // console.log(blockNumber + " " + txIndex + " " + txHashIndex + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
                       const [ fromOwnerIndex, toOwnerIndex, punkId ] = [ event[2], event[3], event[4].toString() ];
                       if (parseInt(punkId) < 10000) {
                         tokens[contractIndex][punkId] = toOwnerIndex;
@@ -1703,7 +1728,7 @@
                         punkIds[punkId] = 1;
                       }
                     }
-                    // console.log(blockNumber + " " + txIndex + " " + txHash + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
+                    // console.log(blockNumber + " " + txIndex + " " + txHashIndex + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
                     events.push([ parseInt(logIndex), contractIndex, eventType, event[2], event[3], event[4] ]);
 
                   // PunkOffered - V1 & V2
@@ -1714,7 +1739,7 @@
                       punkIds[punkId] = 1;
                     }
                     if (punkId == 7144) {
-                      console.log("PunkOffered " + blockNumber + " " + txIndex + " " + txHash + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
+                      console.log("PunkOffered " + blockNumber + " " + txIndex + " " + txHashIndex + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
                       console.log("  offers[contractIndex][7144]: " + JSON.stringify(offers[contractIndex][7144]));
                     }
                     events.push([ parseInt(logIndex), contractIndex, eventType, event[2], event[3], event[4], tokens[contractIndex][punkId] ]);
@@ -1727,7 +1752,7 @@
                       punkIds[punkId] = 1;
                     }
                     if (punkId == 7144) {
-                      console.log("PunkNoLongerForSale " + blockNumber + " " + txIndex + " " + txHash + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
+                      console.log("PunkNoLongerForSale " + blockNumber + " " + txIndex + " " + txHashIndex + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
                       console.log("  offers[contractIndex][7144]: " + JSON.stringify(offers[contractIndex][7144]));
                     }
                     events.push([ parseInt(logIndex), contractIndex, eventType, event[2], tokens[contractIndex][punkId] ]);
@@ -1740,7 +1765,7 @@
                       punkIds[punkId] = 1;
                     }
                     // if (punkId == 0) {
-                    //   console.log("PunkBidEntered " + blockNumber + " " + txIndex + " " + txHash + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
+                    //   console.log("PunkBidEntered " + blockNumber + " " + txIndex + " " + txHashIndex + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
                     //   console.log("  v2Bids[0]: " + JSON.stringify(v2Bids[0]));
                     // }
                     events.push([ parseInt(logIndex), contractIndex, eventType, event[2], event[3], event[4] ]);
@@ -1753,7 +1778,7 @@
                       punkIds[punkId] = 1;
                     }
                     // if (punkId == 0) {
-                    //   console.log("PunkBidWithdrawn " + blockNumber + " " + txIndex + " " + txHash + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
+                    //   console.log("PunkBidWithdrawn " + blockNumber + " " + txIndex + " " + txHashIndex + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
                     //   console.log("  v2Bids[0]: " + JSON.stringify(v2Bids[0]));
                     // }
                     events.push([ parseInt(logIndex), contractIndex, eventType, event[2], event[3], event[4] ]);
@@ -1776,7 +1801,7 @@
                     }
                     events.push([ parseInt(logIndex), contractIndex, eventType, event[2], value, fromOwnerIndex, toOwnerIndex, bidAccepted ]);
                     // if (punkId == 0) {
-                    //   console.log("PunkBought " + blockNumber + " " + txIndex + " " + txHash + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
+                    //   console.log("PunkBought " + blockNumber + " " + txIndex + " " + txHashIndex + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
                     //   console.log("  v2Bids[0]: " + JSON.stringify(v2Bids[0]));
                     // }
 
@@ -1800,8 +1825,8 @@
                 }
                 const contractIndexList = Object.keys(contractIndexes).map(e => parseInt(e));
                 const punkIdList = Object.keys(punkIds).map(e => parseInt(e));
-                const txSummary = parsePunkTx(txHash, events, this.addressToIndex);
-                txs.push([ parseInt(blockNumber), parseInt(txIndex), txHash, txSummary, contractIndexList, punkIdList, events ]);
+                const txSummary = parsePunkTx(txHashIndex, events, this.addressToIndex);
+                txs.push([ parseInt(blockNumber), parseInt(txIndex), txHashIndex, txSummary, contractIndexList, punkIdList, events ]);
               }
               this.sync.completed++;
             }
@@ -1923,6 +1948,15 @@
             const indexToNameDataItems = await db.cache.where("objectName").equals(this.chainId + "_indexToName").toArray();
             if (indexToNameDataItems.length == 1) {
               Vue.set(this, 'indexToName', indexToNameDataItems[0].object);
+            }
+            const indexToTxHashDataItems = await db.cache.where("objectName").equals(this.chainId + "_indexToTxHash").toArray();
+            if (indexToTxHashDataItems.length == 1) {
+              Vue.set(this, 'indexToTxHash', indexToTxHashDataItems[0].object);
+              let txHashToIndex = {};
+              for (const [index, address] of this.indexToTxHash.entries()) {
+                txHashToIndex[address] = index;
+              }
+              Vue.set(this, 'txHashToIndex', txHashToIndex);
             }
             const blockTimestampsDataItems = await db.cache.where("objectName").equals(this.chainId + "_blockTimestamps").toArray();
             if (blockTimestampsDataItems.length == 1) {
