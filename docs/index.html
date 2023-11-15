@@ -448,7 +448,7 @@
 
                     <template #cell(to)="data">
                       <font size="-1">
-                        <b-link v-if="[0, 1, 2, 3, 4, 6, 9, 12, 13, 14, 15].includes(data.item[5][0])" :href="'https://etherscan.io/address/' + indexToAddress[data.item[5][2]]" v-b-popover.hover.bottom="'to. Click to view in etherscan.io'" target="_blank">
+                        <b-link v-if="[0, 1, 2, 3, 4, 6, 9, 10, 11, 12, 13, 14, 15].includes(data.item[5][0])" :href="'https://etherscan.io/address/' + indexToAddress[data.item[5][2]]" v-b-popover.hover.bottom="'to. Click to view in etherscan.io'" target="_blank">
                           <b-badge pill variant="light">{{ ensOrAddress(data.item[5][2], 24) }}</b-badge>
                         </b-link>
                       </font>
@@ -1344,18 +1344,20 @@
             // console.log("filteredActivity - this.settings.filters: " + JSON.stringify(this.settings.filters));
             // console.log(JSON.stringify(this.txs).substring(0, 1000));
             // let count = 0;
+
+            const selectedContractFilter = (this.settings.selectedContracts.length == 0 || this.settings.selectedContracts.length == 4) ? null : this.settings.selectedContracts;
+
             for (const tx of this.txs) {
               const timestamp = this.blockTimestamps[tx[0]] || "(unknown)";
               // if (count < 3) {
               //   console.log(JSON.stringify([ timestamp, ...tx ]));
               // }
               let include = true;
-              if (this.settings.selectedContracts.length == 0 || this.settings.selectedContracts.length == 4) {
-              } else {
+              if (selectedContractFilter) {
                 include = false;
                 const contractIndexes = tx[5];
                 for (let contractIndex of contractIndexes) {
-                  if (this.settings.selectedContracts.includes(contractIndex)) {
+                  if (selectedContractFilter.includes(contractIndex)) {
                     include = true;
                     break;
                   }
