@@ -173,8 +173,7 @@
                 <div class="mt-0 pr-1" style="max-width: 12.0rem;">
                   <b-form-input type="text" size="sm" v-model.trim="settings.filterByIds" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Filter by punk id(s) or first 3 (or more) characters of attribute names, e.g., `1 5-10 alien ape`. Replace spaces with `-`, e.g., `male-4`, `clown-nose` or `3d-gl`'" placeholder="🔍 id1 id2-id3 attrib1 ..."></b-form-input>
                 </div>
-                <!-- TODO -->
-                <div v-if="false" class="mt-0 pr-1" style="max-width: 12.0rem;">
+                <div class="mt-0 pr-1" style="max-width: 12.0rem;">
                   <b-form-input type="text" size="sm" v-model.trim="settings.filterByOwners" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Filter by owner(s)'" placeholder="🔍 0x12ab... 0x23bc..."></b-form-input>
                 </div>
                 <div v-if="settings.tabIndex == 1" class="mt-0 pr-1">
@@ -997,7 +996,21 @@
           },
           filteredPunks() {
             const results = [];
-            // console.log("filteredPunks - this.settings.filterByIds: " + JSON.stringify(this.settings.filterByIds));
+
+            let filteredOwners = null;
+            if (this.settings.filterByOwners) {
+              const searchOwners = this.settings.filterByOwners.split(/[, \t\n]+/).map(s => s.trim());
+              filteredOwners = [];
+              for (s of searchOwners) {
+                for (const [index, name] of Object.entries(this.indexToName)) {
+                  if (name.match(s)) {
+                    console.log("  " + index + " => " + name);
+                    filteredOwners = [...new Set([...filteredOwners, parseInt(index)])]
+                  }
+                }
+              }
+            }
+            console.log("filteredOwners: " + JSON.stringify(filteredOwners));
 
             let filteredIds = null;
             if (this.settings.filterByIds) {
