@@ -175,17 +175,14 @@
                 <div class="mt-0">
                   <b-button size="sm" :pressed.sync="settings.showFilter" @click="saveSettings" variant="link" v-b-popover.hover.top="'Show filter'"><span v-if="settings.showFilter"><b-icon-layout-sidebar-inset shift-v="+1" font-scale="1.0"></b-icon-layout-sidebar-inset></span><span v-else><b-icon-layout-sidebar shift-v="+1" font-scale="1.0"></b-icon-layout-sidebar></span></b-button>
                 </div>
-
                 <div class="mt-0 pr-1" style="max-width: 10.0rem;">
                   <b-form-input type="text" size="sm" v-model.trim="settings.filterByIds" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Filter by punk id(s)'" placeholder="🔍 id1 id2-id3"></b-form-input>
                 </div>
-
+                <!-- TODO -->
                 <div v-if="false" class="mt-0 pr-1" style="max-width: 10.0rem;">
                   <b-form-input type="text" size="sm" v-model.trim="settings.filterByOwners" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Filter by owner(s)'" placeholder="🔍 0x12ab... 0x23bc..."></b-form-input>
                 </div>
-
                 <div v-if="settings.tabIndex == 1" class="mt-0 pr-1">
-                  <!-- <b-form-checkbox-group size="sm" @input="saveSettings(); loadCurrentData();" v-model="settings.selectedContracts" :options="contractOptions" buttons button-variant="outline-primary" v-b-popover.hover.top="'Filter by [Wrapped] CryptoPunks V1 & V2'"></b-form-checkbox-group> -->
                   <b-form-checkbox-group size="sm" @input="saveSettings" v-model="settings.selectedContracts" :options="contractOptions" buttons button-variant="outline-primary" v-b-popover.hover.top="'Filter by [Wrapped] CryptoPunks V1 & V2'"></b-form-checkbox-group>
                 </div>
                 <div v-if="Object.keys(settings.filters).length > 0 || settings.filterByIds || settings.filterByOwners" class="mt-0 pr-1">
@@ -196,9 +193,6 @@
                     </b-iconstack>
                   </b-button>
                 </div>
-                <!-- <div class="mt-0 pr-1">
-                  <b-form-input type="text" size="sm" v-model.trim="settings.pairsTable.filter" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Base or quote symbol and name filter'" placeholder="🔍 sym/name regex" style="min-width: 8.0rem;"></b-form-input>
-                </div> -->
                 <div class="mt-0 flex-grow-1">
                 </div>
                 <div v-if="!sync.section" class="mt-0 pr-1">
