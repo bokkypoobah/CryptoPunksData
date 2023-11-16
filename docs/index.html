@@ -454,7 +454,7 @@
                       </font>
                     </template>
 
-                    <template #cell(punks)="data">
+                    <template #cell(punk)="data">
                       <font size="-1">
                         <!-- <span v-if="data.item[5][0] == 0">
                           <span v-for="punkId of data.item[5][3]">
@@ -492,7 +492,7 @@
                       </font>
                     </template>
 
-                    <template #cell(info)="data">
+                    <template #cell(value)="data">
 
                       <span v-if="[13].includes(data.item[5][0])">
                         <b-badge pill variant="light">{{ data.item[5][3] }}</b-badge>
@@ -1201,10 +1201,10 @@
             { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
             { key: 'timestamp', label: 'When', sortable: false, thStyle: 'width: 15%;', tdClass: 'text-truncate' },
             { key: 'action', label: 'Action', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'from', label: 'From/Account', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'from', label: 'From', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'to', label: 'To', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'punks', label: 'Punks', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-left' },
-            { key: 'info', label: 'Info/Value', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'punk', label: 'Punk', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'value', label: 'Value', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-left' },
             { key: 'events', label: 'Events', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
           ],
           punkAttributesFields: [
