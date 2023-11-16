@@ -273,13 +273,27 @@
                 <!-- 0:Home -->
                 <b-col class="m-0 p-0">
 
-                  <b-card no-body class="my-1 p-1">
-                    <b-card-body v-if="settings.showInfo || coinbase == null" class="mt-1 p-1">
+                  <b-card v-if="settings.showInfo || coinbase == null" no-body class="my-1 p-1">
+                    <b-card-body class="mt-1 p-1">
                       <h4>Welcome</h4>
-                      This dapp retrieves event logs via your browser's web3 connection for the CryptoPunks V1 and V2, and Wrapped CryptoPunks V1 and V2 contracts.
-                      <br />
+                      This dapp retrieves historical log events for CryptoPunks, collates the data, and provides an interface for users to query the data.
                       <br />
                       This dapp currently takes about 10 minutes to retrieve the data initially, and about a minute to sync subsequently.
+                      <h5 class="mt-3">How This Works</h5>
+                      <ul>
+                        <li>Event logs are retrieved via your browser's web3 connection for the CryptoPunks V1 and V2, and Wrapped CryptoPunks V1 and V2 contracts.</li>
+                        <li>Block timestamps are retrieved from the <b-link href="https://api.thegraph.com/subgraphs/name/blocklytics/ethereum-blocks" target="_blank">https://api.thegraph.com/subgraphs/name/blocklytics/ethereum-blocks</b-link> subgraph API endpoint.</li>
+                        <li>The resulting data is collated and presented in this dapp.</li>
+                      </ul>
+                      <h5 class="mt-2">Requirements</h5>
+                      <ul>
+                        <li>This dapp runs on a web3 enabled desktop browser connected to the Ethereum mainnet</li>
+                      </ul>
+                      <h5 class="mt-2">References</h5>
+                      <ul>
+                        <li>Dapp: <b-link href="https://bokkypoobah.github.io/CryptoPunksData/" target="_blank">https://bokkypoobah.github.io/CryptoPunksData/</b-link></li>
+                        <li>GitHub: <b-link href="https://github.com/bokkypoobah/CryptoPunksData" target="_blank">https://github.com/bokkypoobah/CryptoPunksData</b-link></li>
+                      </ul>
                     </b-card-body>
                   </b-card>
 
