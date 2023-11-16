@@ -971,7 +971,7 @@
             let filteredIds = null;
             if (this.settings.filterByIds) {
               const searchIds = this.settings.filterByIds.split(/[, \t\n]+/).map(s => s.trim());
-              console.log("filteredPunks - searchIds: " + JSON.stringify(searchIds));
+              // console.log("filteredPunks - searchIds: " + JSON.stringify(searchIds));
               filteredIds = [];
               for (s of searchIds) {
                 var range = s.match(/(\d+)-(\d+)/)
@@ -1052,23 +1052,31 @@
 
           filteredActivity() {
             const results = [];
-            // console.log("filteredActivity - this.settings.filters: " + JSON.stringify(this.settings.filters));
-            // console.log(JSON.stringify(this.txs).substring(0, 1000));
-            // let count = 0;
-
+            let filteredIds = null;
+            const punks = this.filteredPunks;
+            if (punks.length != 10000) {
+              filteredIds = {};
+              for (const punk of this.filteredPunks) {
+                filteredIds[punk.punkId] = true;;
+              }
+            }
             const selectedContractFilter = (this.settings.selectedContracts.length == 0 || this.settings.selectedContracts.length == 4) ? null : this.settings.selectedContracts;
-
             for (const tx of this.txs) {
               const timestamp = this.blockTimestamps[tx[0]] || "(unknown)";
-              // if (count < 3) {
-              //   console.log(JSON.stringify([ timestamp, ...tx ]));
-              // }
               let include = true;
               if (selectedContractFilter) {
                 include = false;
-                const contractIndexes = tx[5];
-                for (let contractIndex of contractIndexes) {
+                for (let contractIndex of tx[5]) {
                   if (selectedContractFilter.includes(contractIndex)) {
+                    include = true;
+                    break;
+                  }
+                }
+              }
+              if (include && filteredIds) {
+                include = false;
+                for (let punkId of tx[6]) {
+                  if (punkId in filteredIds) {
                     include = true;
                     break;
                   }
@@ -1077,38 +1085,7 @@
               if (include) {
                 results.push([ timestamp, ...tx ]);
               }
-              // count++;
             }
-            // console.log(JSON.stringify(results));
-
-            // let stage1Data = this.punkAttributes;
-            // if (Object.keys(this.settings.filters).length == 0) {
-            //   for (const [punkId, attributes] of this.punkAttributes.entries()) {
-            //     results.push({ punkId, attributes });
-            //   }
-            // } else {
-            //   let selectedTokenIds = [];
-            //   for (const [attributeType, attributeList] of Object.entries(this.settings.filters)) {
-            //     let thisAttributeTypeTokenIds = [];
-            //     for (const attribute of Object.keys(attributeList)) {
-            //       for (const attributeInfo of this.punkAttributesWithTokenIds) {
-            //         if (attributeInfo.attributeType == attributeType) {
-            //           const tokenIds = attributeInfo.attributeList.filter(e => e.attribute == attribute).map(e => e.punks).flat();
-            //           thisAttributeTypeTokenIds = [...thisAttributeTypeTokenIds, ...tokenIds];
-            //           break;
-            //         }
-            //       }
-            //     }
-            //     if (selectedTokenIds.length == 0) {
-            //       selectedTokenIds = thisAttributeTypeTokenIds;
-            //     } else {
-            //       selectedTokenIds = selectedTokenIds.filter(tokenId => thisAttributeTypeTokenIds.includes(tokenId));
-            //     }
-            //   }
-            //   for (const punkId of selectedTokenIds) {
-            //     results.push({ punkId, attributes: this.punkAttributes[punkId] });
-            //   }
-            // }
             // console.log(moment().format("HH:mm:ss") + " filteredActivity - results: " + JSON.stringify(results.slice(0, 10)) + ", ...");
             return results;
           },
