@@ -1035,7 +1035,7 @@
                 }
               }
             }
-            console.log("filteredOwners: " + JSON.stringify(filteredOwners));
+            console.log(moment().format("HH:mm:ss") + " filteredPunks - filteredOwners: " + JSON.stringify(filteredOwners));
 
             let filteredIds = null;
             if (this.settings.filterByIds) {
@@ -1190,38 +1190,59 @@
 
           filteredOwners() {
             const results = [];
-            let filteredIds = null;
+            // console.log(moment().format("HH:mm:ss") + " filteredOwners - tokens: " + JSON.stringify(this.tokens, null, 2));
             const punks = this.filteredPunks;
-            if (punks.length != 10000) {
-              filteredIds = {};
+
+            if (punks.length == 10000) {
+              for (let i = 0; i < 10000; i++) {
+                const v1OwnerIndex = this.tokens[1] && this.tokens[1][i] || null;
+                const v2OwnerIndex = this.tokens[2] && this.tokens[2][i] || null;
+                const w1OwnerIndex = this.tokens[3] && this.tokens[3][i] || null;
+                const w2OwnerIndex = this.tokens[4] && this.tokens[4][i] || null;
+                console.log(moment().format("HH:mm:ss") + " filteredOwners - " + i + " " + v1OwnerIndex + " " + v2OwnerIndex + " " + w1OwnerIndex + " " + w2OwnerIndex);
+              }
+            } else {
               for (const punk of this.filteredPunks) {
-                filteredIds[punk.punkId] = true;;
+                const v1OwnerIndex = this.tokens[1] && this.tokens[1][punk.punkId] || null;
+                const v2OwnerIndex = this.tokens[2] && this.tokens[2][punk.punkId] || null;
+                const w1OwnerIndex = this.tokens[3] && this.tokens[3][punk.punkId] || null;
+                const w2OwnerIndex = this.tokens[4] && this.tokens[4][punk.punkId] || null;
+                console.log(moment().format("HH:mm:ss") + " filteredOwners - filtered: " + punk.punkId + " " + v1OwnerIndex + " " + v2OwnerIndex + " " + w1OwnerIndex + " " + w2OwnerIndex);
               }
             }
-            const selectedContractFilter = (this.settings.selectedContracts.length == 0 || this.settings.selectedContracts.length == 4) ? null : this.settings.selectedContracts;
-            for (const tx of this.txs) {
-              const timestamp = this.blockTimestamps[tx[0]] || "(unknown)";
-              let include = true;
-              if (selectedContractFilter) {
-                include = false;
-                for (let contractIndex of tx[5]) {
-                  if (selectedContractFilter.includes(contractIndex)) {
-                    include = true;
-                    break;
-                  }
-                }
-              }
-              if (include && filteredIds) {
-                include = false;
-                const punkId = tx[4] && tx[4][3] && parseInt(tx[4][3]);
-                if (punkId in filteredIds) {
-                  include = true;
-                }
-              }
-              if (include) {
-                results.push([ timestamp, ...tx ]);
-              }
-            }
+
+            // let filteredIds = null;
+            // const punks = this.filteredPunks;
+            // if (punks.length != 10000) {
+            //   filteredIds = {};
+            //   for (const punk of this.filteredPunks) {
+            //     filteredIds[punk.punkId] = true;;
+            //   }
+            // }
+            // const selectedContractFilter = (this.settings.selectedContracts.length == 0 || this.settings.selectedContracts.length == 4) ? null : this.settings.selectedContracts;
+            // for (const tx of this.txs) {
+            //   const timestamp = this.blockTimestamps[tx[0]] || "(unknown)";
+            //   let include = true;
+            //   if (selectedContractFilter) {
+            //     include = false;
+            //     for (let contractIndex of tx[5]) {
+            //       if (selectedContractFilter.includes(contractIndex)) {
+            //         include = true;
+            //         break;
+            //       }
+            //     }
+            //   }
+            //   if (include && filteredIds) {
+            //     include = false;
+            //     const punkId = tx[4] && tx[4][3] && parseInt(tx[4][3]);
+            //     if (punkId in filteredIds) {
+            //       include = true;
+            //     }
+            //   }
+            //   if (include) {
+            //     results.push([ timestamp, ...tx ]);
+            //   }
+            // }
             // console.log(moment().format("HH:mm:ss") + " filteredOwners - results: " + JSON.stringify(results.slice(0, 10)) + ", ...");
             return results;
           },
