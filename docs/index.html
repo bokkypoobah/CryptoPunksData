@@ -175,6 +175,15 @@
                 <div class="mt-0">
                   <b-button size="sm" :pressed.sync="settings.showFilter" @click="saveSettings" variant="link" v-b-popover.hover.top="'Show filter'"><span v-if="settings.showFilter"><b-icon-layout-sidebar-inset shift-v="+1" font-scale="1.0"></b-icon-layout-sidebar-inset></span><span v-else><b-icon-layout-sidebar shift-v="+1" font-scale="1.0"></b-icon-layout-sidebar></span></b-button>
                 </div>
+
+                <div class="mt-0 pr-1" style="max-width: 8.0rem;">
+                  <b-form-input type="text" size="sm" v-model.trim="settings.filterByIds" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Filter by punk id(s)'" placeholder="🔍 id1 id2-id3"></b-form-input>
+                </div>
+
+                <div class="mt-0 pr-1" style="max-width: 8.0rem;">
+                  <b-form-input type="text" size="sm" v-model.trim="settings.filterByOwners" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Filter by owner(s)'" placeholder="🔍 0x12ab... 0x23bc..."></b-form-input>
+                </div>
+
                 <div v-if="settings.tabIndex == 1" class="mt-0 pr-1">
                   <!-- <b-form-checkbox-group size="sm" @input="saveSettings(); loadCurrentData();" v-model="settings.selectedContracts" :options="contractOptions" buttons button-variant="outline-primary" v-b-popover.hover.top="'Filter by [Wrapped] CryptoPunks V1 & V2'"></b-form-checkbox-group> -->
                   <b-form-checkbox-group size="sm" @input="saveSettings" v-model="settings.selectedContracts" :options="contractOptions" buttons button-variant="outline-primary" v-b-popover.hover.top="'Filter by [Wrapped] CryptoPunks V1 & V2'"></b-form-checkbox-group>
@@ -193,13 +202,13 @@
                 <div class="mt-0 flex-grow-1">
                 </div>
                 <div v-if="!sync.section" class="mt-0 pr-1">
-                  <b-button size="sm" @click="syncCryptoPunksData(false)" variant="primary" v-b-popover.hover.top="'Sync CryptoPunksData. This will take ~10 minutes initially, and ~0.5 minutes subsequently'">Sync</b-button>
+                  <b-button size="sm" @click="syncCryptoPunksData(false)" variant="primary" v-b-popover.hover.top="'Sync CryptoPunksData. This will take ~10 minutes initially, and ~2 minutes subsequently'">Sync</b-button>
                 </div>
                 <div v-if="!sync.section" class="mt-0 pr-1">
-                  <b-button size="sm" @click="syncCryptoPunksData(true)" variant="outline-primary" v-b-popover.hover.top="'Sync CryptoPunksData. This will take ~10 minutes initially, and ~0.5 minutes subsequently'">Sync(devMode)</b-button>
+                  <b-button size="sm" @click="syncCryptoPunksData(true)" variant="outline-primary" v-b-popover.hover.top="'Sync CryptoPunksData in Dev mode. This will take ~10 minutes initially, and ~2 minutes subsequently'">Dev</b-button>
                 </div>
-                <div class="mt-0" style="width: 350px;">
-                  <b-progress v-if="sync.section != null" height="1.5rem" :max="sync.total" show-progress :animated="sync.section != null" :variant="sync.section != null ? 'success' : 'secondary'" v-b-popover.hover.top="'{processed blocked number}/{latest block number}. Click the button on the right to stop this process. This process can be continued later'">
+                <div v-if="sync.section" class="mt-1" style="width: 350px;">
+                  <b-progress height="1.5rem" :max="sync.total" show-progress :animated="!sync.section" :variant="!sync.section ? 'success' : 'secondary'" v-b-popover.hover.top="'{processed blocked number}/{latest block number}. Click the button on the right to stop this process. This process can be continued later'">
                     <b-progress-bar :value="sync.completed">
                       {{ sync.total == null || sync.total == 0 ? (sync.completed + ' ' + sync.section) : (sync.completed + '/' + sync.total + ' ' + ((sync.completed / sync.total) * 100).toFixed(0) + '% ' + sync.section) }}
                     </b-progress-bar>
@@ -237,8 +246,7 @@
               </div>
             </b-card-text>
 
-            <!-- 0:Home -->
-            <b-card-text v-if="settings.tabIndex == 0" class="m-0 p-0">
+            <b-card-text class="m-0 p-0">
               <b-row class="m-0 p-0">
                 <b-col v-if="settings.showFilter" cols="2" class="m-0 p-0 border-0">
                   <b-card no-header no-body class="m-0 p-0 border-0">
@@ -269,7 +277,9 @@
                     </b-card-body>
                   </b-card>
                 </b-col>
-                <b-col class="m-0 p-0 pl-1">
+
+                <!-- 0:Home -->
+                <b-col v-if="settings.tabIndex == 0" class="m-0 p-0 pl-1">
                   <!-- <b-table small fixed striped responsive hover selectable select-mode="single" @row-selected="pairsRowSelected" :fields="pairsFields" :items="pagedFilteredSortedPairs" show-empty empty-html="Click Sync above to retrieve existing pairs" head-variant="light" class="mx-0 my-1"> -->
                   <b-table small fixed striped responsive hover :fields="punksFields" :items="pagedFilteredSortedPunks" show-empty empty-html="Click Sync above to retrieve punk history" head-variant="light" class="mx-0 my-1">
                     <template #cell(punkId)="data">
@@ -324,42 +334,8 @@
                     </template>
                   </b-table>
                 </b-col>
-              </b-row>
-            </b-card-text>
 
-            <!-- 1:Activity -->
-            <b-card-text v-if="settings.tabIndex == 1" class="m-0 p-0">
-              <b-row class="m-0 p-0">
-                <b-col v-if="settings.showFilter" cols="2" class="m-0 p-0 border-0">
-                  <b-card no-header no-body class="m-0 p-0 border-0">
-                    <!-- <b-card-body class="m-0 p-1" style="flex-grow: 1; max-height: 3000px; overflow-y: auto;"> -->
-                    <b-card-body class="m-0 mt-2 px-2 py-1" style="flex-grow: 1; max-height: 3000px; overflow-y: auto;">
-                      <div v-for="punkAttribute of punkAttributesWithTokenIds">
-                        <b-card header-class="m-0 px-2 pt-2 pb-0" body-class="p-0" class="m-0 p-0 border-0">
-                          <template #header>
-                            <span variant="secondary" class="small truncate">
-                              {{ slugToTitle(punkAttribute.attributeType) }}
-                            </span>
-                          </template>
-                        </b-card>
-                        <font size="-2">
-                          <b-table small fixed striped sticky-header="200px" :fields="punkAttributesFields" :items="punkAttribute.attributeList" head-variant="light">
-                            <template #cell(select)="data">
-                              <b-form-checkbox size="sm" :checked="(settings.filters[punkAttribute.attributeType] && settings.filters[punkAttribute.attributeType][data.item.attribute]) ? 1 : 0" value="1" @change="filterChanged(punkAttribute.attributeType, data.item.attribute)"></b-form-checkbox>
-                            </template>
-                            <template #cell(attributeOption)="data">
-                              {{ slugToTitle(data.item.attribute) }}
-                            </template>
-                            <template #cell(attributeTotal)="data">
-                              {{ data.item.punks.length }}
-                            </template>
-                          </b-table>
-                        </font>
-                      </div>
-                    </b-card-body>
-                  </b-card>
-                </b-col>
-                <b-col class="m-0 p-0 pl-1">
+                <b-col v-if="settings.tabIndex == 1" class="m-0 p-0 pl-1">
                   <b-table small fixed striped responsive hover :fields="activityFields" :items="pagedFilteredSortedActivity" show-empty empty-html="Click Sync above to retrieve punk history" head-variant="light" class="mx-0 my-1">
 
                     <template #head(timestamp)="data">
@@ -785,27 +761,8 @@
                               <!-- //    w2 event ProxyRegistered(address user, address proxy); -->
                             </span>
                             &nbsp;&nbsp;
-
-                            <!--
-                            // v1 v2 event Assign(address indexed to, uint256 punkIndex);
-                            // v1 v2 event Transfer(address indexed from, address indexed to, uint256 value);
-                            // v1 v2 event PunkTransfer(address indexed from, address indexed to, uint256 punkIndex);
-                            // v1 v2 event PunkOffered(uint indexed punkIndex, uint minValue, address indexed toAddress);
-                            // v1 v2 event PunkBought(uint indexed punkIndex, uint value, address indexed fromAddress, address indexed toAddress);
-                            // v1 v2 event PunkNoLongerForSale(uint indexed punkIndex);
-                            //    v2 event PunkBidEntered(uint indexed punkIndex, uint value, address indexed fromAddress);
-                            //    v2 event PunkBidWithdrawn(uint indexed punkIndex, uint value, address indexed fromAddress);
-                            // w1 w2 event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
-                            // w1 w2 event Transfer(address indexed from, address indexed to, uint256 indexed tokenId);
-                            // w1 w2 event Approval(address indexed owner, address indexed approved, uint256 indexed tokenId);
-                            // w1 w2 event ApprovalForAll(address indexed owner, address indexed operator, bool approved);
-                            //    w2 event Paused(address account);
-                            //    w2 event Unpaused(address account);
-                            //    w2 event ProxyRegistered(address user, address proxy);
-                            -->
                           </span>
                         </font>
-
                         <!-- <font size="-2">
                           <pre>
 {{ data.item }}
@@ -966,50 +923,14 @@
                             <!-- //    w2 event ProxyRegistered(address user, address proxy); -->
                           </span>
                           &nbsp;&nbsp;
-
-                          <!--
-                          // v1 v2 event Assign(address indexed to, uint256 punkIndex);
-                          // v1 v2 event Transfer(address indexed from, address indexed to, uint256 value);
-                          // v1 v2 event PunkTransfer(address indexed from, address indexed to, uint256 punkIndex);
-                          // v1 v2 event PunkOffered(uint indexed punkIndex, uint minValue, address indexed toAddress);
-                          // v1 v2 event PunkBought(uint indexed punkIndex, uint value, address indexed fromAddress, address indexed toAddress);
-                          // v1 v2 event PunkNoLongerForSale(uint indexed punkIndex);
-                          //    v2 event PunkBidEntered(uint indexed punkIndex, uint value, address indexed fromAddress);
-                          //    v2 event PunkBidWithdrawn(uint indexed punkIndex, uint value, address indexed fromAddress);
-                          // w1 w2 event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
-                          // w1 w2 event Transfer(address indexed from, address indexed to, uint256 indexed tokenId);
-                          // w1 w2 event Approval(address indexed owner, address indexed approved, uint256 indexed tokenId);
-                          // w1 w2 event ApprovalForAll(address indexed owner, address indexed operator, bool approved);
-                          //    w2 event Paused(address account);
-                          //    w2 event Unpaused(address account);
-                          //    w2 event ProxyRegistered(address user, address proxy);
-                          -->
                         </span>
                       </font>
                     </template>
-                    <!-- <template #cell(punkId)="data">
-                      <b-link :href="'https://cryptopunks.app/cryptopunks/details/' + data.item.punkId" v-b-popover.hover.bottom="'View in original website'" target="_blank">
-                        {{ data.item.punkId }}
-                      </b-link>
-                    </template>
-                    <template #cell(image)="data">
-                      <b-link :href="'https://cryptopunks.app/cryptopunks/details/' + data.item.punkId" v-b-popover.hover.bottom="'View in original website'" target="_blank">
-                        <b-img-lazy width="100%" :src="'images/punks/punk' + data.item.punkId.toString().padStart(4, '0') + '.png'" style="background-color: #638596"/>
-                      </b-link>
-                    </template>
-                    <template #cell(attribute)="data">
-                      <span v-for="(attribute, attributeIndex) in data.item.attributes" v-bind:key="attributeIndex">
-                        <b-badge size="sm" pill variant="light" v-b-popover.hover.bottom="slugToTitle(attribute.trait_type)" class="mr-1">{{ slugToTitle(attribute.value) }}</b-badge>
-                      </span>
-                    </template> -->
                   </b-table>
-                  <!-- <b-table small fixed striped responsive hover :items="pagedFilteredSortedActivity" show-empty empty-html="Click Sync above to retrieve punk activity" head-variant="light" class="mx-0 my-1">
-                  </b-table> -->
                 </b-col>
               </b-row>
             </b-card-text>
           </b-card>
-
         </b-card>
 
         <b-card no-header body-class="m-0 p-0" class="m-0 p-0 border-0">
