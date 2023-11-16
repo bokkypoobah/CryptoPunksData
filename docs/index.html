@@ -208,6 +208,9 @@
                 </div>
                 <div class="mt-0 flex-grow-1">
                 </div>
+                <div class="mt-0 pl-1">
+                  <b-button size="sm" :pressed.sync="settings.showInfo" @click="saveSettings" variant="link" v-b-popover.hover.top="'Show info'"><span v-if="settings.showInfo"><b-icon-info-circle-fill shift-v="+1" font-scale="1.0"></b-icon-info-circle-fill></span><span v-else><b-icon-info-circle shift-v="+1" font-scale="1.0"></b-icon-info-circle></span></b-button>
+                </div>
                 <div v-if="settings.tabIndex == 0" class="mt-0 pl-1">
                   <b-form-select size="sm" v-model="settings.punksTable.sortOption" @change="saveSettings" :options="punksSortOptions" v-b-popover.hover.top="'Yeah. Sort'"></b-form-select>
                 </div>
@@ -268,8 +271,19 @@
                 </b-col>
 
                 <!-- 0:Home -->
-                <b-col v-if="settings.tabIndex == 0" class="m-0 p-0 pl-1">
-                  <b-table small fixed striped responsive hover :fields="punksFields" :items="pagedFilteredSortedPunks" show-empty empty-html="Click Sync above to retrieve punk history" head-variant="light" class="mx-0 my-1">
+                <b-col class="m-0 p-0">
+
+                  <b-card no-body class="my-1 p-1">
+                    <b-card-body v-if="settings.showInfo || coinbase == null" class="mt-1 p-1">
+                      <h4>Welcome</h4>
+                      This dapp retrieves event logs via your browser's web3 connection for the CryptoPunks V1 and V2, and Wrapped CryptoPunks V1 and V2 contracts.
+                      <br />
+                      <br />
+                      This dapp currently takes about 10 minutes to retrieve the data initially, and about a minute to sync subsequently.
+                    </b-card-body>
+                  </b-card>
+
+                  <b-table v-if="settings.tabIndex == 0 && !settings.showInfo" small fixed striped responsive hover :fields="punksFields" :items="pagedFilteredSortedPunks" show-empty empty-html="Click Sync above to retrieve punk history" head-variant="light" class="mx-0 my-1">
                     <template #cell(punkId)="data">
                       <b-link :href="'https://cryptopunks.app/cryptopunks/details/' + data.item.punkId" v-b-popover.hover.bottom="'View in original website'" target="_blank">
                         {{ data.item.punkId }}
@@ -320,10 +334,8 @@
                       </span>
                     </template>
                   </b-table>
-                </b-col>
 
-                <b-col v-if="settings.tabIndex == 1" class="m-0 p-0 pl-1">
-                  <b-table small fixed striped responsive hover :fields="activityFields" :items="pagedFilteredSortedActivity" show-empty empty-html="Click Sync above to retrieve punk history" head-variant="light" class="mx-0 my-1">
+                  <b-table v-if="settings.tabIndex == 1 && !settings.showInfo" small fixed striped responsive hover :fields="activityFields" :items="pagedFilteredSortedActivity" show-empty empty-html="Click Sync above to retrieve punk history" head-variant="light" class="mx-0 my-1">
                     <template #head(timestamp)="data">
                       <b-link size="sm" @click="toggleUTCMode" variant="link" v-b-popover.hover.top="'Switch between local time or UTC time'">{{ settings.utcMode ? 'UTC Time' : 'Local Time' }}</b-link>
                     </template>
@@ -770,6 +782,7 @@
           settings: {
             tabIndex: 0,
             showFilter: false,
+            showInfo: false,
             filterByIds: null,
             filterByOwners: null,
             filters: {},
@@ -795,7 +808,7 @@
               pageSize: 10,
               sortOption: 'groupnameasc',
             },
-            version: 9,
+            version: 10,
           },
 
           sync: {
