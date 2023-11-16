@@ -276,23 +276,27 @@
                   <b-card v-if="settings.showInfo || coinbase == null" no-body class="my-1 p-1">
                     <b-card-body class="mt-1 p-1">
                       <h4>Welcome</h4>
-                      This dapp retrieves historical log events for CryptoPunks, collates the data, and provides an interface for users to query the data.
-                      <br />
+                      This dapp retrieves historical log events from the <b-link href="https://cryptopunks.app/" target="_blank">CryptoPunks</b-link> contract on the Ethereum mainnet, collates the data, and provides an interface for users to query the data.
                       This dapp currently takes about 10 minutes to retrieve the data initially, and about a minute to sync subsequently.
-                      <h5 class="mt-3">How This Works</h5>
+                      <h5 class="mt-4">How This Works</h5>
                       <ul>
-                        <li>Event logs are retrieved via your browser's web3 connection for the CryptoPunks V1 and V2, and Wrapped CryptoPunks V1 and V2 contracts.</li>
-                        <li>Block timestamps are retrieved from the <b-link href="https://api.thegraph.com/subgraphs/name/blocklytics/ethereum-blocks" target="_blank">https://api.thegraph.com/subgraphs/name/blocklytics/ethereum-blocks</b-link> subgraph API endpoint.</li>
-                        <li>The resulting data is collated and presented in this dapp.</li>
+                        <li>Event logs are retrieved via your browser's web3 connection for the CryptoPunks V1 and V2, and Wrapped CryptoPunks V1 and V2 contracts</li>
+                        <li>Block timestamps are retrieved from the <b-link href="https://api.thegraph.com/subgraphs/name/blocklytics/ethereum-blocks" target="_blank">https://api.thegraph.com/subgraphs/name/blocklytics/ethereum-blocks</b-link> subgraph API endpoint</li>
+                        <li>The resulting data is collated and presented in this dapp</li>
                       </ul>
-                      <h5 class="mt-2">Requirements</h5>
+                      <h5 class="mt-3">Requirements</h5>
                       <ul>
-                        <li>This dapp runs on a web3 enabled desktop browser connected to the Ethereum mainnet</li>
+                        <li>This dapp runs in web3 enabled desktop browsers connected to the Ethereum mainnet</li>
                       </ul>
-                      <h5 class="mt-2">References</h5>
+                      <h5 class="mt-3">References</h5>
                       <ul>
                         <li>Dapp: <b-link href="https://bokkypoobah.github.io/CryptoPunksData/" target="_blank">https://bokkypoobah.github.io/CryptoPunksData/</b-link></li>
                         <li>GitHub: <b-link href="https://github.com/bokkypoobah/CryptoPunksData" target="_blank">https://github.com/bokkypoobah/CryptoPunksData</b-link></li>
+                      </ul>
+                      <h5 class="mt-3">Some Info</h5>
+                      <ul>
+                        <li>Three v1 CryptoPunks were claimed with invalid ids <b-link href="https://etherscan.io/tx/0x39d77a95637640b6291bea0b015be4f6578c95f9a57af6a9399dabd70b56d50c" target="_blank">9845944</b-link>, <b-link href="https://etherscan.io/tx/0xdc37a82d43eb253077abd4618683efea615fc8573bfc669568fab04098ab24b1" target="_blank">76623</b-link> and <b-link href="https://etherscan.io/tx/0x7da83b5002251ca83537aef8833f443263a9109a1ccca502b0b03a0529813aa2" target="_blank">0xffff...ffff</b-link>. This resulted in 3 unassigned v1 CryptoPunks 1416, 1838 and 1841</li>
+                        <li>LarvaLabs airdropped these unassigned v2 CryptoPunk <b-link href="https://cryptopunks.app/cryptopunks/details/1416" target="_blank">1416</b-link>, <b-link href="https://cryptopunks.app/cryptopunks/details/1838" target="_blank">1838</b-link> and <b-link href="https://cryptopunks.app/cryptopunks/details/1841" target="_blank">1841</b-link> to <b-link href="https://etherscan.io/address/0x5b098b00621eda6a96b7a476220661ad265f083f" target="_blank">0x5b098b...</b-link></li>
                       </ul>
                     </b-card-body>
                   </b-card>
@@ -1737,26 +1741,16 @@
               console.log("error: " + error);
             });
             this.txs = txs;
-
-            // V1 1416, 1838 and 1841 are unclaimed, Due to claim of invalid punkIds 9845944 (0x39d77a95637640b6291bea0b015be4f6578c95f9a57af6a9399dabd70b56d50c), 76623 (0xdc37a82d43eb253077abd4618683efea615fc8573bfc669568fab04098ab24b1) and 0xffff...ffff (0x7da83b5002251ca83537aef8833f443263a9109a1ccca502b0b03a0529813aa2)
-            // V2 1416, 1838 and 1841 were assigned to 0x5b098b00621eda6a96b7a476220661ad265f083f
             for (let punkId = 0; punkId < 10000; punkId++) {
               if (!(punkId in tokens[1])) {
-                // console.log("Not found - punkId: " + punkId);
                 tokens[1][punkId] = 0; // 0x0000...0000
               }
             }
-            // console.log("tokens[2][9478]: " + JSON.stringify(this.indexToAddress[tokens[2][9478]], null, 2));
-            // console.log("tokens[2]: " + JSON.stringify(tokens[2], null, 2));
             await db.cache.put({ objectName: this.chainId + "_tokens", object: tokens }).then (function() {
             }).catch(function(error) {
               console.log("error: " + error);
             });
             this.tokens = tokens;
-
-            // console.log(moment().format("HH:mm:ss") + " processData - combined: " + JSON.stringify(combined));
-            // console.log(moment().format("HH:mm:ss") + " processData - combined['18527112']: " + JSON.stringify(combined['18527112']));
-            // console.log(moment().format("HH:mm:ss") + " processData - Object.keys(combined).length: " + Object.keys(combined).length);
             console.log(moment().format("HH:mm:ss") + " processData END");
           },
 
