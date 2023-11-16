@@ -53,13 +53,8 @@
             <em v-b-popover.hover.bottom="'gm gm gm'">CryptoPunksData</em>
           </b-navbar-brand>
           <b-navbar-nav class="ml-auto">
-            <b-nav-item size="sm" @click="settings.tabIndex = 0; saveSettings()" :active="settings.tabIndex == 0" active-class="active" v-b-popover.hover="'Welcome screen with info'">Home</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 0; saveSettings()" :active="settings.tabIndex == 0" active-class="active" v-b-popover.hover="'View Punks'">Punks</b-nav-item>
             <b-nav-item size="sm" @click="settings.tabIndex = 1; saveSettings()" :active="settings.tabIndex == 1" active-class="active" v-b-popover.hover="'View Activity'">Activity</b-nav-item>
-            <!-- <b-nav-item size="sm" @click="settings.tabIndex = 2; saveSettings()" :active="settings.tabIndex == 2" active-class="active" v-b-popover.hover="'View/sync Pair'">Pair</b-nav-item> -->
-            <!-- <b-nav-item size="sm" @click="settings.tabIndex = 3; saveSettings()" :active="settings.tabIndex == 3" active-class="active" v-b-popover.hover="'View/edit ERC-20 tokens'">Tokens</b-nav-item> -->
-            <!-- <b-nav-item size="sm" @click="settings.tabIndex = 4; saveSettings()" :active="settings.tabIndex == 4" active-class="active" v-b-popover.hover="'Execute raw Chadex transactions'">Raw</b-nav-item> -->
-            <!-- <b-nav-item size="sm" @click="settings.tabIndex = 5; saveSettings()" :active="settings.tabIndex == 5" active-class="active" v-b-popover.hover="'View info'">Info</b-nav-item> -->
-            <!-- <b-nav-item size="sm" @click="settings.tabIndex = 5; saveSettings()" :active="settings.tabIndex == 5" active-class="active" v-b-popover.hover="'View/edit my accounts'">Accounts</b-nav-item> -->
             <b-avatar v-if="coinbase && coinbase != ensOrAddress(coinbase)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensOrAddress(coinbase)" v-b-popover.hover="'Your ENS avatar if set'"></b-avatar>
             <b-button size="sm" variant="outline-primary" class="ml-1" @click="processIt('connect'); syncAll();" v-b-popover.hover.bottom="'Click to update wallet'">{{ coinbase ? ensOrAddress(coinbase, 16) : 'Connect' }}</b-button>
           </b-navbar-nav>
@@ -176,7 +171,7 @@
                   <b-button size="sm" :pressed.sync="settings.showFilter" @click="saveSettings" variant="link" v-b-popover.hover.top="'Show filter'"><span v-if="settings.showFilter"><b-icon-layout-sidebar-inset shift-v="+1" font-scale="1.0"></b-icon-layout-sidebar-inset></span><span v-else><b-icon-layout-sidebar shift-v="+1" font-scale="1.0"></b-icon-layout-sidebar></span></b-button>
                 </div>
                 <div class="mt-0 pr-1" style="max-width: 12.0rem;">
-                  <b-form-input type="text" size="sm" v-model.trim="settings.filterByIds" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Filter by punk id(s) or first 3 (or more) characters of attribute names, e.g., `1 5-10 alien ape`'" placeholder="🔍 id1 id2-id3 attrib1 ..."></b-form-input>
+                  <b-form-input type="text" size="sm" v-model.trim="settings.filterByIds" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Filter by punk id(s) or first 3 (or more) characters of attribute names, e.g., `1 5-10 alien ape`. Replace spaces with `-`, e.g., `male-4`, `clown-nose` or `3d-gl`'" placeholder="🔍 id1 id2-id3 attrib1 ..."></b-form-input>
                 </div>
                 <!-- TODO -->
                 <div v-if="false" class="mt-0 pr-1" style="max-width: 12.0rem;">
@@ -773,14 +768,13 @@
           timestamp: null,
 
           settings: {
-            selectedContracts: [],
-            utcMode: false,
             tabIndex: 0,
             showFilter: false,
-            showAdditionalFilters: false,
             filterByIds: null,
             filterByOwners: null,
             filters: {},
+            selectedContracts: [],
+            utcMode: false,
             punksTable: {
               filter: null,
               currentPage: 1,
@@ -801,20 +795,7 @@
               pageSize: 10,
               sortOption: 'groupnameasc',
             },
-            transfersTable: {
-              filter: null,
-              currentPage: 1,
-              pageSize: 10,
-              sortOption: 'blocknumberdsc',
-            },
-            tokensTable: {
-              tokenFilter: null,
-              collectionFilter: null,
-              currentPage: 1,
-              pageSize: 10,
-              sortOption: 'lastsaledsc',
-            },
-            version: 8,
+            version: 9,
           },
 
           sync: {
