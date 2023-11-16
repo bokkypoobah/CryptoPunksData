@@ -1191,19 +1191,18 @@
           filteredOwners() {
             const w1Index = this.addressToIndex[WRAPPEDCRYPTOPUNKSV1ADDRESS];
             const w2Index = this.addressToIndex[WRAPPEDCRYPTOPUNKSV2ADDRESS];
-            console.log(moment().format("HH:mm:ss") + " filteredOwners - w1Index: " + w1Index + ", w2Index: " + w2Index);
-
             const results = [];
-            // console.log(moment().format("HH:mm:ss") + " filteredOwners - tokens: " + JSON.stringify(this.tokens, null, 2));
             const punks = this.filteredPunks;
-
+            const ownersMap = {};
             if (punks.length == 10000) {
               for (let i = 0; i < 10000; i++) {
                 const v1OwnerIndex = this.tokens[1] && this.tokens[1][i] || null;
                 const v2OwnerIndex = this.tokens[2] && this.tokens[2][i] || null;
                 const w1OwnerIndex = this.tokens[3] && this.tokens[3][i] || null;
                 const w2OwnerIndex = this.tokens[4] && this.tokens[4][i] || null;
-                console.log(moment().format("HH:mm:ss") + " filteredOwners - " + i + " " + v1OwnerIndex + " " + v2OwnerIndex + " " + w1OwnerIndex + " " + w2OwnerIndex);
+                if (!(i in ownersMap)) {
+                  ownersMap[i] = [v1OwnerIndex, v2OwnerIndex, w1OwnerIndex, w2OwnerIndex, v1OwnerIndex == w1Index, v2OwnerIndex == w2Index];
+                }
               }
             } else {
               for (const punk of this.filteredPunks) {
@@ -1211,9 +1210,12 @@
                 const v2OwnerIndex = this.tokens[2] && this.tokens[2][punk.punkId] || null;
                 const w1OwnerIndex = this.tokens[3] && this.tokens[3][punk.punkId] || null;
                 const w2OwnerIndex = this.tokens[4] && this.tokens[4][punk.punkId] || null;
-                console.log(moment().format("HH:mm:ss") + " filteredOwners - filtered: " + punk.punkId + " " + v1OwnerIndex + " " + v2OwnerIndex + " " + w1OwnerIndex + " " + w2OwnerIndex);
+                if (!(punk.punkId in ownersMap)) {
+                  ownersMap[punk.punkId] = [v1OwnerIndex, v2OwnerIndex, w1OwnerIndex, w2OwnerIndex, v1OwnerIndex == w1Index, v2OwnerIndex == w2Index];
+                }
               }
             }
+            console.log(moment().format("HH:mm:ss") + " filteredOwners - ownersMap: " + JSON.stringify(ownersMap, null, 2));
 
             // let filteredIds = null;
             // const punks = this.filteredPunks;
