@@ -1189,6 +1189,10 @@
           },
 
           filteredOwners() {
+            const w1Index = this.addressToIndex[WRAPPEDCRYPTOPUNKSV1ADDRESS];
+            const w2Index = this.addressToIndex[WRAPPEDCRYPTOPUNKSV2ADDRESS];
+            console.log(moment().format("HH:mm:ss") + " filteredOwners - w1Index: " + w1Index + ", w2Index: " + w2Index);
+
             const results = [];
             // console.log(moment().format("HH:mm:ss") + " filteredOwners - tokens: " + JSON.stringify(this.tokens, null, 2));
             const punks = this.filteredPunks;
