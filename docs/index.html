@@ -175,11 +175,11 @@
                 <div class="mt-0">
                   <b-button size="sm" :pressed.sync="settings.showFilter" @click="saveSettings" variant="link" v-b-popover.hover.top="'Show filter'"><span v-if="settings.showFilter"><b-icon-layout-sidebar-inset shift-v="+1" font-scale="1.0"></b-icon-layout-sidebar-inset></span><span v-else><b-icon-layout-sidebar shift-v="+1" font-scale="1.0"></b-icon-layout-sidebar></span></b-button>
                 </div>
-                <div class="mt-0 pr-1" style="max-width: 10.0rem;">
-                  <b-form-input type="text" size="sm" v-model.trim="settings.filterByIds" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Filter by punk id(s)'" placeholder="🔍 id1 id2-id3"></b-form-input>
+                <div class="mt-0 pr-1" style="max-width: 12.0rem;">
+                  <b-form-input type="text" size="sm" v-model.trim="settings.filterByIds" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Filter by punk id(s) or first 3 (or more) characters of attribute names, e.g., `1 5-10 alien ape`'" placeholder="🔍 id1 id2-id3 attrib1 ..."></b-form-input>
                 </div>
                 <!-- TODO -->
-                <div v-if="false" class="mt-0 pr-1" style="max-width: 10.0rem;">
+                <div v-if="false" class="mt-0 pr-1" style="max-width: 12.0rem;">
                   <b-form-input type="text" size="sm" v-model.trim="settings.filterByOwners" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Filter by owner(s)'" placeholder="🔍 0x12ab... 0x23bc..."></b-form-input>
                 </div>
                 <div v-if="settings.tabIndex == 1" class="mt-0 pr-1">
@@ -987,30 +987,42 @@
             const results = [];
             // console.log("filteredPunks - this.settings.filterByIds: " + JSON.stringify(this.settings.filterByIds));
 
+            let filteredIds = null;
             if (this.settings.filterByIds) {
               const searchIds = this.settings.filterByIds.split(/[, \t\n]+/).map(s => s.trim());
               console.log("filteredPunks - searchIds: " + JSON.stringify(searchIds));
-              const filteredIds = [];
+              filteredIds = [];
               for (s of searchIds) {
                 var range = s.match(/(\d+)-(\d+)/)
                 if (range != null) {
                   for (let i = parseInt(range[1]); i <= parseInt(range[2]); i++) {
-                    if (i < 10000) {
+                    if (i >= 0 && i < 10000) {
                       filteredIds.push(i);
                     }
                   }
-                }
-                if (s >= 0 && s < 10000) {
+                } else if (s >= 0 && s < 10000) {
                   filteredIds.push(parseInt(s));
+                } else {
+                  if (s.match(/[a-zA-Z0-9 \-]{3,}/)) {
+                    const searchFor = s.toLowerCase();
+                    for (const attributeInfo of this.punkAttributesWithTokenIds) {
+                      for (const attribute of attributeInfo.attributeList) {
+                        if (attribute.attribute.indexOf(searchFor) == 0) {
+                          filteredIds = [...new Set([...filteredIds, ...attribute.punks])]
+                        }
+                      }
+                    }
+                  }
                 }
               }
-              console.log("filteredPunks - filteredIds: " + JSON.stringify(filteredIds));
             }
 
             let stage1Data = this.punkAttributes;
             if (Object.keys(this.settings.filters).length == 0) {
               for (const [punkId, attributes] of this.punkAttributes.entries()) {
-                results.push({ punkId, attributes });
+                if (!filteredIds || filteredIds.includes(punkId)) {
+                  results.push({ punkId, attributes });
+                }
               }
             } else {
               let selectedTokenIds = [];
@@ -1032,7 +1044,9 @@
                 }
               }
               for (const punkId of selectedTokenIds) {
-                results.push({ punkId, attributes: this.punkAttributes[punkId] });
+                if (!filteredIds || filteredIds.includes(punkId)) {
+                  results.push({ punkId, attributes: this.punkAttributes[punkId] });
+                }
               }
             }
             // console.log(moment().format("HH:mm:ss") + " filteredPunks - results: " + JSON.stringify(results.slice(0, 10)) + ", ...");
