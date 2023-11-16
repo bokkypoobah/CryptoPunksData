@@ -168,9 +168,9 @@
             </div>
           </b-modal>
 
-          <!-- 0:Toolbar -->
-          <b-card v-if="coinbase" class="m-0 p-0 border-0" body-class="m-1 p-0">
-            <b-card-text class="m-0 p-0">
+          <b-card class="m-0 p-0 border-0" body-class="m-1 p-0">
+            <!-- 0:Toolbar -->
+            <b-card-text v-if="coinbase" class="m-0 p-0">
               <div class="d-flex flex-wrap m-0 p-0">
                 <div class="mt-0">
                   <b-button size="sm" :pressed.sync="settings.showFilter" @click="saveSettings" variant="link" v-b-popover.hover.top="'Show filter'"><span v-if="settings.showFilter"><b-icon-layout-sidebar-inset shift-v="+1" font-scale="1.0"></b-icon-layout-sidebar-inset></span><span v-else><b-icon-layout-sidebar shift-v="+1" font-scale="1.0"></b-icon-layout-sidebar></span></b-button>
@@ -236,16 +236,14 @@
                 </div>
               </div>
             </b-card-text>
-          </b-card>
 
-          <!-- 0:Home -->
-          <b-card v-if="coinbase && settings.tabIndex == 0" class="m-0 p-0 border-0" body-class="m-1 p-0">
-            <b-card-text class="m-0 p-0">
+            <!-- 0:Home -->
+            <b-card-text v-if="settings.tabIndex == 0" class="m-0 p-0">
               <b-row class="m-0 p-0">
                 <b-col v-if="settings.showFilter" cols="2" class="m-0 p-0 border-0">
                   <b-card no-header no-body class="m-0 p-0 border-0">
-                    <!-- <b-card-body class="m-0 p-1" style="flex-grow: 1; max-height: 1500px; overflow-y: auto;"> -->
-                    <b-card-body class="m-0 px-2 py-1" style="flex-grow: 1; max-height: 1500px; overflow-y: auto;">
+                    <!-- <b-card-body class="m-0 p-1" style="flex-grow: 1; max-height: 3000px; overflow-y: auto;"> -->
+                    <b-card-body class="m-0 mt-2 px-2 py-1" style="flex-grow: 1; max-height: 3000px; overflow-y: auto;">
                       <div v-for="punkAttribute of punkAttributesWithTokenIds">
                         <b-card header-class="m-0 px-2 pt-2 pb-0" body-class="p-0" class="m-0 p-0 border-0">
                           <template #header>
@@ -328,17 +326,14 @@
                 </b-col>
               </b-row>
             </b-card-text>
-          </b-card>
 
-
-          <!-- 1:Activity -->
-          <b-card v-if="coinbase && settings.tabIndex == 1" class="m-0 p-0 border-0" body-class="m-1 p-0">
-            <b-card-text class="m-0 p-0">
+            <!-- 1:Activity -->
+            <b-card-text v-if="settings.tabIndex == 1" class="m-0 p-0">
               <b-row class="m-0 p-0">
                 <b-col v-if="settings.showFilter" cols="2" class="m-0 p-0 border-0">
                   <b-card no-header no-body class="m-0 p-0 border-0">
-                    <!-- <b-card-body class="m-0 p-1" style="flex-grow: 1; max-height: 1500px; overflow-y: auto;"> -->
-                    <b-card-body class="m-0 px-2 py-1" style="flex-grow: 1; max-height: 1500px; overflow-y: auto;">
+                    <!-- <b-card-body class="m-0 p-1" style="flex-grow: 1; max-height: 3000px; overflow-y: auto;"> -->
+                    <b-card-body class="m-0 mt-2 px-2 py-1" style="flex-grow: 1; max-height: 3000px; overflow-y: auto;">
                       <div v-for="punkAttribute of punkAttributesWithTokenIds">
                         <b-card header-class="m-0 px-2 pt-2 pb-0" body-class="p-0" class="m-0 p-0 border-0">
                           <template #header>
