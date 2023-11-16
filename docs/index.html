@@ -55,6 +55,7 @@
           <b-navbar-nav class="ml-auto">
             <b-nav-item size="sm" @click="settings.tabIndex = 0; saveSettings()" :active="settings.tabIndex == 0" active-class="active" v-b-popover.hover="'View Punks'">Punks</b-nav-item>
             <b-nav-item size="sm" @click="settings.tabIndex = 1; saveSettings()" :active="settings.tabIndex == 1" active-class="active" v-b-popover.hover="'View Activity'">Activity</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 2; saveSettings()" :active="settings.tabIndex == 2" active-class="active" v-b-popover.hover="'View Owners'">Owners</b-nav-item>
             <b-avatar v-if="coinbase && coinbase != ensOrAddress(coinbase)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensOrAddress(coinbase)" v-b-popover.hover="'Your ENS avatar if set'"></b-avatar>
             <b-button size="sm" variant="outline-primary" class="ml-1" @click="processIt('connect'); syncAll();" v-b-popover.hover.bottom="'Click to update wallet'">{{ coinbase ? ensOrAddress(coinbase, 16) : 'Connect' }}</b-button>
           </b-navbar-nav>
@@ -170,10 +171,10 @@
                 <div class="mt-0">
                   <b-button size="sm" :pressed.sync="settings.showFilter" @click="saveSettings" variant="link" v-b-popover.hover.top="'Show filter'"><span v-if="settings.showFilter"><b-icon-layout-sidebar-inset shift-v="+1" font-scale="1.0"></b-icon-layout-sidebar-inset></span><span v-else><b-icon-layout-sidebar shift-v="+1" font-scale="1.0"></b-icon-layout-sidebar></span></b-button>
                 </div>
-                <div class="mt-0 pr-1" style="max-width: 12.0rem;">
+                <div class="mt-0 pr-1" style="max-width: 11.0rem;">
                   <b-form-input type="text" size="sm" v-model.trim="settings.filterByIds" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Filter by punk id(s) or first 3 (or more) characters of attribute names, e.g., `1 5-10 alien ape`. Replace spaces with `-`, e.g., `male-4`, `clown-nose` or `3d-gl`'" placeholder="🔍 id1 id2-id3 attrib1 ..."></b-form-input>
                 </div>
-                <div class="mt-0 pr-1" style="max-width: 12.0rem;">
+                <div v-if="false" class="mt-0 pr-1" style="max-width: 11.0rem;">
                   <b-form-input type="text" size="sm" v-model.trim="settings.filterByOwners" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Filter by owner(s)'" placeholder="🔍 0x12ab... 0x23bc..."></b-form-input>
                 </div>
                 <div v-if="settings.tabIndex == 1" class="mt-0 pr-1">
@@ -195,7 +196,7 @@
                 <div v-if="!sync.section" class="mt-0 pr-1">
                   <b-button size="sm" @click="syncCryptoPunksData(true)" variant="outline-primary" v-b-popover.hover.top="'Sync CryptoPunksData in Dev mode. This will take ~10 minutes initially, and ~2 minutes subsequently'">Dev</b-button>
                 </div>
-                <div v-if="sync.section" class="mt-1 p-0" style="width: 350px;">
+                <div v-if="sync.section" class="mt-1 p-0" style="width: 300px;">
                   <b-progress height="1.5rem" :max="sync.total" show-progress :animated="!sync.section" :variant="sync.section ? 'success' : 'secondary'" v-b-popover.hover.top="'{processed blocked number}/{latest block number}. Click the button on the right to stop this process. This process can be continued later'">
                     <b-progress-bar :value="sync.completed">
                       {{ sync.total == null || sync.total == 0 ? (sync.completed + ' ' + sync.section) : (sync.completed + '/' + sync.total + ' ' + ((sync.completed / sync.total) * 100).toFixed(0) + '% ' + sync.section) }}
@@ -216,23 +217,36 @@
                 <div v-if="settings.tabIndex == 1" class="mt-0 pl-1">
                   <b-form-select size="sm" v-model="settings.activityTable.sortOption" @change="saveSettings" :options="activitySortOptions" v-b-popover.hover.top="'Yeah. Sort'"></b-form-select>
                 </div>
+                <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
+                  <b-form-select size="sm" v-model="settings.ownersTable.sortOption" @change="saveSettings" :options="ownersSortOptions" v-b-popover.hover.top="'Yeah. Sort'"></b-form-select>
+                </div>
                 <div v-if="settings.tabIndex == 0" class="mt-0 pl-1">
                   <font size="-2" v-b-popover.hover.top="'# tokens'">{{ filteredSortedPunks.length + '/' + punkAttributes.length }}</font>
                 </div>
                 <div v-if="settings.tabIndex == 1" class="mt-0 pl-1">
                   <font size="-2" v-b-popover.hover.top="'# events'">{{ filteredSortedActivity.length + '/' + Object.keys(txs).length }}</font>
                 </div>
+                <!-- TODO -->
+                <!-- <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
+                  <font size="-2" v-b-popover.hover.top="'# events'">{{ filteredSortedOwners.length + '/' + Object.keys(owners).length }}</font>
+                </div> -->
                 <div v-if="settings.tabIndex == 0" class="mt-0 pl-1">
                   <b-pagination size="sm" v-model="settings.punksTable.currentPage" @input="saveSettings" :total-rows="filteredSortedPunks.length" :per-page="settings.punksTable.pageSize" style="height: 0;"></b-pagination>
                 </div>
                 <div v-if="settings.tabIndex == 1" class="mt-0 pl-1">
                   <b-pagination size="sm" v-model="settings.activityTable.currentPage" @input="saveSettings" :total-rows="filteredSortedActivity.length" :per-page="settings.activityTable.pageSize" style="height: 0;"></b-pagination>
                 </div>
+                <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
+                  <b-pagination size="sm" v-model="settings.ownersTable.currentPage" @input="saveSettings" :total-rows="filteredSortedOwners.length" :per-page="settings.ownersTable.pageSize" style="height: 0;"></b-pagination>
+                </div>
                 <div v-if="settings.tabIndex == 0" class="mt-0 pl-1">
                   <b-form-select size="sm" v-model="settings.punksTable.pageSize" @change="saveSettings" :options="pageSizes" v-b-popover.hover.top="'Yeah. Page size'"></b-form-select>
                 </div>
                 <div v-if="settings.tabIndex == 1" class="mt-0 pl-1">
                   <b-form-select size="sm" v-model="settings.activityTable.pageSize" @change="saveSettings" :options="pageSizes" v-b-popover.hover.top="'Yeah. Page size'"></b-form-select>
+                </div>
+                <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
+                  <b-form-select size="sm" v-model="settings.ownersTable.pageSize" @change="saveSettings" :options="pageSizes" v-b-popover.hover.top="'Yeah. Page size'"></b-form-select>
                 </div>
               </div>
             </b-card-text>
@@ -751,6 +765,11 @@
                       </span>
                     </template>
                   </b-table>
+
+                  <!-- <b-table v-if="settings.tabIndex == 2 && !settings.showInfo" small fixed striped responsive hover :fields="ownersFields" :items="pagedFilteredSortedOwners" show-empty empty-html="Click Sync above to retrieve punk history" head-variant="light" class="mx-0 my-1"> -->
+                  <b-table v-if="settings.tabIndex == 2 && !settings.showInfo" small fixed striped responsive hover :items="pagedFilteredSortedOwners" show-empty empty-html="Click Sync above to retrieve punk history" head-variant="light" class="mx-0 my-1">
+                  </b-table>
+
                 </b-col>
               </b-row>
             </b-card-text>
@@ -817,15 +836,15 @@
               pageSize: 100,
               sortOption: 'txorderdsc',
             },
-            editAccounts: false,
-            accounts: {},
-            accountsTable: {
+            ownersTable: {
               filter: null,
               currentPage: 1,
               pageSize: 10,
-              sortOption: 'groupnameasc',
+              sortOption: 'countdsc',
             },
-            version: 10,
+            editAccounts: false,
+            accounts: {},
+            version: 11,
           },
 
           sync: {
@@ -860,6 +879,12 @@
           activitySortOptions: [
             { value: 'txorderasc', text: '▲ TxOrder' },
             { value: 'txorderdsc', text: '▼ TxOrder' },
+          ],
+          ownersSortOptions: [
+            { value: 'countasc', text: '▲ #Punks' },
+            { value: 'countdsc', text: '▼ #Punks' },
+            { value: 'accountasc', text: '▲ Account' },
+            { value: 'accountdsc', text: '▼ Account' },
           ],
           contractOptions: [
             { text: 'v1', value: 1 },
@@ -1000,12 +1025,12 @@
             let filteredOwners = null;
             if (this.settings.filterByOwners) {
               const searchOwners = this.settings.filterByOwners.split(/[, \t\n]+/).map(s => s.trim());
-              filteredOwners = [];
+              filteredOwners = {};
               for (s of searchOwners) {
                 for (const [index, name] of Object.entries(this.indexToName)) {
                   if (name.match(s)) {
                     console.log("  " + index + " => " + name);
-                    filteredOwners = [...new Set([...filteredOwners, parseInt(index)])]
+                    filteredOwners[index] = true;
                   }
                 }
               }
@@ -1163,6 +1188,75 @@
             return this.filteredSortedActivity.slice((this.settings.activityTable.currentPage - 1) * this.settings.activityTable.pageSize, this.settings.activityTable.currentPage * this.settings.activityTable.pageSize);
           },
 
+          filteredOwners() {
+            const results = [];
+            let filteredIds = null;
+            const punks = this.filteredPunks;
+            if (punks.length != 10000) {
+              filteredIds = {};
+              for (const punk of this.filteredPunks) {
+                filteredIds[punk.punkId] = true;;
+              }
+            }
+            const selectedContractFilter = (this.settings.selectedContracts.length == 0 || this.settings.selectedContracts.length == 4) ? null : this.settings.selectedContracts;
+            for (const tx of this.txs) {
+              const timestamp = this.blockTimestamps[tx[0]] || "(unknown)";
+              let include = true;
+              if (selectedContractFilter) {
+                include = false;
+                for (let contractIndex of tx[5]) {
+                  if (selectedContractFilter.includes(contractIndex)) {
+                    include = true;
+                    break;
+                  }
+                }
+              }
+              if (include && filteredIds) {
+                include = false;
+                const punkId = tx[4] && tx[4][3] && parseInt(tx[4][3]);
+                if (punkId in filteredIds) {
+                  include = true;
+                }
+              }
+              if (include) {
+                results.push([ timestamp, ...tx ]);
+              }
+            }
+            // console.log(moment().format("HH:mm:ss") + " filteredOwners - results: " + JSON.stringify(results.slice(0, 10)) + ", ...");
+            return results;
+          },
+          filteredSortedOwners() {
+            let results = this.filteredOwners;
+            if (this.settings.activityTable.sortOption == 'txorderasc') {
+              results.sort((a, b) => {
+                if (a[1] == b[1]) {
+                  if (a[2] == b[2]) {
+                    return a[3] - b[3];
+                  } else {
+                    return a[2] - b[2];
+                  }
+                } else {
+                  return a[1] - b[1];
+                }
+              });
+            } else if (this.settings.activityTable.sortOption == 'txorderdsc') {
+              results.sort((a, b) => {
+                if (a[1] == b[1]) {
+                  if (a[2] == b[2]) {
+                    return b[3] - a[3];
+                  } else {
+                    return b[2] - a[2];
+                  }
+                } else {
+                  return b[1] - a[1];
+                }
+              });
+            }
+            return results;
+          },
+          pagedFilteredSortedOwners() {
+            return this.filteredSortedOwners.slice((this.settings.activityTable.currentPage - 1) * this.settings.activityTable.pageSize, this.settings.activityTable.currentPage * this.settings.activityTable.pageSize);
+          },
         },
 
         // --- METHODS ---
