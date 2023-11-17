@@ -226,10 +226,10 @@
                 <div v-if="settings.tabIndex == 1" class="mt-0 pl-1">
                   <font size="-2" v-b-popover.hover.top="'# events'">{{ filteredSortedActivity.length + '/' + Object.keys(txs).length }}</font>
                 </div>
-                <!-- TODO -->
-                <!-- <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
-                  <font size="-2" v-b-popover.hover.top="'# events'">{{ filteredSortedOwners.length + '/' + Object.keys(owners).length }}</font>
-                </div> -->
+                <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
+                  <!-- <font size="-2" v-b-popover.hover.top="'# owners'">{{ filteredSortedOwners.length + '/' + Object.keys(owners).length }}</font> -->
+                  <font size="-2" v-b-popover.hover.top="'# owners'">{{ filteredSortedOwners.length }}</font>
+                </div>
                 <div v-if="settings.tabIndex == 0" class="mt-0 pl-1">
                   <b-pagination size="sm" v-model="settings.punksTable.currentPage" @input="saveSettings" :total-rows="filteredSortedPunks.length" :per-page="settings.punksTable.pageSize" style="height: 0;"></b-pagination>
                 </div>
@@ -779,10 +779,10 @@
                       </font>
                     </template>
                     <template #cell(v1)="data">
-                      {{ data.item[1] }}
+                      {{ data.item[1].map(e => e[1] ? ('[' + e[0] + ']') : e[0]).join(", ") }}
                     </template>
                     <template #cell(v2)="data">
-                      {{ data.item[2] }}
+                      {{ data.item[2].map(e => e[1] ? ('[' + e[0] + ']') : e[0]).join(", ") }}
                     </template>
                   </b-table>
                 </b-col>
@@ -855,11 +855,11 @@
               filter: null,
               currentPage: 1,
               pageSize: 10,
-              sortOption: 'countdsc',
+              sortOption: 'count2dsc',
             },
             editAccounts: false,
             accounts: {},
-            version: 11,
+            version: 12,
           },
 
           sync: {
@@ -896,8 +896,12 @@
             { value: 'txorderdsc', text: '▼ TxOrder' },
           ],
           ownersSortOptions: [
-            { value: 'countasc', text: '▲ #Punks' },
-            { value: 'countdsc', text: '▼ #Punks' },
+            { value: 'count1asc', text: '▲ Σv1 Punks' },
+            { value: 'count1dsc', text: '▼ Σv1 Punks' },
+            { value: 'count2asc', text: '▲ Σv2 Punks' },
+            { value: 'count2dsc', text: '▼ Σv2 Punks' },
+            { value: 'count12asc', text: '▲ Σv1 & v2 Punks' },
+            { value: 'count12dsc', text: '▼ Σv1 & v2 Punks' },
             { value: 'accountasc', text: '▲ Account' },
             { value: 'accountdsc', text: '▼ Account' },
           ],
@@ -1256,8 +1260,6 @@
                 punkIdsByOwnerIndexes[v2OwnerIndex][punk.punkId][2] = false;
               }
             }
-            // console.log(moment().format("HH:mm:ss") + " filteredOwners - punkIdsByOwnerIndexes: " + JSON.stringify(punkIdsByOwnerIndexes, null, 2));
-
             for (const [ownerIndex, ownerData] of Object.entries(punkIdsByOwnerIndexes)) {
               const v1Punks = [];
               const v2Punks = [];
@@ -1268,74 +1270,52 @@
                   } else {
                     v2Punks.push([parseInt(punkId), wrapped]);
                   }
-                  // console.log(moment().format("HH:mm:ss") + " filteredOwners - ownerIndex: " + ownerIndex + ", punkId: " + punkId + ", version: " + version + ", wrapped: " + wrapped); // " => " + JSON.stringify(ownerInfo));
                 }
               }
               results.push([parseInt(ownerIndex), v1Punks, v2Punks]);
             }
-
-            // let filteredIds = null;
-            // const punks = this.filteredPunks;
-            // if (punks.length != 10000) {
-            //   filteredIds = {};
-            //   for (const punk of this.filteredPunks) {
-            //     filteredIds[punk.punkId] = true;;
-            //   }
-            // }
-            // const selectedContractFilter = (this.settings.selectedContracts.length == 0 || this.settings.selectedContracts.length == 4) ? null : this.settings.selectedContracts;
-            // for (const tx of this.txs) {
-            //   const timestamp = this.blockTimestamps[tx[0]] || "(unknown)";
-            //   let include = true;
-            //   if (selectedContractFilter) {
-            //     include = false;
-            //     for (let contractIndex of tx[5]) {
-            //       if (selectedContractFilter.includes(contractIndex)) {
-            //         include = true;
-            //         break;
-            //       }
-            //     }
-            //   }
-            //   if (include && filteredIds) {
-            //     include = false;
-            //     const punkId = tx[4] && tx[4][3] && parseInt(tx[4][3]);
-            //     if (punkId in filteredIds) {
-            //       include = true;
-            //     }
-            //   }
-            //   if (include) {
-            //     results.push([ timestamp, ...tx ]);
-            //   }
-            // }
-            console.log(moment().format("HH:mm:ss") + " filteredOwners - results: " + JSON.stringify(results.slice(0, 10)) + ", ...");
             return results;
           },
           filteredSortedOwners() {
             let results = this.filteredOwners;
-            if (this.settings.ownersTable.sortOption == 'txorderasc') {
+            if (this.settings.ownersTable.sortOption == 'count1asc') {
               results.sort((a, b) => {
-                if (a[1] == b[1]) {
-                  if (a[2] == b[2]) {
-                    return a[3] - b[3];
-                  } else {
-                    return a[2] - b[2];
-                  }
-                } else {
-                  return a[1] - b[1];
-                }
+                return a[1].length - b[1].length;
               });
-            } else if (this.settings.ownersTable.sortOption == 'txorderdsc') {
+            } else if (this.settings.ownersTable.sortOption == 'count1dsc') {
               results.sort((a, b) => {
-                if (a[1] == b[1]) {
-                  if (a[2] == b[2]) {
-                    return b[3] - a[3];
-                  } else {
-                    return b[2] - a[2];
-                  }
-                } else {
-                  return b[1] - a[1];
-                }
+                return b[1].length - a[1].length;
+              });
+            } else if (this.settings.ownersTable.sortOption == 'count2asc') {
+              results.sort((a, b) => {
+                return a[2].length - b[2].length;
+              });
+            } else if (this.settings.ownersTable.sortOption == 'count2dsc') {
+              results.sort((a, b) => {
+                return b[2].length - a[2].length;
+              });
+            } else if (this.settings.ownersTable.sortOption == 'count12asc') {
+              results.sort((a, b) => {
+                return a[1].length + a[2].length - b[1].length - b[2].length;
+              });
+            } else if (this.settings.ownersTable.sortOption == 'count12dsc') {
+              results.sort((a, b) => {
+                return b[1].length + b[2].length - a[1].length - a[2].length;
+              });
+            } else if (this.settings.ownersTable.sortOption == 'accountasc') {
+              results.sort((a, b) => {
+                const namea = this.indexToName[a[0]] || this.indexToAddress[a[0]] || "";
+                const nameb = this.indexToName[b[0]] || this.indexToAddress[b[0]] || "";
+                return namea.localeCompare(nameb);
+              });
+            } else if (this.settings.ownersTable.sortOption == 'accountdsc') {
+              results.sort((a, b) => {
+                const namea = this.indexToName[a[0]] || this.indexToAddress[a[0]] || "";
+                const nameb = this.indexToName[b[0]] || this.indexToAddress[b[0]] || "";
+                return nameb.localeCompare(namea);
               });
             }
+            // console.log(moment().format("HH:mm:ss") + " filteredSortedOwners - results: " + JSON.stringify(results.slice(0, 10)) + ", ...");
             return results;
           },
           pagedFilteredSortedOwners() {
