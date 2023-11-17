@@ -1946,9 +1946,11 @@
               console.log("error: " + error);
             });
             this.txs = txs;
-            for (let punkId = 0; punkId < 10000; punkId++) {
-              if (!(punkId in tokens[1])) {
-                tokens[1][punkId] = 0; // 0x0000...0000
+            if (tokens[1]) {
+              for (let punkId = 0; punkId < 10000; punkId++) {
+                if (!(punkId in tokens[1])) {
+                  tokens[1][punkId] = 0; // 0x0000...0000
+                }
               }
             }
             await db.cache.put({ objectName: this.chainId + "_tokens", object: tokens }).then (function() {
