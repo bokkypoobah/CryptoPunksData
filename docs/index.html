@@ -1725,6 +1725,7 @@
             this.sync.section = null;
           },
 
+          // TODO: Track down W1 Transfers
           async processData(db) {
             console.log(moment().format("HH:mm:ss") + " processData BEGIN");
             const combined = {};
@@ -1922,6 +1923,7 @@
                   }
                 }
                 const contractIndexList = Object.keys(contractIndexes).map(e => parseInt(e));
+                // TODO: punkIdList may not be required
                 const punkIdList = Object.keys(punkIds).map(e => parseInt(e));
                 const txSummary = parsePunkTx(txHashIndex, events, this.addressToIndex);
                 if (txSummary) {
