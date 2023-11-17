@@ -56,7 +56,7 @@
             <b-nav-item size="sm" @click="settings.tabIndex = 0; saveSettings()" :active="settings.tabIndex == 0" active-class="active" v-b-popover.hover="'View Punks'">Punks</b-nav-item>
             <b-nav-item size="sm" @click="settings.tabIndex = 1; saveSettings()" :active="settings.tabIndex == 1" active-class="active" v-b-popover.hover="'View Activity'">Activity</b-nav-item>
             <b-nav-item size="sm" @click="settings.tabIndex = 2; saveSettings()" :active="settings.tabIndex == 2" active-class="active" v-b-popover.hover="'View Owners'">Owners</b-nav-item>
-            <b-avatar v-if="coinbase && coinbase != ensOrAddress(coinbase)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensOrAddress(coinbase)" v-b-popover.hover="'Your ENS avatar if set'"></b-avatar>
+            <b-avatar v-if="coinbase && coinbase != ensOrAddress(coinbase)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensOrAddress(coinbase, 100)" v-b-popover.hover="'Your ENS avatar if set'"></b-avatar>
             <b-button size="sm" variant="outline-primary" class="ml-1" @click="processIt('connect'); syncAll();" v-b-popover.hover.bottom="'Click to update wallet'">{{ coinbase ? ensOrAddress(coinbase, 16) : 'Connect' }}</b-button>
           </b-navbar-nav>
         </b-navbar>
@@ -767,10 +767,24 @@
                     </template>
                   </b-table>
 
-                  <!-- <b-table v-if="settings.tabIndex == 2 && !settings.showInfo" small fixed striped responsive hover :fields="ownersFields" :items="pagedFilteredSortedOwners" show-empty empty-html="Click Sync above to retrieve punk history" head-variant="light" class="mx-0 my-1"> -->
-                  <b-table v-if="settings.tabIndex == 2 && !settings.showInfo" small fixed striped responsive hover :items="pagedFilteredSortedOwners" show-empty empty-html="Click Sync above to retrieve punk history" head-variant="light" class="mx-0 my-1">
+                  <b-table v-if="settings.tabIndex == 2 && !settings.showInfo" small fixed striped responsive hover :fields="ownersFields" :items="pagedFilteredSortedOwners" show-empty empty-html="Click Sync above to retrieve punk history" head-variant="light" class="mx-0 my-1">
+                    <template #cell(number)="data">
+                      {{ parseInt(data.index) + ((settings.ownersTable.currentPage - 1) * settings.ownersTable.pageSize) + 1 }}
+                    </template>
+                    <template #cell(owner)="data">
+                      <font size="-1">
+                        <b-link :href="'https://etherscan.io/address/' + indexToAddress[data.item[0]]" v-b-popover.hover.bottom="'owner. Click to view in etherscan.io'" target="_blank">
+                          <b-badge pill variant="light">{{ ensOrAddress(data.item[0], 24) }}</b-badge>
+                        </b-link>
+                      </font>
+                    </template>
+                    <template #cell(v1)="data">
+                      {{ data.item[1] }}
+                    </template>
+                    <template #cell(v2)="data">
+                      {{ data.item[2] }}
+                    </template>
                   </b-table>
-
                 </b-col>
               </b-row>
             </b-card-text>
@@ -919,6 +933,12 @@
             { key: 'punk', label: 'Punk', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-left' },
             { key: 'value', label: 'Value', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-left' },
             { key: 'events', label: 'Events', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
+          ],
+          ownersFields: [
+            { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
+            { key: 'owner', label: 'Owner', sortable: false, thStyle: 'width: 35%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'v1', label: 'v1', sortable: false, thStyle: 'width: 30%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'v2', label: 'v2', sortable: false, thStyle: 'width: 30%;', thClass: 'text-left', tdClass: 'text-left' },
           ],
           punkAttributesFields: [
             { key: 'select', label: '', thStyle: 'width: 10%;' },
@@ -1209,7 +1229,7 @@
                   punkIdsByOwnerIndexes[w1OwnerIndex][punk.punkId] = {};
                 }
                 punkIdsByOwnerIndexes[w1OwnerIndex][punk.punkId][1] = true;
-              } else {
+              } else if (v1OwnerIndex != null) {
                 if (!(v1OwnerIndex in punkIdsByOwnerIndexes)) {
                   punkIdsByOwnerIndexes[v1OwnerIndex] = {};
                 }
@@ -1226,7 +1246,7 @@
                   punkIdsByOwnerIndexes[w2OwnerIndex][punk.punkId] = {};
                 }
                 punkIdsByOwnerIndexes[w2OwnerIndex][punk.punkId][2] = true;
-              } else {
+              } else if (v2OwnerIndex != null) {
                 if (!(v2OwnerIndex in punkIdsByOwnerIndexes)) {
                   punkIdsByOwnerIndexes[v2OwnerIndex] = {};
                 }
@@ -1239,21 +1259,20 @@
             // console.log(moment().format("HH:mm:ss") + " filteredOwners - punkIdsByOwnerIndexes: " + JSON.stringify(punkIdsByOwnerIndexes, null, 2));
 
             for (const [ownerIndex, ownerData] of Object.entries(punkIdsByOwnerIndexes)) {
-              const punks = [];
+              const v1Punks = [];
+              const v2Punks = [];
               for (const [punkId, ownerInfo] of Object.entries(ownerData)) {
                 for (const [version, wrapped] of Object.entries(ownerInfo)) {
-                  punks.push([punkId, version, wrapped]);
+                  if (version == 1) {
+                    v1Punks.push([parseInt(punkId), wrapped]);
+                  } else {
+                    v2Punks.push([parseInt(punkId), wrapped]);
+                  }
                   // console.log(moment().format("HH:mm:ss") + " filteredOwners - ownerIndex: " + ownerIndex + ", punkId: " + punkId + ", version: " + version + ", wrapped: " + wrapped); // " => " + JSON.stringify(ownerInfo));
                 }
               }
-              results.push([ownerIndex, punks]);
+              results.push([parseInt(ownerIndex), v1Punks, v2Punks]);
             }
-
-
-            // for (const [punkId, ownerData] of Object.entries(ownersByPunkIds)) {
-            //   const [v1OwnerIndex, v2OwnerIndex, w1OwnerIndex, w2OwnerIndex, v1Wrapped, v2Wrapped] = ownerData;
-            //   console.log(moment().format("HH:mm:ss") + " filteredOwners - punkId: " + punkId + " => " + JSON.stringify(ownerData));
-            // }
 
             // let filteredIds = null;
             // const punks = this.filteredPunks;
