@@ -227,8 +227,7 @@
                   <font size="-2" v-b-popover.hover.top="'# events'">{{ filteredSortedActivity.length + '/' + Object.keys(txs).length }}</font>
                 </div>
                 <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
-                  <!-- <font size="-2" v-b-popover.hover.top="'# owners'">{{ filteredSortedOwners.length + '/' + Object.keys(owners).length }}</font> -->
-                  <font size="-2" v-b-popover.hover.top="'# owners'">{{ filteredSortedOwners.length }}</font>
+                  <font size="-2" v-b-popover.hover.top="'# owners'">{{ filteredSortedOwners.length + '/' + Object.keys(owners).length }}</font>
                 </div>
                 <div v-if="settings.tabIndex == 0" class="mt-0 pl-1">
                   <b-pagination size="sm" v-model="settings.punksTable.currentPage" @input="saveSettings" :total-rows="filteredSortedPunks.length" :per-page="settings.punksTable.pageSize" style="height: 0;"></b-pagination>
@@ -1245,7 +1244,7 @@
             return this.filteredSortedActivity.slice((this.settings.activityTable.currentPage - 1) * this.settings.activityTable.pageSize, this.settings.activityTable.currentPage * this.settings.activityTable.pageSize);
           },
 
-          filteredOwners() {
+          owners() {
             const w1Index = this.addressToIndex[WRAPPEDCRYPTOPUNKSV1ADDRESS];
             const w2Index = this.addressToIndex[WRAPPEDCRYPTOPUNKSV2ADDRESS];
             const results = [];
@@ -1306,6 +1305,10 @@
               }
               results.push([parseInt(ownerIndex), v1Punks, v2Punks]);
             }
+            return results;
+          },
+          filteredOwners() {
+            const results = this.owners;
             return results;
           },
           filteredSortedOwners() {
