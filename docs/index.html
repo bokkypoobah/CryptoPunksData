@@ -1194,25 +1194,13 @@
             const results = [];
             const punks = this.filteredPunks;
             const ownersByPunkIds = {};
-            if (punks.length == 10000) {
-              for (let i = 0; i < 10000; i++) {
-                const v1OwnerIndex = this.tokens[1] && this.tokens[1][i] || null;
-                const v2OwnerIndex = this.tokens[2] && this.tokens[2][i] || null;
-                const w1OwnerIndex = this.tokens[3] && this.tokens[3][i] || null;
-                const w2OwnerIndex = this.tokens[4] && this.tokens[4][i] || null;
-                if (!(i in ownersByPunkIds)) {
-                  ownersByPunkIds[i] = [v1OwnerIndex, v2OwnerIndex, w1OwnerIndex, w2OwnerIndex, v1OwnerIndex == w1Index, v2OwnerIndex == w2Index];
-                }
-              }
-            } else {
-              for (const punk of this.filteredPunks) {
-                const v1OwnerIndex = this.tokens[1] && this.tokens[1][punk.punkId] || null;
-                const v2OwnerIndex = this.tokens[2] && this.tokens[2][punk.punkId] || null;
-                const w1OwnerIndex = this.tokens[3] && this.tokens[3][punk.punkId] || null;
-                const w2OwnerIndex = this.tokens[4] && this.tokens[4][punk.punkId] || null;
-                if (!(punk.punkId in ownersByPunkIds)) {
-                  ownersByPunkIds[punk.punkId] = [v1OwnerIndex, v2OwnerIndex, w1OwnerIndex, w2OwnerIndex, ((v1OwnerIndex == w1Index) && (w1OwnerIndex != null)), ((v2OwnerIndex == w2Index) && (w2OwnerIndex != null))];
-                }
+            for (const punk of this.filteredPunks) {
+              const v1OwnerIndex = this.tokens[1] && this.tokens[1][punk.punkId] || null;
+              const v2OwnerIndex = this.tokens[2] && this.tokens[2][punk.punkId] || null;
+              const w1OwnerIndex = this.tokens[3] && this.tokens[3][punk.punkId] || null;
+              const w2OwnerIndex = this.tokens[4] && this.tokens[4][punk.punkId] || null;
+              if (!(punk.punkId in ownersByPunkIds)) {
+                ownersByPunkIds[punk.punkId] = [v1OwnerIndex, v2OwnerIndex, w1OwnerIndex, w2OwnerIndex, ((v1OwnerIndex == w1Index) && (w1OwnerIndex != null)), ((v2OwnerIndex == w2Index) && (w2OwnerIndex != null))];
               }
             }
             console.log(moment().format("HH:mm:ss") + " filteredOwners - ownersByPunkIds: " + JSON.stringify(ownersByPunkIds, null, 2));
