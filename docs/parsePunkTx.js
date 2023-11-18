@@ -117,6 +117,8 @@ function parsePunkTx(txHashIndex, events, addressToIndex) {
       const secondEvent = events[1];
       if (firstEvent[EVENTFIELD_TYPE] == 1 && secondEvent[EVENTFIELD_TYPE] == 7) { // Transfer & PunkBought
         return [[ 9, secondEvent[5], secondEvent[6], secondEvent[3], secondEvent[4]]]; // [[ AcceptBid, from, to, punkId, amount ]]
+      } else if (firstEvent[EVENTFIELD_TYPE] == 8 && secondEvent[EVENTFIELD_TYPE] == 1) { // Approval & Transfer
+        return [[ 3, secondEvent[3], secondEvent[4], secondEvent[5] ]]; // [[ Transfer, from, to, punkId ]]
       }
     }
 
