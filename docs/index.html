@@ -57,7 +57,7 @@
             <b-nav-item size="sm" @click="settings.tabIndex = 1; saveSettings()" :active="settings.tabIndex == 1" active-class="active" v-b-popover.hover="'View Activity'">Activity</b-nav-item>
             <b-nav-item size="sm" @click="settings.tabIndex = 2; saveSettings()" :active="settings.tabIndex == 2" active-class="active" v-b-popover.hover="'View Owners'">Owners</b-nav-item>
             <b-avatar v-if="coinbase && coinbase != ensOrAddress(coinbase)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensOrAddress(coinbase, 100)" v-b-popover.hover="'Your ENS avatar if set'"></b-avatar>
-            <b-button size="sm" variant="outline-primary" class="ml-1" @click="processIt('connect'); syncAll();" v-b-popover.hover.bottom="'Click to update wallet'">{{ coinbase ? ensOrAddress(coinbase, 16) : 'Connect' }}</b-button>
+            <b-button size="sm" variant="outline-primary" class="ml-1" @click="processIt('connect'); processNewBlock();" v-b-popover.hover.bottom="'Click to update wallet'">{{ coinbase ? ensOrAddress(coinbase, 16) : 'Connect' }}</b-button>
           </b-navbar-nav>
         </b-navbar>
 
@@ -1668,7 +1668,7 @@
             }
             await this.processData(db);
             if (!devMode) {
-              await this.syncAllENSNames(db, provider);
+              await this.syncENSNames(db, provider);
             }
             if (!devMode) {
               await this.loadCurrentData();
@@ -1958,8 +1958,8 @@
             console.log(moment().format("HH:mm:ss") + " processData END");
           },
 
-          async syncAllENSNames(db, provider) {
-            console.log(moment().format("HH:mm:ss") + " syncAllENSNames BEGIN");
+          async syncENSNames(db, provider) {
+            console.log(moment().format("HH:mm:ss") + " syncENSNames BEGIN");
             const ensReverseRecordsContract = new ethers.Contract(ENSREVERSERECORDSADDRESS, ENSREVERSERECORDSABI, provider);
 
             let indexToAddress = [];
@@ -2026,7 +2026,7 @@
             }).catch(function(error) {
               console.log("error: " + error);
             });
-            console.log(moment().format("HH:mm:ss") + " syncAllENSNames END");
+            console.log(moment().format("HH:mm:ss") + " syncENSNames END");
             this.sync.section = null;
           },
 
@@ -2104,16 +2104,16 @@
             this.saveSettings();
           },
 
-          async syncAll(blockNumber) {
-            console.log(moment().format("HH:mm:ss") + " syncAll - blockNumber: " + blockNumber + ", chainId: " + this.chainId);
-            const provider = new ethers.providers.Web3Provider(window.ethereum);
-            const block = await provider.getBlock();
-            const latestBlockNumber = block && block.number || null;
+          async processNewBlock(blockNumber) {
+            // const provider = new ethers.providers.Web3Provider(window.ethereum);
+            // const block = await provider.getBlock();
+            // const latestBlockNumber = block && block.number || null;
+            console.log(moment().format("HH:mm:ss") + " processNewBlock " + this.chainId + "#" + blockNumber + ", latest #" + this.blockNumber + " @ " + moment.unix(this.timestamp).format("YYYY-MM-DD HH:mm:ss") + " " + moment.unix(this.timestamp).fromNow());
             // console.log("latestBlockNumber: " + latestBlockNumber);
-            const db = new Dexie(this.db.name);
-            db.version(this.db.version).stores(this.db.schemaDefinition);
-            const context = { provider, latestBlockNumber, db };
-            db.close();
+            // const db = new Dexie(this.db.name);
+            // db.version(this.db.version).stores(this.db.schemaDefinition);
+            // const context = { provider, latestBlockNumber, db };
+            // db.close();
           },
 
           async halt() {
@@ -2320,7 +2320,7 @@
                 const block = await provider.getBlock();
                 t.blockNumber = blockNumber;
                 t.timestamp = block.timestamp;
-                await t.syncAll(blockNumber);
+                await t.processNewBlock(blockNumber);
               }
               provider.on("block", handleNewBlock);
               const signer = provider.getSigner();
