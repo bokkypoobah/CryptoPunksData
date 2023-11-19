@@ -1308,11 +1308,33 @@
             return results;
           },
           filteredOwners() {
-            let results = this.owners;
-            console.log(moment().format("HH:mm:ss") + " filteredOwners - results: " + JSON.stringify(results.slice(0, 10)) + ", ...");
+            let stage1Results = this.owners;
+            let results;
             if (this.settings.filterByOwners) {
-              const searchOwners = this.settings.filterByOwners ? this.settings.filterByOwners.split(/[, \t\n]+/).map(s => s.toLowerCase()) : [];
-              console.log(moment().format("HH:mm:ss") + " filteredOwners - searchOwners: " + JSON.stringify(searchOwners));
+              const searchOwners = this.settings.filterByOwners ? this.settings.filterByOwners.split(/[, \t\n]+/).map(s => new RegExp(s.toLowerCase(), "i")) : [];
+              results = [];
+              const ownerIndexMap = {};
+              for (const [index, name] of Object.entries(this.indexToName)) {
+                for (const searchItem of searchOwners) {
+                  if (searchItem.test(name)) {
+                    ownerIndexMap[index] = name;
+                  }
+                }
+              }
+              for (const [index, address] of Object.entries(this.indexToAddress)) {
+                for (const searchItem of searchOwners) {
+                  if (searchItem.test(address)) {
+                    ownerIndexMap[index] = address;
+                  }
+                }
+              }
+              for (const row of stage1Results) {
+                if (row[0] in ownerIndexMap) {
+                  results.push(row);
+                }
+              }
+            } else {
+              results = stage1Results;
             }
             return results;
           },
