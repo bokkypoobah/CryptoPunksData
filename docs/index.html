@@ -2699,10 +2699,10 @@
           (async() => {
             const db = new Dexie(this.db.name);
             db.version(this.db.version).stores(this.db.schemaDefinition);
-            const blockTimestampsDataItems = await db.cache.where("objectName").equals('blockTimestamps').toArray();
-            if (blockTimestampsDataItems.length == 1) {
-              this.blockTimestamps = blockTimestampsDataItems[0].object;
-            }
+            // const blockTimestampsDataItems = await db.cache.where("objectName").equals('blockTimestamps').toArray();
+            // if (blockTimestampsDataItems.length == 1) {
+            //   this.blockTimestamps = blockTimestampsDataItems[0].object;
+            // }
             await this.loadCurrentData(db);
             db.close();
           })();
