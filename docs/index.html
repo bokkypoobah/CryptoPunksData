@@ -174,7 +174,7 @@
                 <div class="mt-0 pr-1" style="max-width: 11.0rem;">
                   <b-form-input type="text" size="sm" v-model.trim="settings.filterByIds" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Filter by punk id(s) or first 3 (or more) characters of attribute names, e.g., `1 5-10 alien ape`. Replace spaces with `-`, e.g., `male-4`, `clown-nose` or `3d-gl`'" placeholder="🔍 id1 id2-id3 attrib1 ..."></b-form-input>
                 </div>
-                <div v-if="settings.tabIndex == 1 || settings.tabIndex == 2" class="mt-0 pr-1" style="max-width: 11.0rem;">
+                <div class="mt-0 pr-1" style="max-width: 11.0rem;">
                   <b-form-input type="text" size="sm" v-model.trim="settings.filterByOwners" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Filter owners by space separated regex'" placeholder="🔍 0x12ab... ^dead"></b-form-input>
                 </div>
                 <div v-if="settings.tabIndex == 1" class="mt-0 pr-1">
@@ -325,39 +325,21 @@
                         <b-img-lazy width="100%" :src="'images/punks/punk' + data.item.punkId.toString().padStart(4, '0') + '.png'" style="background-color: #638596"/>
                       </b-link>
                     </template>
-                    <template #cell(owner)="data">
-                      <b-row v-if="tokens[1] && tokens[1][data.item.punkId]">
-                        <b-col cols="1" class="m-0 p-0">v1</b-col>
-                        <b-col>
-                          <b-link :href="'https://etherscan.io/address/' + indexToAddress[tokens[1][data.item.punkId]]" v-b-popover.hover.bottom="'View tx in etherscan.io'" target="_blank">
-                            {{ ensOrAddress(tokens[1][data.item.punkId], 16) }}
-                          </b-link>
-                        </b-col>
-                      </b-row>
-                      <b-row v-if="tokens[2] && (data.item.punkId in tokens[2])">
-                        <b-col cols="1" class="m-0 p-0">v2</b-col>
-                        <b-col>
-                          <b-link :href="'https://etherscan.io/address/' + indexToAddress[tokens[2][data.item.punkId]]" v-b-popover.hover.bottom="'View tx in etherscan.io'" target="_blank">
-                            {{ ensOrAddress(tokens[2][data.item.punkId], 16) }}
-                          </b-link>
-                        </b-col>
-                      </b-row>
-                      <b-row v-if="tokens[3] && tokens[3][data.item.punkId]">
-                        <b-col cols="1" class="m-0 p-0">w1</b-col>
-                        <b-col>
-                          <b-link :href="'https://etherscan.io/address/' + indexToAddress[tokens[3][data.item.punkId]]" v-b-popover.hover.bottom="'View tx in etherscan.io'" target="_blank">
-                            {{ ensOrAddress(tokens[3][data.item.punkId], 16) }}
-                          </b-link>
-                        </b-col>
-                      </b-row>
-                      <b-row v-if="tokens[4] && tokens[4][data.item.punkId]">
-                        <b-col cols="1" class="m-0 p-0">w2</b-col>
-                        <b-col>
-                          <b-link :href="'https://etherscan.io/address/' + indexToAddress[tokens[4][data.item.punkId]]" v-b-popover.hover.bottom="'View tx in etherscan.io'" target="_blank">
-                            {{ ensOrAddress(tokens[4][data.item.punkId], 16) }}
-                          </b-link>
-                        </b-col>
-                      </b-row>
+                    <template #cell(v1Owner)="data">
+                      <b-link v-if="data.item.v1.ownerIndex && !data.item.v1.wrapped" :href="'https://etherscan.io/address/' + indexToAddress[data.item.v1.ownerIndex]" v-b-popover.hover.bottom="'View owner in etherscan.io'" target="_blank">
+                        {{ ensOrAddress(data.item.v1.ownerIndex, 16) }}
+                      </b-link>
+                      <b-link v-if="data.item.v1.ownerIndex && data.item.v1.wrapped" :href="'https://etherscan.io/address/' + indexToAddress[data.item.v1.ownerIndex]" v-b-popover.hover.bottom="'View owner in etherscan.io'" target="_blank">
+                        {{ '[' + ensOrAddress(data.item.v1.ownerIndex, 16) + ']' }}
+                      </b-link>
+                    </template>
+                    <template #cell(v2Owner)="data">
+                      <b-link v-if="data.item.v2.ownerIndex && !data.item.v2.wrapped" :href="'https://etherscan.io/address/' + indexToAddress[data.item.v2.ownerIndex]" v-b-popover.hover.bottom="'View owner in etherscan.io'" target="_blank">
+                        {{ ensOrAddress(data.item.v2.ownerIndex, 16) }}
+                      </b-link>
+                      <b-link v-if="data.item.v2.ownerIndex && data.item.v2.wrapped" :href="'https://etherscan.io/address/' + indexToAddress[data.item.v2.ownerIndex]" v-b-popover.hover.bottom="'View owner in etherscan.io'" target="_blank">
+                        {{ '[' + ensOrAddress(data.item.v2.ownerIndex, 16) + ']' }}
+                      </b-link>
                     </template>
                     <template #cell(attribute)="data">
                       <span v-for="(attribute, attributeIndex) in data.item.attributes" v-bind:key="attributeIndex">
@@ -959,8 +941,9 @@
           punksFields: [
             { key: 'punkId', label: 'PunkId', sortable: false, thStyle: 'width: 15%;', thClass: 'text-right', tdClass: 'text-right' },
             { key: 'image', label: 'Image', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
-            { key: 'owner', label: 'Owner', sortable: false, thStyle: 'width: 25%;', thClass: 'text-left', tdClass: 'text-left' },
-            { key: 'attribute', label: 'Attributes', sortable: false, thStyle: 'width: 50%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'v1Owner', label: 'v1 Owner', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'v2Owner', label: 'v2 Owner', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'attribute', label: 'Attributes', sortable: false, thStyle: 'width: 25%;', thClass: 'text-left', tdClass: 'text-left' },
           ],
           activityFields: [
             { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
@@ -1088,13 +1071,17 @@
               for (s of searchOwners) {
                 for (const [index, name] of Object.entries(this.indexToName)) {
                   if (name.match(s)) {
-                    console.log("  " + index + " => " + name);
-                    filteredOwners[index] = true;
+                    filteredOwners[index] = name;
+                  }
+                }
+                for (const [index, address] of Object.entries(this.indexToAddress)) {
+                  if (address.match(s)) {
+                    filteredOwners[index] = address;
                   }
                 }
               }
             }
-            console.log(moment().format("HH:mm:ss") + " filteredPunks - filteredOwners: " + JSON.stringify(filteredOwners));
+            // console.log(moment().format("HH:mm:ss") + " filteredPunks - filteredOwners: " + JSON.stringify(filteredOwners));
 
             let filteredIds = null;
             if (this.settings.filterByIds) {
@@ -1125,11 +1112,13 @@
               }
             }
 
-            let stage1Data = this.punkAttributes;
+            // let stage1Data = this.punkAttributes;
+            const stage1PunkIds = [];
             if (Object.keys(this.settings.filters).length == 0) {
               for (const [punkId, attributes] of this.punkAttributes.entries()) {
                 if (!filteredIds || filteredIds.includes(punkId)) {
-                  results.push({ punkId, attributes });
+                  // results.push({ punkId, attributes });
+                  stage1PunkIds.push(punkId);
                 }
               }
             } else {
@@ -1153,8 +1142,41 @@
               }
               for (const punkId of selectedTokenIds) {
                 if (!filteredIds || filteredIds.includes(punkId)) {
-                  results.push({ punkId, attributes: this.punkAttributes[punkId] });
+                  // results.push({ punkId, attributes: this.punkAttributes[punkId] });
+                  stage1PunkIds.push(punkId);
                 }
+              }
+            }
+
+            const w1Index = this.addressToIndex[WRAPPEDCRYPTOPUNKSV1ADDRESS];
+            const w2Index = this.addressToIndex[WRAPPEDCRYPTOPUNKSV2ADDRESS];
+            for (let punkId of stage1PunkIds) {
+              const attributes = this.punkAttributes[punkId];
+              const v1OwnerIndex = this.tokens[1] && this.tokens[1][punkId] || null;
+              const v2OwnerIndex = this.tokens[2] && this.tokens[2][punkId] || null;
+              const w1OwnerIndex = this.tokens[3] && this.tokens[3][punkId] || null;
+              const w2OwnerIndex = this.tokens[4] && this.tokens[4][punkId] || null;
+              // if (punkId >= 1030 && punkId < 1040) {
+              //   console.log("v1OwnerIndex: " + v1OwnerIndex + ", w1OwnerIndex: " + w1OwnerIndex + ", v2OwnerIndex: " + v2OwnerIndex + ", w2OwnerIndex: " + w2OwnerIndex);
+              // }
+              let v1 = {};
+              if (v1OwnerIndex == w1Index) {
+                v1.ownerIndex = w1OwnerIndex || 0;
+                v1.wrapped = true;
+              } else {
+                v1.ownerIndex = v1OwnerIndex;
+                v1.wrapped = false;
+              }
+              let v2 = {};
+              if (v2OwnerIndex == w2Index) {
+                v2.ownerIndex = w2OwnerIndex;
+                v2.wrapped = true;
+              } else {
+                v2.ownerIndex = v2OwnerIndex;
+                v2.wrapped = false;
+              }
+              if (!filteredOwners || (v1.ownerIndex in filteredOwners || v2.ownerIndex in filteredOwners)) {
+                results.push({ punkId, v1, v2, attributes });
               }
             }
             // console.log(moment().format("HH:mm:ss") + " filteredPunks - results: " + JSON.stringify(results.slice(0, 10)) + ", ...");
@@ -1171,6 +1193,7 @@
                 return b.punkId - a.punkId;
               });
             }
+            // console.log(moment().format("HH:mm:ss") + " filteredSortedPunks - results: " + JSON.stringify(results.slice(0, 10)) + ", ...");
             return results;
           },
           pagedFilteredSortedPunks() {
