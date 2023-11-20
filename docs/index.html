@@ -305,6 +305,12 @@
                         <li>Dapp: <b-link href="https://bokkypoobah.github.io/CryptoPunksData/" target="_blank">https://bokkypoobah.github.io/CryptoPunksData/</b-link></li>
                         <li>GitHub: <b-link href="https://github.com/bokkypoobah/CryptoPunksData" target="_blank">https://github.com/bokkypoobah/CryptoPunksData</b-link></li>
                       </ul>
+                      <h5 class="mt-3">This Dapp Design</h5>
+                      <ul>
+                        <li>Addresses and transaction hashes are stored as integer indices into lookup tables to save on memory and computations</li>
+                        <li><b-link href="https://github.com/bokkypoobah/CryptoPunksData/tree/master/docs/images/punks" target="_blank">10k 24x24 punk images</b-link> were split from the original <b-link href="https://raw.githubusercontent.com/larvalabs/cryptopunks/master/punks.png" target="_blank">punks.png</b-link> using the <b-link href="https://github.com/bokkypoobah/aenus/blob/main/scripts/01_splitImage.js" target="_blank">01_splitImage.js</b-link> script</li>
+                        <li><b-link href="https://raw.githubusercontent.com/bokkypoobah/CryptoPunksData/master/docs/punkAttributes.js" target="_blank">10k punk attributes</b-link> were extracted from the <i>CryptopunksData</i> contract at <b-link href="https://etherscan.io/address/0x16F5A35647D6F03D5D3da7b35409D65ba03aF3B2#code" target="_blank">0x16F5A35647D6F03D5D3da7b35409D65ba03aF3B2</b-link> using the <b-link href="https://github.com/bokkypoobah/aenus/blob/main/scripts/02_scrapeCryptoPunksAttributes.js" target="_blank">02_scrapeCryptoPunksAttributes.js</b-link> script</li>
+                      </ul>
                       <h5 class="mt-3">Some Info</h5>
                       <ul>
                         <li>Three v1 CryptoPunks were claimed with invalid ids <b-link href="https://etherscan.io/tx/0x39d77a95637640b6291bea0b015be4f6578c95f9a57af6a9399dabd70b56d50c" target="_blank">9845944</b-link>, <b-link href="https://etherscan.io/tx/0xdc37a82d43eb253077abd4618683efea615fc8573bfc669568fab04098ab24b1" target="_blank">76623</b-link> and <b-link href="https://etherscan.io/tx/0x7da83b5002251ca83537aef8833f443263a9109a1ccca502b0b03a0529813aa2" target="_blank">0xffff...ffff</b-link>. This resulted in 3 unassigned v1 CryptoPunks 1416, 1838 and 1841</li>
