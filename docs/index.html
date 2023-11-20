@@ -376,7 +376,7 @@
                     </template>
                     <template #cell(from)="data">
                       <font size="-1">
-                        <b-link v-if="[3, 4, 6, 9, 10, 11, 12, 13, 14, 15].includes(data.item[5][0])" :href="'https://etherscan.io/address/' + indexToAddress[data.item[5][1]]" v-b-popover.hover.bottom="'from or account. Click to view in etherscan.io'" target="_blank">
+                        <b-link v-if="[3, 4, 5, 6, 9, 10, 11, 12, 13, 14, 15].includes(data.item[5][0])" :href="'https://etherscan.io/address/' + indexToAddress[data.item[5][1]]" v-b-popover.hover.bottom="'from or account. Click to view in etherscan.io'" target="_blank">
                           <b-badge pill variant="light">{{ ensOrAddress(data.item[5][1], 24) }}</b-badge>
                         </b-link>
                       </font>
@@ -1061,28 +1061,7 @@
             results.sort((a, b) => ('' + a.attributeType).localeCompare(b.attributeType))
             return results;
           },
-          filteredPunks() {
-            const results = [];
-
-            let filteredOwners = null;
-            if (this.settings.filterByOwners) {
-              const searchOwners = this.settings.filterByOwners.split(/[, \t\n]+/).map(s => s.trim());
-              filteredOwners = {};
-              for (s of searchOwners) {
-                for (const [index, name] of Object.entries(this.indexToName)) {
-                  if (name.match(s)) {
-                    filteredOwners[index] = name;
-                  }
-                }
-                for (const [index, address] of Object.entries(this.indexToAddress)) {
-                  if (address.match(s)) {
-                    filteredOwners[index] = address;
-                  }
-                }
-              }
-            }
-            // console.log(moment().format("HH:mm:ss") + " filteredPunks - filteredOwners: " + JSON.stringify(filteredOwners));
-
+          filteredPunkIds() {
             let filteredIds = null;
             if (this.settings.filterByIds) {
               const searchIds = this.settings.filterByIds.split(/[, \t\n]+/).map(s => s.trim());
@@ -1111,14 +1090,11 @@
                 }
               }
             }
-
-            // let stage1Data = this.punkAttributes;
-            const stage1PunkIds = [];
+            const results = [];
             if (Object.keys(this.settings.filters).length == 0) {
               for (const [punkId, attributes] of this.punkAttributes.entries()) {
                 if (!filteredIds || filteredIds.includes(punkId)) {
-                  // results.push({ punkId, attributes });
-                  stage1PunkIds.push(punkId);
+                  results.push(punkId);
                 }
               }
             } else {
@@ -1142,23 +1118,39 @@
               }
               for (const punkId of selectedTokenIds) {
                 if (!filteredIds || filteredIds.includes(punkId)) {
-                  // results.push({ punkId, attributes: this.punkAttributes[punkId] });
-                  stage1PunkIds.push(punkId);
+                  results.push(punkId);
                 }
               }
             }
-
+            return results;
+          },
+          ownerFilteredPunks() {
             const w1Index = this.addressToIndex[WRAPPEDCRYPTOPUNKSV1ADDRESS];
             const w2Index = this.addressToIndex[WRAPPEDCRYPTOPUNKSV2ADDRESS];
-            for (let punkId of stage1PunkIds) {
+            let filteredOwners = null;
+            if (this.settings.filterByOwners) {
+              const searchOwners = this.settings.filterByOwners.split(/[, \t\n]+/).map(s => s.trim());
+              filteredOwners = {};
+              for (s of searchOwners) {
+                for (const [index, name] of Object.entries(this.indexToName)) {
+                  if (name.match(s)) {
+                    filteredOwners[index] = name;
+                  }
+                }
+                for (const [index, address] of Object.entries(this.indexToAddress)) {
+                  if (address.match(s)) {
+                    filteredOwners[index] = address;
+                  }
+                }
+              }
+            }
+            const results = [];
+            for (let punkId of this.filteredPunkIds) {
               const attributes = this.punkAttributes[punkId];
               const v1OwnerIndex = this.tokens[1] && this.tokens[1][punkId] || null;
               const v2OwnerIndex = this.tokens[2] && this.tokens[2][punkId] || null;
               const w1OwnerIndex = this.tokens[3] && this.tokens[3][punkId] || null;
               const w2OwnerIndex = this.tokens[4] && this.tokens[4][punkId] || null;
-              // if (punkId >= 1030 && punkId < 1040) {
-              //   console.log("v1OwnerIndex: " + v1OwnerIndex + ", w1OwnerIndex: " + w1OwnerIndex + ", v2OwnerIndex: " + v2OwnerIndex + ", w2OwnerIndex: " + w2OwnerIndex);
-              // }
               let v1 = {};
               if (v1OwnerIndex == w1Index) {
                 v1.ownerIndex = w1OwnerIndex || 0;
@@ -1179,11 +1171,11 @@
                 results.push({ punkId, v1, v2, attributes });
               }
             }
-            // console.log(moment().format("HH:mm:ss") + " filteredPunks - results: " + JSON.stringify(results.slice(0, 10)) + ", ...");
+
             return results;
           },
           filteredSortedPunks() {
-            let results = this.filteredPunks;
+            let results = this.ownerFilteredPunks;
             if (this.settings.punksTable.sortOption == 'punkidasc') {
               results.sort((a, b) => {
                 return a.punkId - b.punkId;
@@ -1193,7 +1185,6 @@
                 return b.punkId - a.punkId;
               });
             }
-            // console.log(moment().format("HH:mm:ss") + " filteredSortedPunks - results: " + JSON.stringify(results.slice(0, 10)) + ", ...");
             return results;
           },
           pagedFilteredSortedPunks() {
@@ -1201,15 +1192,10 @@
           },
 
           filteredActivity() {
-            // TODO: Want filteredPunks without owner check
             const results = [];
-            let filteredIds = null;
-            const punks = this.filteredPunks;
-            if (punks.length != 10000) {
-              filteredIds = {};
-              for (const punk of this.filteredPunks) {
-                filteredIds[punk.punkId] = true;;
-              }
+            let filteredIds = {};
+            for (const punkId of this.filteredPunkIds) {
+              filteredIds[punkId] = true;
             }
             const selectedContractFilter = (this.settings.selectedContracts.length == 0 || this.settings.selectedContracts.length == 4) ? null : this.settings.selectedContracts;
 
