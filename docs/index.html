@@ -376,7 +376,7 @@
                     </template>
                     <template #cell(from)="data">
                       <font size="-1">
-                        <b-link v-if="[3, 4, 5, 6, 9, 10, 11, 12, 13, 14, 15].includes(data.item[5][0])" :href="'https://etherscan.io/address/' + indexToAddress[data.item[5][1]]" v-b-popover.hover.bottom="'from or account. Click to view in etherscan.io'" target="_blank">
+                        <b-link v-if="[3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].includes(data.item[5][0])" :href="'https://etherscan.io/address/' + indexToAddress[data.item[5][1]]" v-b-popover.hover.bottom="'from or account. Click to view in etherscan.io'" target="_blank">
                           <b-badge pill variant="light">{{ ensOrAddress(data.item[5][1], 24) }}</b-badge>
                         </b-link>
                       </font>
