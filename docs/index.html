@@ -175,7 +175,7 @@
                   <b-form-input type="text" size="sm" v-model.trim="settings.filterByIds" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Filter by punk id(s) or first 3 (or more) characters of attribute names, e.g., `1 5-10 alien ape`. Replace spaces with `-`, e.g., `male-4`, `clown-nose` or `3d-gl`'" placeholder="🔍 id1 id2-id3 attrib1 ..."></b-form-input>
                 </div>
                 <div v-if="settings.tabIndex == 1 || settings.tabIndex == 2" class="mt-0 pr-1" style="max-width: 11.0rem;">
-                  <b-form-input type="text" size="sm" v-model.trim="settings.filterByOwners" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Filter owners by space separated regex'" placeholder="🔍 0x12ab... ^dead ^null"></b-form-input>
+                  <b-form-input type="text" size="sm" v-model.trim="settings.filterByOwners" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Filter owners by space separated regex'" placeholder="🔍 0x12ab... ^dead"></b-form-input>
                 </div>
                 <div v-if="settings.tabIndex == 1" class="mt-0 pr-1">
                   <b-form-checkbox-group size="sm" @input="saveSettings" v-model="settings.selectedContracts" :options="contractOptions" buttons button-variant="outline-primary" v-b-popover.hover.top="'Filter by [Wrapped] CryptoPunks V1 & V2'"></b-form-checkbox-group>
@@ -402,6 +402,9 @@
                     <template #cell(to)="data">
                       <font size="-1">
                         <b-link v-if="[0, 1, 2, 3, 6, 9, 10, 11, 12, 13, 14, 15].includes(data.item[5][0])" :href="'https://etherscan.io/address/' + indexToAddress[data.item[5][2]]" v-b-popover.hover.bottom="'to. Click to view in etherscan.io'" target="_blank">
+                          <b-badge pill variant="light">{{ ensOrAddress(data.item[5][2], 24) }}</b-badge>
+                        </b-link>
+                        <b-link v-else-if="data.item[5][0] == 4 && data.item[5][2] > 0" :href="'https://etherscan.io/address/' + indexToAddress[data.item[5][2]]" v-b-popover.hover.bottom="'to. Click to view in etherscan.io'" target="_blank">
                           <b-badge pill variant="light">{{ ensOrAddress(data.item[5][2], 24) }}</b-badge>
                         </b-link>
                       </font>
