@@ -1292,44 +1292,44 @@
             const punks = this.filteredPunks;
             const ownersByPunkIds = {};
             const punkIdsByOwnerIndexes = {};
-            for (const punk of this.filteredPunks) {
-              const v1OwnerIndex = this.tokens[1] && this.tokens[1][punk.punkId] || null;
-              const v2OwnerIndex = this.tokens[2] && this.tokens[2][punk.punkId] || null;
-              const w1OwnerIndex = this.tokens[3] && this.tokens[3][punk.punkId] || null;
-              const w2OwnerIndex = this.tokens[4] && this.tokens[4][punk.punkId] || null;
+            for (const punkId of this.filteredPunkIds) {
+              const v1OwnerIndex = this.tokens[1] && this.tokens[1][punkId] || null;
+              const v2OwnerIndex = this.tokens[2] && this.tokens[2][punkId] || null;
+              const w1OwnerIndex = this.tokens[3] && this.tokens[3][punkId] || null;
+              const w2OwnerIndex = this.tokens[4] && this.tokens[4][punkId] || null;
               if (w1OwnerIndex != null) {
                 if (!(w1OwnerIndex in punkIdsByOwnerIndexes)) {
                   punkIdsByOwnerIndexes[w1OwnerIndex] = {};
                 }
-                if (!(punk.punkId in punkIdsByOwnerIndexes[w1OwnerIndex])) {
-                  punkIdsByOwnerIndexes[w1OwnerIndex][punk.punkId] = {};
+                if (!(punkId in punkIdsByOwnerIndexes[w1OwnerIndex])) {
+                  punkIdsByOwnerIndexes[w1OwnerIndex][punkId] = {};
                 }
-                punkIdsByOwnerIndexes[w1OwnerIndex][punk.punkId][1] = true;
+                punkIdsByOwnerIndexes[w1OwnerIndex][punkId][1] = true;
               } else if (v1OwnerIndex != null) {
                 if (!(v1OwnerIndex in punkIdsByOwnerIndexes)) {
                   punkIdsByOwnerIndexes[v1OwnerIndex] = {};
                 }
-                if (!(punk.punkId in punkIdsByOwnerIndexes[v1OwnerIndex])) {
-                  punkIdsByOwnerIndexes[v1OwnerIndex][punk.punkId] = {};
+                if (!(punkId in punkIdsByOwnerIndexes[v1OwnerIndex])) {
+                  punkIdsByOwnerIndexes[v1OwnerIndex][punkId] = {};
                 }
-                punkIdsByOwnerIndexes[v1OwnerIndex][punk.punkId][1] = false;
+                punkIdsByOwnerIndexes[v1OwnerIndex][punkId][1] = false;
               }
               if (w2OwnerIndex != null) {
                 if (!(w2OwnerIndex in punkIdsByOwnerIndexes)) {
                   punkIdsByOwnerIndexes[w2OwnerIndex] = {};
                 }
-                if (!(punk.punkId in punkIdsByOwnerIndexes[w2OwnerIndex])) {
-                  punkIdsByOwnerIndexes[w2OwnerIndex][punk.punkId] = {};
+                if (!(punkId in punkIdsByOwnerIndexes[w2OwnerIndex])) {
+                  punkIdsByOwnerIndexes[w2OwnerIndex][punkId] = {};
                 }
-                punkIdsByOwnerIndexes[w2OwnerIndex][punk.punkId][2] = true;
+                punkIdsByOwnerIndexes[w2OwnerIndex][punkId][2] = true;
               } else if (v2OwnerIndex != null) {
                 if (!(v2OwnerIndex in punkIdsByOwnerIndexes)) {
                   punkIdsByOwnerIndexes[v2OwnerIndex] = {};
                 }
-                if (!(punk.punkId in punkIdsByOwnerIndexes[v2OwnerIndex])) {
-                  punkIdsByOwnerIndexes[v2OwnerIndex][punk.punkId] = {};
+                if (!(punkId in punkIdsByOwnerIndexes[v2OwnerIndex])) {
+                  punkIdsByOwnerIndexes[v2OwnerIndex][punkId] = {};
                 }
-                punkIdsByOwnerIndexes[v2OwnerIndex][punk.punkId][2] = false;
+                punkIdsByOwnerIndexes[v2OwnerIndex][punkId][2] = false;
               }
             }
             for (const [ownerIndex, ownerData] of Object.entries(punkIdsByOwnerIndexes)) {
