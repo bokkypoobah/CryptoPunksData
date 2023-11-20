@@ -174,7 +174,7 @@
                 <div class="mt-0 pr-1" style="max-width: 11.0rem;">
                   <b-form-input type="text" size="sm" v-model.trim="settings.filterByIds" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Filter by punk id(s) or first 3 (or more) characters of attribute names, e.g., `1 5-10 alien ape`. Replace spaces with `-`, e.g., `male-4`, `clown-nose` or `3d-gl`'" placeholder="🔍 id1 id2-id3 attrib1 ..."></b-form-input>
                 </div>
-                <div v-if="settings.tabIndex == 2" class="mt-0 pr-1" style="max-width: 11.0rem;">
+                <div v-if="settings.tabIndex == 1 || settings.tabIndex == 2" class="mt-0 pr-1" style="max-width: 11.0rem;">
                   <b-form-input type="text" size="sm" v-model.trim="settings.filterByOwners" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Filter owners by space separated regex'" placeholder="🔍 0x12ab... ^dead ^null"></b-form-input>
                 </div>
                 <div v-if="settings.tabIndex == 1" class="mt-0 pr-1">
@@ -394,14 +394,14 @@
                     </template>
                     <template #cell(from)="data">
                       <font size="-1">
-                        <b-link :href="'https://etherscan.io/address/' + indexToAddress[data.item[5][1]]" v-b-popover.hover.bottom="'from or account. Click to view in etherscan.io'" target="_blank">
+                        <b-link v-if="[3, 4, 6, 9, 10, 11, 12, 13, 14, 15].includes(data.item[5][0])" :href="'https://etherscan.io/address/' + indexToAddress[data.item[5][1]]" v-b-popover.hover.bottom="'from or account. Click to view in etherscan.io'" target="_blank">
                           <b-badge pill variant="light">{{ ensOrAddress(data.item[5][1], 24) }}</b-badge>
                         </b-link>
                       </font>
                     </template>
                     <template #cell(to)="data">
                       <font size="-1">
-                        <b-link v-if="[0, 1, 2, 3, 4, 6, 9, 10, 11, 12, 13, 14, 15].includes(data.item[5][0])" :href="'https://etherscan.io/address/' + indexToAddress[data.item[5][2]]" v-b-popover.hover.bottom="'to. Click to view in etherscan.io'" target="_blank">
+                        <b-link v-if="[0, 1, 2, 3, 6, 9, 10, 11, 12, 13, 14, 15].includes(data.item[5][0])" :href="'https://etherscan.io/address/' + indexToAddress[data.item[5][2]]" v-b-popover.hover.bottom="'to. Click to view in etherscan.io'" target="_blank">
                           <b-badge pill variant="light">{{ ensOrAddress(data.item[5][2], 24) }}</b-badge>
                         </b-link>
                       </font>
@@ -1185,6 +1185,27 @@
               }
             }
             const selectedContractFilter = (this.settings.selectedContracts.length == 0 || this.settings.selectedContracts.length == 4) ? null : this.settings.selectedContracts;
+
+            let ownerIndexMap = null;
+            if (this.settings.filterByOwners) {
+              const searchOwners = this.settings.filterByOwners ? this.settings.filterByOwners.split(/[, \t\n]+/).map(s => new RegExp(s.toLowerCase(), "i")) : [];
+              ownerIndexMap = {};
+              for (const [index, name] of Object.entries(this.indexToName)) {
+                for (const searchItem of searchOwners) {
+                  if (searchItem.test(name)) {
+                    ownerIndexMap[index] = name;
+                  }
+                }
+              }
+              for (const [index, address] of Object.entries(this.indexToAddress)) {
+                for (const searchItem of searchOwners) {
+                  if (searchItem.test(address)) {
+                    ownerIndexMap[index] = address;
+                  }
+                }
+              }
+            }
+
             for (const tx of this.txs) {
               const timestamp = this.blockTimestamps[tx[0]] || "(unknown)";
               let include = true;
@@ -1201,6 +1222,13 @@
                 include = false;
                 const punkId = tx[4] && tx[4][3] && parseInt(tx[4][3]);
                 if (punkId in filteredIds) {
+                  include = true;
+                }
+              }
+              if (include && ownerIndexMap) {
+                include = false;
+                const [txType, fromIndex, toIndex] = [tx[4][0], tx[4][1], tx[4][2]];
+                if ((txType >= 3 && (fromIndex in ownerIndexMap)) || (txType != 4 && (toIndex in ownerIndexMap))) {
                   include = true;
                 }
               }
