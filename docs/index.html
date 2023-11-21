@@ -2427,7 +2427,7 @@
               window.ethereum.on('accountsChanged', handleAccountsChanged);
               async function handleNewBlock(blockNumber) {
                 // console.log(moment().format("HH:mm:ss") + " handleNewBlock - New Block #" + blockNumber);
-                const block = await provider.getBlock();
+                const block = await provider.getBlock(blockNumber);
                 t.blockNumber = blockNumber;
                 t.timestamp = block.timestamp;
                 await t.processNewBlock(blockNumber);
