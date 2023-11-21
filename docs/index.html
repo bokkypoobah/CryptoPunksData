@@ -1482,6 +1482,33 @@
           },
 
           async syncCryptoPunksData(devMode) {
+            const db = new Dexie(this.db.name);
+            db.version(this.db.version).stores(this.db.schemaDefinition);
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const signer = provider.getSigner();
+            this.coinbase = await signer.getAddress();
+            localStorage.cryptoPunksDataCoinbase = this.coinbase;
+            const network = await provider.getNetwork();
+            localStorage.cryptoPunksDataChainId = network.chainId;
+            const block = await provider.getBlock();
+            const latestBlockNumber = block && block.number || null;
+            console.log(moment().format("HH:mm:ss") + " syncCryptoPunksEvents - latestBlockNumber: " + latestBlockNumber + ", chainId: " + this.chainId);
+            await this.syncCryptoPunksEvents(db, provider, latestBlockNumber, devMode);
+            if (!devMode) {
+              await this.loadBlockTimestamps(db);
+            }
+            await this.processData(db);
+            if (!devMode) {
+              await this.syncENSNames(db, provider);
+            }
+            if (!devMode) {
+              await this.loadCurrentData();
+            }
+            this.sync.section = null;
+            this.sync.halt = false;
+          },
+
+          async syncCryptoPunksEvents(db, provider, latestBlockNumber, devMode) {
             // v1 v2 event Assign(address indexed to, uint256 punkIndex);
             // v1 v2 event Transfer(address indexed from, address indexed to, uint256 value);
             // v1 v2 event PunkTransfer(address indexed from, address indexed to, uint256 punkIndex);
@@ -1498,18 +1525,7 @@
             //    w2 event Unpaused(address account);
             //    w2 event ProxyRegistered(address user, address proxy);
             const CONFIRMATIONS = 100;
-            // console.log(moment().format("HH:mm:ss") + " syncCryptoPunksData - chainId: " + this.chainId);
-            const db = new Dexie(this.db.name);
-            db.version(this.db.version).stores(this.db.schemaDefinition);
-            const provider = new ethers.providers.Web3Provider(window.ethereum);
-            const signer = provider.getSigner();
-            this.coinbase = await signer.getAddress();
-            localStorage.cryptoPunksDataCoinbase = this.coinbase;
-            const network = await provider.getNetwork();
-            localStorage.cryptoPunksDataChainId = network.chainId;
-            const block = await provider.getBlock();
-            const latestBlockNumber = block && block.number || null;
-            console.log(moment().format("HH:mm:ss") + " syncCryptoPunksData - latestBlockNumber: " + latestBlockNumber + ", chainId: " + this.chainId);
+            // console.log(moment().format("HH:mm:ss") + " syncCryptoPunksEvents - chainId: " + this.chainId);
 
             let indexToAddress = [];
             let addressToIndex = {};
@@ -1733,8 +1749,8 @@
               if (eventsDataItems.length == 1) {
                 const storedLatestBlockNumber = eventsDataItems[0].object.latestBlockNumber;
                 events = eventsDataItems[0].object.events;
-                // console.log(moment().format("HH:mm:ss") + " syncCryptoPunksData - storedLatestBlockNumber: " + storedLatestBlockNumber);
-                // console.log(moment().format("HH:mm:ss") + " syncCryptoPunksData - events: " + JSON.stringify(events).substring(0, 1000));
+                // console.log(moment().format("HH:mm:ss") + " syncCryptoPunksEvents - storedLatestBlockNumber: " + storedLatestBlockNumber);
+                // console.log(moment().format("HH:mm:ss") + " syncCryptoPunksEvents - events: " + JSON.stringify(events).substring(0, 1000));
                 if (!devMode) {
                   Object.keys(events).forEach(function (key) {
                     const confirmations = storedLatestBlockNumber - key;
@@ -1763,28 +1779,15 @@
                 }).catch(function(error) {
                   console.log("error: " + error);
                 });
-                // console.log(moment().format("HH:mm:ss") + " syncCryptoPunksData - events: " + JSON.stringify(events));
+                // console.log(moment().format("HH:mm:ss") + " syncCryptoPunksEvents - events: " + JSON.stringify(events));
                 await db.cache.put({ objectName: this.chainId + "_" + process.address + "_events", object: { latestBlockNumber, events } }).then (function() {
                 }).catch(function(error) {
                   console.log("error: " + error);
                 });
               }
             }
-            // console.log(moment().format("HH:mm:ss") + " syncCryptoPunksData - indexToTxHash: " + JSON.stringify(indexToTxHash));
-            // console.log(moment().format("HH:mm:ss") + " syncCryptoPunksData - txHashToIndex: " + JSON.stringify(txHashToIndex));
-
-            if (!devMode) {
-              await this.loadBlockTimestamps(db);
-            }
-            await this.processData(db);
-            if (!devMode) {
-              await this.syncENSNames(db, provider);
-            }
-            if (!devMode) {
-              await this.loadCurrentData();
-            }
-            this.sync.section = null;
-            this.sync.halt = false;
+            // console.log(moment().format("HH:mm:ss") + " syncCryptoPunksEvents - indexToTxHash: " + JSON.stringify(indexToTxHash));
+            // console.log(moment().format("HH:mm:ss") + " syncCryptoPunksEvents - txHashToIndex: " + JSON.stringify(txHashToIndex));
           },
 
           async loadBlockTimestamps(db) {
