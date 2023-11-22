@@ -912,6 +912,7 @@
             halt: false,
           },
           blockTimestamps: {},
+          exchangeRates: {},
           addressToIndex: {},
           indexToAddress: [],
           txHashToIndex: {},
@@ -1492,12 +1493,15 @@
             localStorage.cryptoPunksDataChainId = network.chainId;
             const block = await provider.getBlock();
             const latestBlockNumber = block && block.number || null;
-            console.log(moment().format("HH:mm:ss") + " syncCryptoPunksEvents - latestBlockNumber: " + latestBlockNumber + ", chainId: " + this.chainId);
+            console.log(moment().format("HH:mm:ss") + " syncCryptoPunksData - latestBlockNumber: " + latestBlockNumber + ", chainId: " + this.chainId);
             await this.syncCryptoPunksEvents(db, provider, latestBlockNumber, devMode);
             if (!devMode) {
               await this.loadBlockTimestamps(db);
             }
-            await this.processData(db);
+            if (!devMode) {
+              await this.processData(db);
+            }
+            await this.syncExchangeRates(db);
             if (!devMode) {
               await this.syncENSNames(db, provider);
             }
@@ -2071,8 +2075,42 @@
             console.log(moment().format("HH:mm:ss") + " processData END");
           },
 
+          async syncExchangeRates(db) {
+            // NOTE: Rates may be EOD UTC time - may be some mismatch with local time
+            console.log(moment().format("HH:mm:ss") + " syncExchangeRates - reportingCurrency: " + this.settings.reportingCurrency);
+            const MAXDAYS = 2000;
+            const MINDATE = moment("2017-06-09");
+            let toTs = moment();
+            const exchangeRates = {};
+            while (toTs.year() >= 2017) {
+              let days = toTs.diff(MINDATE, 'days');
+              if (days > MAXDAYS) {
+                days = MAXDAYS;
+              }
+              let url = "https://min-api.cryptocompare.com/data/v2/histoday?fsym=ETH&tsym=" + this.settings.reportingCurrency + "&toTs=" + toTs.unix() + "&limit=" + days;
+              if (this.settings.cryptoCompareAPIKey) {
+                url = url + "&api_key=" + this.settings.cryptoCompareAPIKey;
+              }
+              console.log(url);
+              const data = await fetch(url)
+                .then(response => response.json())
+                .catch(function(e) {
+                  console.log("error: " + e);
+                });
+              for (day of data.Data.Data) {
+                exchangeRates[moment.unix(day.time).format("YYYYMMDD")] = day.close;
+              }
+              toTs = moment(toTs).subtract(MAXDAYS, 'days');
+            }
+            console.log(moment().format("HH:mm:ss") + " syncExchangeRates - exchangeRates: " + JSON.stringify(exchangeRates));
+            await db.cache.put({ objectName: this.chainId + "_exchangeRates", object: exchangeRates }).then (function() {
+            }).catch(function(error) {
+              console.log("error: " + error);
+            });
+            this.exchangeRates = exchangeRates;
+          },
+
           async syncENSNames(db, provider) {
-            console.log(moment().format("HH:mm:ss") + " syncENSNames BEGIN");
             const ensReverseRecordsContract = new ethers.Contract(ENSREVERSERECORDSADDRESS, ENSREVERSERECORDSABI, provider);
 
             let indexToAddress = [];
@@ -2086,7 +2124,6 @@
             }
 
             const addresses = indexToAddress;
-            // addresses.sort();
             this.sync.completed = 0;
             this.sync.total = addresses.length;
             this.sync.section = 'ENS Names';
@@ -2103,14 +2140,11 @@
               }
               try {
                 const batch = addresses.slice(start, end + 1);
-                // console.log("batch: " + JSON.stringify(batch, null, 2));
                 const allnames = await ensReverseRecordsContract.getNames(batch);
-                // console.log("allnames: " + JSON.stringify(allnames, null, 2));
-                // console.log(start + " - " + end + " " + batch.length);
                 for (let j = 0; j < batch.length; j++) {
                   const account = batch[j];
                   const name = allnames[j];
-                  // const normalized = normalize(account);
+                  // TODO: const normalized = normalize(account);
                   if (name.length > 0) {
                     // console.log(account + " => " + name);
                     Vue.set(this.indexToName, addressToIndex[account], name);
@@ -2181,6 +2215,11 @@
             if (txsDataItems.length == 1) {
               Vue.set(this, 'txs', txsDataItems[0].object);
             }
+            const exchangeRatesDataItems = await db.cache.where("objectName").equals(this.chainId + "_exchangeRates").toArray();
+            if (exchangeRatesDataItems.length == 1) {
+              Vue.set(this, 'exchangeRates', exchangeRatesDataItems[0].object);
+            }
+            console.log(moment().format("HH:mm:ss") + " loadCurrentData - exchangeRates: " + JSON.stringify(this.exchangeRates, null, 2));
             db.close();
             console.log(moment().format("HH:mm:ss") + " loadCurrentData END");
           },
