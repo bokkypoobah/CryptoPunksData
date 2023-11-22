@@ -58,7 +58,7 @@
             <b-nav-item size="sm" @click="settings.tabIndex = 2; saveSettings()" :active="settings.tabIndex == 2" active-class="active" v-b-popover.hover="'View Owners'">Owners</b-nav-item>
             <b-nav-item size="sm" @click="settings.tabIndex = 3; saveSettings()" :active="settings.tabIndex == 3" active-class="active" v-b-popover.hover="'Configure Settings'">Config</b-nav-item>
             <b-avatar v-if="coinbase && coinbase != ensOrAddress(coinbase)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensOrAddress(coinbase, 100)" v-b-popover.hover="'Your ENS avatar if set'"></b-avatar>
-            <b-button size="sm" variant="outline-primary" class="ml-1" @click="processIt('connect'); processNewBlock();" v-b-popover.hover.bottom="'Click to update wallet'">{{ coinbase ? ensOrAddress(coinbase, 16) : 'Connect' }}</b-button>
+            <b-button size="sm" variant="outline-primary" class="ml-1" @click="connectToWeb3(); processNewBlock();" v-b-popover.hover.bottom="'Click to update wallet'">{{ coinbase ? ensOrAddress(coinbase, 16) : 'Connect' }}</b-button>
           </b-navbar-nav>
         </b-navbar>
 
@@ -357,7 +357,6 @@
 
                   <b-table v-if="settings.tabIndex == 1 && !settings.showInfo" small fixed striped responsive hover :fields="activityFields" :items="pagedFilteredSortedActivity" show-empty empty-html="Click Sync above to retrieve punk history" head-variant="light" class="mx-0 my-1">
                     <template #head(timestamp)="data">
-                      <!-- <b-link size="sm" @click="toggleUTCMode" variant="link" v-b-popover.hover.top="'Switch between local time or UTC time'">{{ settings.utcMode ? 'UTC Time' : 'Local Time' }}</b-link> -->
                       When
                     </template>
                     <template #cell(number)="data">
@@ -2227,14 +2226,6 @@
           saveSettings() {
             localStorage.cryptoPunksDataSettings = JSON.stringify(this.settings);
           },
-          // toggleUTCMode() {
-          //   if (this.settings.utcMode) {
-          //     Vue.set(this.settings, 'utcMode', false);
-          //   } else {
-          //     Vue.set(this.settings, 'utcMode', true);
-          //   }
-          //   this.saveSettings();
-          // },
           filterChanged(dataType, option) {
             if (!this.settings.filters[dataType]) {
               Vue.set(this.settings.filters, dataType, {});
@@ -2256,16 +2247,8 @@
             this.saveSettings();
           },
 
-          async processNewBlock(blockNumber) {
-            // const provider = new ethers.providers.Web3Provider(window.ethereum);
-            // const block = await provider.getBlock();
-            // const latestBlockNumber = block && block.number || null;
-            console.log(moment().format("HH:mm:ss") + " processNewBlock " + this.chainId + "#" + blockNumber + ", latest #" + this.blockNumber + " @ " + moment.unix(this.timestamp).format("YYYY-MM-DD HH:mm:ss") + " " + moment.unix(this.timestamp).fromNow());
-            // console.log("latestBlockNumber: " + latestBlockNumber);
-            // const db = new Dexie(this.db.name);
-            // db.version(this.db.version).stores(this.db.schemaDefinition);
-            // const context = { provider, latestBlockNumber, db };
-            // db.close();
+          async processNewBlock() {
+            console.log(moment().format("HH:mm:ss") + " processNewBlock #" + this.blockNumber + " @ " + moment.unix(this.timestamp).format("YYYY-MM-DD HH:mm:ss") + " " + moment.unix(this.timestamp).fromNow());
           },
 
           async halt() {
@@ -2482,270 +2465,6 @@
               // console.log(moment().format("HH:mm:ss") + " connectToWeb3 - chainId: " + this.chainId);
             }
           },
-          // TODO: Delete
-          async processIt(action, parameters = null) {
-            console.log("processIt - action: " + action + ", parameters: " + parameters);
-            let connected = true;
-            if (!window.ethereum) {
-              connected = false;
-            } else {
-              try {
-                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                connected = window.ethereum.isConnected();
-              } catch (e) {
-                console.log("window.ethereum.request error: " + e.message);
-                connected = false;
-              }
-            }
-            if (!connected) {
-              alert("Please use the https://metamask.io addon with Firefox, Chromium, Opera or Chrome, or any other other web3 browser, for web3 data retrieval. And refresh!");
-            } else {
-              const provider = new ethers.providers.Web3Provider(window.ethereum);
-              const signer = provider.getSigner();
-              const ensReverseRecordsContract = new ethers.Contract(ENSREVERSERECORDSADDRESS, ENSREVERSERECORDSABI, provider);
-              const erc721Helper = new ethers.Contract(ERC721HELPERADDRESS_SEPOLIA, ERC721HELPERABI, provider);
-              this.coinbase = await signer.getAddress();
-              localStorage.cryptoPunksDataCoinbase = this.coinbase;
-              const network = await provider.getNetwork();
-              console.log("network: " + JSON.stringify(network));
-              localStorage.cryptoPunksDataChainId = network.chainId;
-              this.chainId = network.chainId;
-              const block = await provider.getBlock("latest");
-              const blockNumber = block.number;
-              const timestamp = block.timestamp;
-
-              provider.off("block");
-              // provider.removeAllListeners("block");
-              provider.on("block", async (n) => {
-                console.log(moment().format("HH:mm:ss") + " " + JSON.stringify(n));
-              });
-              const listenerCount = provider.listenerCount("block");
-              // console.log("listenerCount: " + listenerCount);
-
-              const ENSOWNERBATCHSIZE = 100; // 500 fails occassionally
-
-              const db = new Dexie(this.db.name);
-              db.version(this.db.version).stores(this.db.schemaDefinition);
-
-              if (action == "retrieveMainCollection") {
-                console.log("retrieveMainCollection");
-                let continuation = null;
-                this.sync.completed = 0;
-                this.sync.total = null;
-                this.sync.section = "Main collection";
-                const mainTokens = {};
-                this.mainToken.collection.name = null;
-                do {
-                  let url = "https://api.reservoir.tools/tokens/v5?contract=" + this.settings.mainCollection + "&limit=100" +
-                    (continuation != null ? "&continuation=" + continuation : '');
-                  console.log("url: " + url);
-                  const data = await fetch(url)
-                    .then(handleErrors)
-                    .then(response => response.json())
-                    .catch(function(error) {
-                       console.log("ERROR - updateCollection: " + error);
-                       // state.sync.error = true;
-                       return [];
-                    });
-                  continuation = data.continuation;
-                  if (data && data.tokens) {
-                    for (const tokenData of data.tokens) {
-                      const token = tokenData.token;
-                      mainTokens[token.tokenId] = {
-                        owner: token.owner,
-                        image: token.image,
-                      };
-                      if (this.mainToken.collection.name == null) {
-                        this.mainToken.collection.name = token.collection.name;
-                        this.mainToken.collection.image = token.collection.image;
-                        this.mainToken.collection.slug = token.collection.slug;
-                      }
-                    }
-                  }
-                  this.sync.completed = Object.keys(mainTokens).length;
-                  await delay(1500); // TODO: Adjust to avoid error 429 Too Many Requests. Fails at 200ms
-                } while (continuation != null /*&& !this.sync.halt && !state.sync.error */);
-
-                const mainOwners = {};
-                for (const [tokenId, data] of Object.entries(mainTokens)) {
-                  if (!(data.owner in mainOwners)) {
-                    mainOwners[data.owner] = [];
-                  }
-                  mainOwners[data.owner].push(tokenId);
-                }
-
-                this.sync.completed = 0;
-                const addresses = Object.keys(mainOwners);
-                this.sync.total = addresses.length;
-                this.sync.section = "ENS Names";
-                const indexToName = {};
-                for (let i = 0; i < addresses.length & !this.sync.halt; i += ENSOWNERBATCHSIZE) {
-                  const batch = addresses.slice(i, parseInt(i) + ENSOWNERBATCHSIZE);
-                  const allnames = await ensReverseRecordsContract.getNames(batch);
-                  for (let j = 0; j < batch.length; j++) {
-                    const address = batch[j];
-                    const name = allnames[j];
-                    indexToName[address] = name != null && name.length > 0 ? name : address;
-                    // const normalized = normalize(address);
-                  }
-                  this.sync.completed = parseInt(this.sync.completed) + batch.length;
-                }
-                this.indexToName = indexToName;
-                await db.cache.put({ objectName: 'indexToName', object: indexToName }).then (function() {
-                }).catch(function(error) {
-                  console.log("error: " + error);
-                });
-                this.mainToken.tokens = mainTokens;
-                this.mainToken.owners = mainOwners;
-                await db.cache.put({ objectName: 'mainToken', object: this.mainToken }).then (function() {
-                }).catch(function(error) {
-                  console.log("error: " + error);
-                });
-                this.secondaryData = {};
-                await db.cache.put({ objectName: 'secondaryData', object: this.secondaryData }).then (function() {
-                }).catch(function(error) {
-                  console.log("error: " + error);
-                });
-                this.sync.section = null;
-              }
-
-              if (action == "syncCollections") {
-                console.log("syncCollections");
-                let contracts = [];
-                if (Object.keys(this.selectedCollections).length > 0) {
-                  contracts = Object.keys(this.selectedCollections);
-                } else {
-                  for (const record of this.filteredSortedCollections) {
-                    if (!(record.contract in this.secondaryData)) {
-                      contracts.push(record.contract);
-                    }
-                  }
-                }
-                console.log("contracts: " + JSON.stringify(contracts));
-                for (let contract of contracts) {
-                  console.log("Processing: " + contract + " " + JSON.stringify(this.collections[contract]));
-
-                  let continuation = null;
-                  this.sync.completed = 0;
-                  this.sync.total = null;
-                  this.sync.section = this.collections[contract].name.substring(0, 24);
-                  const tokens = {};
-                  do {
-                    let url = "https://api.reservoir.tools/tokens/v5?contract=" + contract + "&includeAttributes=false&limit=100" +
-                      (continuation != null ? "&continuation=" + continuation : '');
-                    console.log("url: " + url);
-                    const data = await fetch(url)
-                      .then(handleErrors)
-                      .then(response => response.json())
-                      .catch(function(error) {
-                         console.log("ERROR - updateCollection: " + error);
-                         // state.sync.error = true;
-                         return [];
-                      });
-                    continuation = data.continuation;
-                    if (data && data.tokens) {
-                      for (const tokenData of data.tokens) {
-                        const token = tokenData.token;
-                        tokens[token.tokenId] = {
-                          owner: token.owner,
-                          image: token.image,
-                        };
-                      }
-                    }
-                    this.sync.completed = Object.keys(tokens).length;
-                    await delay(1500); // TODO: Adjust to avoid error 429 Too Many Requests. Fails at 200ms
-                  } while (continuation != null /*&& !this.sync.halt && !state.sync.error */);
-                  Vue.set(this.collections[contract], 'tokens', tokens);
-                  const owners = {};
-                  for (const [tokenId, data] of Object.entries(tokens)) {
-                    if (!(data.owner in owners)) {
-                      owners[data.owner] = [];
-                    }
-                    owners[data.owner].push(tokenId);
-                  }
-                  Vue.set(this.collections[contract], 'owners', owners);
-                  Vue.set(this.collections[contract], 'updated', timestamp);
-                  Vue.set(this.collections[contract], 'blockNumber', blockNumber);
-                }
-                await db.cache.put({ objectName: 'collections', object: this.collections }).then (function() {
-                }).catch(function(error) {
-                  console.log("error: " + error);
-                });
-              }
-
-              if (action == "retrieveSecondaryCollection") {
-                console.log("retrieveSecondaryCollection");
-                let owners = [];
-                if (Object.keys(this.selectedMainTable).length > 0) {
-                  owners = Object.keys(this.selectedMainTable);
-                } else {
-                  for (const record of this.filteredSortedMainTable) {
-                    if (!(record.owner in this.secondaryData)) {
-                      owners.push(record.owner);
-                    }
-                  }
-                }
-                console.log("owners: " + JSON.stringify(owners));
-
-                this.sync.completed = 0;
-                this.sync.total = owners.count;
-                this.sync.section = "Secondary collection";
-                for (let owner of owners) {
-                  console.log("Processing: " + owner);
-                  Vue.set(this.secondaryData, owner, {});
-                  let stop = false;
-                  const LIMIT = 100;
-                  const MAXLIMIT = 10000;
-                  for (let offset = 0; offset < MAXLIMIT && !stop; offset = parseInt(offset) + LIMIT) {
-                    let url = "https://api.reservoir.tools/users/" + owner + "/tokens/v5?sortBy=acquiredAt&sortDirection=desc&offset=" + offset + "&limit=" + LIMIT + "&includeTopBid=false";
-                    console.log("url: " + url);
-                    const data = await fetch(url)
-                      .then(handleErrors)
-                      .then(response => response.json())
-                      .catch(function(error) {
-                         console.log("ERROR - updateCollection: " + error);
-                         // state.sync.error = true;
-                         return [];
-                      });
-                    if (data && data.tokens && data.tokens.length > 0) {
-                      for (const tokenData of data.tokens) {
-                        const contract = tokenData.token.contract;
-                        const tokenId = tokenData.token.tokenId;
-                        const name = tokenData.token.name;
-                        const image = tokenData.token.image;
-                        const collectionName = tokenData.token.collection.name;
-                        const collectionImage = tokenData.token.collection.imageUrl;
-                        if (!(contract in this.secondaryData[owner])) {
-                          Vue.set(this.secondaryData[owner], contract, {
-                            collectionName,
-                            collectionImage,
-                            tokens: {},
-                          });
-                        }
-                        Vue.set(this.secondaryData[owner][contract].tokens, tokenId, { tokenId, name, image });
-                      }
-                    } else {
-                      stop = true;
-                    }
-                    await delay(1500); // TODO: Adjust to avoid error 429 Too Many Requests. Fails at 200ms
-                  }
-                  await delay(1000); // TODO: Adjust to avoid error 429 Too Many Requests. Fails at 200ms
-                  this.sync.completed = parseInt(this.sync.completed) + 1;
-                  if (this.sync.halt) {
-                    break;
-                  }
-                }
-                await db.cache.put({ objectName: 'secondaryData', object: this.secondaryData }).then (function() {
-                }).catch(function(error) {
-                  console.log("error: " + error);
-                });
-              }
-
-              db.close();
-              this.sync.section = null;
-              this.sync.halt = false;
-            }
-          },
         },
 
         // --- MOUNTED ---
@@ -2777,10 +2496,6 @@
           (async() => {
             const db = new Dexie(this.db.name);
             db.version(this.db.version).stores(this.db.schemaDefinition);
-            // const blockTimestampsDataItems = await db.cache.where("objectName").equals('blockTimestamps').toArray();
-            // if (blockTimestampsDataItems.length == 1) {
-            //   this.blockTimestamps = blockTimestampsDataItems[0].object;
-            // }
             await this.loadCurrentData(db);
             db.close();
           })();
