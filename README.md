@@ -4,9 +4,11 @@
 
 <hr />
 
-# CryptoPunks Data
+# CryptoPunks Data Browser
 
-See https://bokkypoobah.github.io/CryptoPunksData/
+Web3 dapp to browse the historical event logs for v1 and v2 CryptoPunks and the wrapped versions. Further information can be found by clicking on the following link (requires a web3 enabled browser).
+
+URL: https://bokkypoobah.github.io/CryptoPunksData/
 
 ---
 
