@@ -2240,7 +2240,6 @@
             if (exchangeRatesDataItems.length == 1) {
               Vue.set(this, 'exchangeRates', exchangeRatesDataItems[0].object);
             }
-            console.log(moment().format("HH:mm:ss") + " loadCurrentData - exchangeRates: " + JSON.stringify(this.exchangeRates, null, 2));
             db.close();
             console.log(moment().format("HH:mm:ss") + " loadCurrentData END");
           },
@@ -2279,17 +2278,10 @@
           },
           commify(n) {
             if (n != null) {
-              return ethers.utils.commify(parseFloat(n).toFixed(2));
+              return Number(parseFloat(n).toFixed(2)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             }
             return null;
           },
-          // sanitise(str, length = 32) {
-          //   let result = str && str.replace(/[^a-z0-9 \.,_-💪]/gim,"_").trim() || "(null)";
-          //   if (result && length > 0) {
-          //     result = result.substring(0, length);
-          //   }
-          //   return result;
-          // },
           formatETH(e, precision = 9) {
             try {
               if (precision == 0) {
@@ -2301,20 +2293,6 @@
             }
             return e.toFixed(precision);
           },
-          // formatERC20(e, decimals = 18) {
-          //   try {
-          //     return e ? ethers.utils.formatUnits(e, decimals) : null;
-          //   } catch (err) {
-          //   }
-          //   return e.toString();
-          // },
-          // formatRate(e, decimals = 18, fixed = 10) {
-          //   try {
-          //     return e ? parseFloat(ethers.utils.formatUnits(e, decimals)).toFixed(fixed) : null;
-          //   } catch (err) {
-          //   }
-          //   return e.toString();
-          // },
           formatTimestamp(ts) {
             if (ts != null) {
               if (this.settings.reportingDateTime == 1) {
@@ -2325,24 +2303,6 @@
             }
             return null;
           },
-          // formatExpiryShort(unixtime) {
-          //   if (!unixtime) {
-          //     return "no expiry";
-          //   } else {
-          //     if (unixtime > moment().unix()) {
-          //       return moment.unix(unixtime).fromNow();
-          //     } else {
-          //       return "expired";
-          //     }
-          //   }
-          // },
-          // formatExpiry(unixtime) {
-          //   if (!unixtime) {
-          //     return "no expiry";
-          //   } else {
-          //     return moment.unix(unixtime).format("YYYY-MM-DD HH:mm:ss");
-          //   }
-          // },
           formatTimeDiff(unixtime) {
             if (!unixtime) {
               return "";
@@ -2353,8 +2313,6 @@
           ensOrAddress(addressOrAddressIndex, length = 0) {
             let result = null;
             if (new RegExp('^[0-9,]+$').test(addressOrAddressIndex)) {
-              // result = this.indexToName[addressOrAddressIndex];
-              // result = this.indexToAddress[addressOrAddressIndex];
               if (addressOrAddressIndex in this.indexToName) {
                 result = this.indexToName[addressOrAddressIndex];
               } else {
