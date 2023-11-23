@@ -7,8 +7,8 @@ const EVENTFIELD_FIELD_3 = 3;
 
 let myCounter = 0;
 
-function parsePunkTx(txHashIndex, events, addressToIndex) {
-  // console.log("parsePunkTx: " + txHashIndex); //  + " => " + JSON.stringify(txInfo));
+function parsePunkTx(txHashIndex, events, addressToIndex, exchangeRate) {
+  // console.log("parsePunkTx: " + txHashIndex + " " + exchangeRate); //  + " => " + JSON.stringify(txInfo));
   if (!cryptoPunksDeployerIndex) {
     cryptoPunksDeployerIndex = addressToIndex[CRYPTOPUNKSDEPLOYER];
   }
@@ -85,13 +85,13 @@ function parsePunkTx(txHashIndex, events, addressToIndex) {
       if (firstEvent[EVENTFIELD_TYPE] == 1) { // Transfer (W1)
         return [[ 3, firstEvent[3], firstEvent[4], firstEvent[5] ]]; // [[ Transfer, from, to, punkId ]]
       } else if (firstEvent[EVENTFIELD_TYPE] == 3) { // PunkOffered
-        return [[ 4, firstEvent[6], firstEvent[5], firstEvent[3], firstEvent[4] ]]; // [[ Offer, from, to, punkId, amount ]]
+        return [[ 4, firstEvent[6], firstEvent[5], firstEvent[3], firstEvent[4], ethers.utils.formatEther(firstEvent[4]) * exchangeRate, exchangeRate ]]; // [[ Offer, from, to, punkId, amount, amountInLocalCurrency, exchangeRate ]]
       } else if (firstEvent[EVENTFIELD_TYPE] == 4) { // PunkNoLongerForSale
         return [[ 5, firstEvent[4], , firstEvent[3] ]]; // [[ Offer, from, , punkId ]]
       } else if (firstEvent[EVENTFIELD_TYPE] == 5) { // PunkBidEntered
-        return [[ 7, firstEvent[5], , firstEvent[3], firstEvent[4] ]]; // [[ Bid, from, , punkId, amount ]]
+        return [[ 7, firstEvent[5], , firstEvent[3], firstEvent[4], ethers.utils.formatEther(firstEvent[4]) * exchangeRate, exchangeRate ]]; // [[ Bid, from, , punkId, amount, amountInLocalCurrency, exchangeRate ]]
       } else if (firstEvent[EVENTFIELD_TYPE] == 6) { // PunkBidWithdrawn
-        return [[ 8, firstEvent[5], , firstEvent[3], firstEvent[4] ]]; // [[ RemoveBid, from, , punkId, amount ]]
+        return [[ 8, firstEvent[5], , firstEvent[3], firstEvent[4], ethers.utils.formatEther(firstEvent[4]) * exchangeRate, exchangeRate ]]; // [[ RemoveBid, from, , punkId, amount, amountInLocalCurrency, exchangeRate ]]
       } else if (firstEvent[EVENTFIELD_TYPE] == 8) { // Approval
         return [[ 12, firstEvent[3], firstEvent[4], firstEvent[5] ]]; // [[ Approval, owner, approved, tokenId ]]
         // w1 w2 event Approval(address indexed owner, address indexed approved, uint256 indexed tokenId);
@@ -109,14 +109,14 @@ function parsePunkTx(txHashIndex, events, addressToIndex) {
       const secondEvent = events[1];
       const thirdEvent = events[2];
       if (firstEvent[EVENTFIELD_TYPE] == 1 && secondEvent[EVENTFIELD_TYPE] == 4 && thirdEvent[EVENTFIELD_TYPE] == 7) { // Transfer & PunkNoLongerForSale & PunkBought
-        return [[ 6, thirdEvent[5], thirdEvent[6], thirdEvent[3], thirdEvent[4] ]]; // [[ Purchase, from, to, punkId, amount ]]
+        return [[ 6, thirdEvent[5], thirdEvent[6], thirdEvent[3], thirdEvent[4], ethers.utils.formatEther(thirdEvent[4]) * exchangeRate, exchangeRate ]]; // [[ Purchase, from, to, punkId, amount, amountInLocalCurrency, exchangeRate ]]
       }
     }
 
     if (eventsLength == 2) {
       const secondEvent = events[1];
       if (firstEvent[EVENTFIELD_TYPE] == 1 && secondEvent[EVENTFIELD_TYPE] == 7) { // Transfer & PunkBought
-        return [[ 9, secondEvent[5], secondEvent[6], secondEvent[3], secondEvent[4]]]; // [[ AcceptBid, from, to, punkId, amount ]]
+        return [[ 9, secondEvent[5], secondEvent[6], secondEvent[3], secondEvent[4], ethers.utils.formatEther(secondEvent[4]) * exchangeRate, exchangeRate ]]; // [[ AcceptBid, from, to, punkId, amount, amountInLocalCurrency, exchangeRate ]]
       } else if (firstEvent[EVENTFIELD_TYPE] == 8 && secondEvent[EVENTFIELD_TYPE] == 1) { // Approval & Transfer
         return [[ 3, secondEvent[3], secondEvent[4], secondEvent[5] ]]; // [[ Transfer, from, to, punkId ]]
       }

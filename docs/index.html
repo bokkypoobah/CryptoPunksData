@@ -295,6 +295,7 @@
                       <ul>
                         <li>Event logs are retrieved via your browser's web3 connection for the CryptoPunks <b-link href="https://etherscan.io/address/0x6Ba6f2207e343923BA692e5Cae646Fb0F566DB8D#code" target="_blank">V1</b-link> and <b-link href="https://etherscan.io/address/0xb47e3cd837dDF8e4c57F05d70Ab865de6e193BBB#code" target="_blank">V2</b-link>, and Wrapped CryptoPunks <b-link href="https://etherscan.io/address/0x282BDD42f4eb70e7A9D9F40c8fEA0825B7f68C5D#code" target="_blank">V1</b-link> and <b-link href="https://etherscan.io/address/0xb7F7F6C52F2e2fdb1963Eab30438024864c313F6#code" target="_blank">V2</b-link> contracts</li>
                         <li>Block timestamps are retrieved from the <b-link href="https://api.thegraph.com/subgraphs/name/blocklytics/ethereum-blocks" target="_blank">https://api.thegraph.com/subgraphs/name/blocklytics/ethereum-blocks</b-link> subgraph API endpoint</li>
+                        <li>Exchange rates are retrieved from <b-link href="https://min-api.cryptocompare.com" target="_blank">https://min-api.cryptocompare.com</b-link>. Get your API key here and enter it in the Config page (some free initial queries without the API key)</li>
                         <li>The resulting data is collated and presented in this dapp</li>
                       </ul>
                       <h5 class="mt-3">Requirements</h5>
@@ -412,12 +413,18 @@
                     </template>
 
                     <template #cell(value)="data">
+                      <!-- 13: ApprovalForAll value -->
                       <span v-if="[13].includes(data.item[5][0])">
                         <b-badge pill variant="light">{{ data.item[5][3] }}</b-badge>
                       </span>
                       <font size="-1">
+                        <!-- 4:Offer, 6:Purchase, 7:Bid, 8:RemoveBid, 9:AcceptBid -->
                         <span v-if="[4, 6, 7, 8, 9].includes(data.item[5][0])">
-                          <b-badge pill variant="light" v-b-popover.hover="'Amount in ETH'">{{ formatETH(data.item[5][4]) }}</b-badge>
+                          {{ formatETH(data.item[5][4], 0) }}<font size="-2">Ξ</font>
+                          <br />
+                          <font size="-2">
+                            {{ settings.reportingCurrency }} {{ commify(data.item[5][5]) }} @ {{ commify(data.item[5][6]) }}
+                          </font>
                         </span>
                       </font>
                       <span v-if="data.item[5][0] == 0">
@@ -1288,10 +1295,15 @@
                 }
               }
               if (include) {
-                results.push([ timestamp, ...tx ]);
+                // TODO: Add exchangeRate in processData
+                // if ([4, 6, 7, 8, 9].includes(tx[4][0])) {
+                //   results.push([ timestamp, ...tx, 123, 456 ]);
+                // } else {
+                  results.push([ timestamp, ...tx ]);
+                // }
               }
             }
-            // console.log(moment().format("HH:mm:ss") + " filteredActivity - results: " + JSON.stringify(results.slice(0, 10)) + ", ...");
+            console.log(moment().format("HH:mm:ss") + " filteredActivity - results: " + JSON.stringify(results.slice(0, 10)) + ", ...");
             return results;
           },
           filteredSortedActivity() {
@@ -1498,9 +1510,9 @@
               await this.loadBlockTimestamps(db);
             }
             if (!devMode) {
-              await this.processData(db);
+              await this.syncExchangeRates(db);
             }
-            await this.syncExchangeRates(db);
+            await this.processData(db);
             if (!devMode) {
               await this.syncENSNames(db, provider);
             }
@@ -1861,7 +1873,6 @@
                   if (!(blockNumber in combined)) {
                     combined[blockNumber] = {};
                   }
-                  const timestamp = this.blockTimestamps[blockNumber] || "(unknown)";
                   for (const [txIndex, txData] of Object.entries(txIndexes)) {
                     const [txHashIndex, logs] = txData;
                     if (!(txIndex in combined[blockNumber])) {
@@ -1885,7 +1896,18 @@
             this.sync.completed = 0;
             this.sync.total = Object.keys(combined).length;
             this.sync.section = 'Process Data #2';
+            let lastDate = null;
+            let exchangeRate = null;
             for (const blockNumber of Object.keys(combined).sort((a, b) => parseInt(a) - parseInt(b))) {
+              const timestamp = this.blockTimestamps[blockNumber] || null;
+              const yyyymmdd = timestamp && moment.unix(timestamp).utc().format("YYYYMMDD") || null;
+              if (yyyymmdd != lastDate) {
+                if (yyyymmdd in this.exchangeRates) {
+                  exchangeRate = this.exchangeRates[yyyymmdd];
+                }
+                lastDate = yyyymmdd;
+                // console.log("yyyymmdd: " + yyyymmdd + " " + exchangeRate);
+              }
               const txIndexes = combined[blockNumber];
               for (const txIndex of Object.keys(txIndexes).sort((a, b) => parseInt(a) - parseInt(b))) {
                 const txData = txIndexes[txIndex];
@@ -1955,9 +1977,9 @@
                     if (!(punkId in punkIds)) {
                       punkIds[punkId] = 1;
                     }
-                    // if (punkId == 7144) {
+                    // if (punkId == 5309) {
                     //   console.log("PunkOffered " + blockNumber + " " + txIndex + " " + txHashIndex + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
-                    //   console.log("  offers[contractIndex][7144]: " + JSON.stringify(offers[contractIndex][7144]));
+                    // //   console.log("  offers[contractIndex][7144]: " + JSON.stringify(offers[contractIndex][7144]));
                     // }
                     events.push([ parseInt(logIndex), contractIndex, eventType, event[2], event[3], event[4], tokens[contractIndex][punkId] ]);
 
@@ -2042,7 +2064,7 @@
                 }
                 const contractIndexList = Object.keys(contractIndexes).map(e => parseInt(e));
                 const punkIdList = Object.keys(punkIds).map(e => parseInt(e));
-                const txSummary = parsePunkTx(txHashIndex, events, this.addressToIndex);
+                const txSummary = parsePunkTx(txHashIndex, events, this.addressToIndex, exchangeRate);
                 if (txSummary) {
                   for (const [index, summary] of txSummary.entries()) {
                     // TODO: Get rid of punkIdList
@@ -2257,38 +2279,42 @@
           },
           commify(n) {
             if (n != null) {
-              return ethers.utils.commify(n);
+              return ethers.utils.commify(parseFloat(n).toFixed(2));
             }
             return null;
           },
-          sanitise(str, length = 32) {
-            let result = str && str.replace(/[^a-z0-9 \.,_-💪]/gim,"_").trim() || "(null)";
-            if (result && length > 0) {
-              result = result.substring(0, length);
-            }
-            return result;
-          },
-          formatETH(e) {
+          // sanitise(str, length = 32) {
+          //   let result = str && str.replace(/[^a-z0-9 \.,_-💪]/gim,"_").trim() || "(null)";
+          //   if (result && length > 0) {
+          //     result = result.substring(0, length);
+          //   }
+          //   return result;
+          // },
+          formatETH(e, precision = 9) {
             try {
-              return e ? parseFloat(ethers.utils.formatEther(e)).toFixed(9) : null;
+              if (precision == 0) {
+                return e ? ethers.utils.formatEther(e) : null;
+              } else {
+                return e ? parseFloat(ethers.utils.formatEther(e)).toFixed(precision) : null;
+              }
             } catch (err) {
             }
-            return e.toFixed(9);
+            return e.toFixed(precision);
           },
-          formatERC20(e, decimals = 18) {
-            try {
-              return e ? ethers.utils.formatUnits(e, decimals) : null;
-            } catch (err) {
-            }
-            return e.toString();
-          },
-          formatRate(e, decimals = 18, fixed = 10) {
-            try {
-              return e ? parseFloat(ethers.utils.formatUnits(e, decimals)).toFixed(fixed) : null;
-            } catch (err) {
-            }
-            return e.toString();
-          },
+          // formatERC20(e, decimals = 18) {
+          //   try {
+          //     return e ? ethers.utils.formatUnits(e, decimals) : null;
+          //   } catch (err) {
+          //   }
+          //   return e.toString();
+          // },
+          // formatRate(e, decimals = 18, fixed = 10) {
+          //   try {
+          //     return e ? parseFloat(ethers.utils.formatUnits(e, decimals)).toFixed(fixed) : null;
+          //   } catch (err) {
+          //   }
+          //   return e.toString();
+          // },
           formatTimestamp(ts) {
             if (ts != null) {
               if (this.settings.reportingDateTime == 1) {
@@ -2299,24 +2325,24 @@
             }
             return null;
           },
-          formatExpiryShort(unixtime) {
-            if (!unixtime) {
-              return "no expiry";
-            } else {
-              if (unixtime > moment().unix()) {
-                return moment.unix(unixtime).fromNow();
-              } else {
-                return "expired";
-              }
-            }
-          },
-          formatExpiry(unixtime) {
-            if (!unixtime) {
-              return "no expiry";
-            } else {
-              return moment.unix(unixtime).format("YYYY-MM-DD HH:mm:ss");
-            }
-          },
+          // formatExpiryShort(unixtime) {
+          //   if (!unixtime) {
+          //     return "no expiry";
+          //   } else {
+          //     if (unixtime > moment().unix()) {
+          //       return moment.unix(unixtime).fromNow();
+          //     } else {
+          //       return "expired";
+          //     }
+          //   }
+          // },
+          // formatExpiry(unixtime) {
+          //   if (!unixtime) {
+          //     return "no expiry";
+          //   } else {
+          //     return moment.unix(unixtime).format("YYYY-MM-DD HH:mm:ss");
+          //   }
+          // },
           formatTimeDiff(unixtime) {
             if (!unixtime) {
               return "";
