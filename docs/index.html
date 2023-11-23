@@ -1295,12 +1295,7 @@
                 }
               }
               if (include) {
-                // TODO: Add exchangeRate in processData
-                // if ([4, 6, 7, 8, 9].includes(tx[4][0])) {
-                //   results.push([ timestamp, ...tx, 123, 456 ]);
-                // } else {
-                  results.push([ timestamp, ...tx ]);
-                // }
+                results.push([ timestamp, ...tx ]);
               }
             }
             console.log(moment().format("HH:mm:ss") + " filteredActivity - results: " + JSON.stringify(results.slice(0, 10)) + ", ...");
