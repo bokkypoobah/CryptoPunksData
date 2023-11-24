@@ -324,14 +324,20 @@
 
                   <b-table v-if="settings.tabIndex == 0 && !settings.showInfo" small fixed striped responsive hover :fields="punksFields" :items="pagedFilteredSortedPunks" show-empty empty-html="Click Sync above to retrieve punk history" head-variant="light" class="mx-0 my-1">
                     <template #cell(punkId)="data">
-                      <b-link :href="'https://cryptopunks.app/cryptopunks/details/' + data.item.punkId" v-b-popover.hover.bottom="'View in original website'" target="_blank">
+                      <b-link @click="showModalPunk(data.item.punkId);" v-b-popover.hover.bottom="'Click here'">
                         {{ data.item.punkId }}
                       </b-link>
+                      <!-- <b-link :href="'https://cryptopunks.app/cryptopunks/details/' + data.item.punkId" v-b-popover.hover.bottom="'View in original website'" target="_blank">
+                        {{ data.item.punkId }}
+                      </b-link> -->
                     </template>
                     <template #cell(image)="data">
-                      <b-link :href="'https://cryptopunks.app/cryptopunks/details/' + data.item.punkId" v-b-popover.hover.bottom="'View in original website'" target="_blank">
+                      <b-link @click="showModalPunk(data.item.punkId);" v-b-popover.hover.bottom="'Click here'">
                         <b-img-lazy width="100%" :src="'images/punks/punk' + data.item.punkId.toString().padStart(4, '0') + '.png'" style="background-color: #638596"/>
                       </b-link>
+                      <!-- <b-link :href="'https://cryptopunks.app/cryptopunks/details/' + data.item.punkId" v-b-popover.hover.bottom="'View in original website'" target="_blank">
+                        <b-img-lazy width="100%" :src="'images/punks/punk' + data.item.punkId.toString().padStart(4, '0') + '.png'" style="background-color: #638596"/>
+                      </b-link> -->
                     </template>
                     <template #cell(v1Owner)="data">
                       <b-link v-if="data.item.v1.ownerIndex && !data.item.v1.wrapped" :href="'https://etherscan.io/address/' + indexToAddress[data.item.v1.ownerIndex]" v-b-popover.hover.bottom="'View owner in etherscan.io'" target="_blank">
@@ -1485,6 +1491,10 @@
                 return word.charAt(0).toUpperCase() + word.substring(1).toLowerCase();
               }
             }).join(' ');
+          },
+
+          showModalPunk(punkId) {
+            console.log(moment().format("HH:mm:ss") + " showModalPunk - punkId: " + punkId);
           },
 
           async syncCryptoPunksData(devMode) {
