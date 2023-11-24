@@ -78,10 +78,59 @@
             </template>
             <b-form-group label-cols-lg="2" label="Punk" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
               <b-form-group label="Id:" label-for="punk-punkid" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                <b-form-input type="text" readonly size="sm" id="punk-punkid" v-model="modalPunk.punkId" class="w-25"></b-form-input>
+                <font size="-1">
+                  <b-link label-for="punk-punkid" :href="'https://cryptopunks.app/cryptopunks/details/' + modalPunk.punkId" v-b-popover.hover.bottom="'punkId. Click to view in cryptopunks.app'" target="_blank">{{ modalPunk.punkId }}</b-link>
+                </font>
               </b-form-group>
               <b-form-group label="Image:" label-for="punk-image" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                 <b-img-lazy width="100%" :src="'images/punks/punk' + ('' + modalPunk.punkId).toString().padStart(4, '0') + '.png'" style="background-color: #638596"/>
+              </b-form-group>
+              <b-form-group label="Attributes:" label-for="punk-attributes" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <span v-for="(attribute, attributeIndex) in modalPunk.attributes" v-bind:key="attributeIndex">
+                  <b-badge size="sm" pill variant="light" v-b-popover.hover.bottom="slugToTitle(attribute.trait_type)" class="mr-1">{{ slugToTitle(attribute.value) }}</b-badge>
+                </span>
+              </b-form-group>
+            </b-form-group>
+            <b-form-group label-cols-lg="2" label="V1" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
+              <b-form-group label="Owner:" label-for="punk-v1owner" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <font size="-1">
+                  <b-link label-for="punk-v1owner" :href="'https://etherscan.io/address/' + indexToAddress[modalPunk.v1.ownerIndex]" v-b-popover.hover.bottom="'v1 Owner. Click to view in etherscan.io'" target="_blank">
+                    {{ ensOrAddress(indexToAddress[modalPunk.v1.ownerIndex], 42) }}
+                  </b-link>
+                </font>
+              </b-form-group>
+              <b-form-group label="Wrapped:" label-for="punk-v1wrapped" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <font size="-1">
+                  <span v-if="modalPunk.v1.wrapped">
+                    <b-link label-for="punk-v1wrapped" :href="'https://opensea.io/assets/ethereum/0x282bdd42f4eb70e7a9d9f40c8fea0825b7f68c5d/' + modalPunk.punkId" v-b-popover.hover.bottom="'Wrapped v1. Click to view in opensea.io'" target="_blank">
+                      Yes
+                    </b-link>
+                  </span>
+                  <span v-else>
+                    No
+                  </span>
+                </font>
+              </b-form-group>
+            </b-form-group>
+            <b-form-group label-cols-lg="2" label="V2" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
+              <b-form-group label="Owner:" label-for="punk-v2owner" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <font size="-1">
+                  <b-link label-for="punk-v2owner" :href="'https://etherscan.io/address/' + indexToAddress[modalPunk.v2.ownerIndex]" v-b-popover.hover.bottom="'v2 Owner. Click to view in etherscan.io'" target="_blank">
+                    {{ ensOrAddress(indexToAddress[modalPunk.v2.ownerIndex], 42) }}
+                  </b-link>
+                </font>
+              </b-form-group>
+              <b-form-group label="Wrapped:" label-for="punk-v2wrapped" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <font size="-1">
+                  <span v-if="modalPunk.v2.wrapped">
+                    <b-link label-for="punk-v2wrapped" :href="'https://opensea.io/assets/ethereum/0xb7f7f6c52f2e2fdb1963eab30438024864c313f6/' + modalPunk.punkId" v-b-popover.hover.bottom="'Wrapped v2. Click to view in opensea.io'" target="_blank">
+                      Yes
+                    </b-link>
+                  </span>
+                  <span v-else>
+                    No
+                  </span>
+                </font>
               </b-form-group>
             </b-form-group>
           </b-modal>
@@ -950,6 +999,15 @@
 
           modalPunk: {
             punkId: null,
+            v1: {
+              ownerIndex: null,
+              wrapped: false,
+            },
+            v2: {
+              ownerIndex: null,
+              wrapped: false,
+            },
+            attributes: {},
           },
 
           modalTxDetails: {
@@ -1512,8 +1570,29 @@
           },
 
           showModalPunk(punkId) {
-            console.log(moment().format("HH:mm:ss") + " showModalPunk - punkId: " + punkId);
+            // console.log(moment().format("HH:mm:ss") + " showModalPunk - punkId: " + punkId);
             this.modalPunk.punkId = punkId;
+            const w1Index = this.addressToIndex[WRAPPEDCRYPTOPUNKSV1ADDRESS];
+            const w2Index = this.addressToIndex[WRAPPEDCRYPTOPUNKSV2ADDRESS];
+            const v1OwnerIndex = this.tokens[1] && this.tokens[1][punkId] || null;
+            const v2OwnerIndex = this.tokens[2] && this.tokens[2][punkId] || null;
+            const w1OwnerIndex = this.tokens[3] && this.tokens[3][punkId] || null;
+            const w2OwnerIndex = this.tokens[4] && this.tokens[4][punkId] || null;
+            if (v1OwnerIndex == w1Index) {
+              this.modalPunk.v1.ownerIndex = w1OwnerIndex || 0;
+              this.modalPunk.v1.wrapped = true;
+            } else {
+              this.modalPunk.v1.ownerIndex = v1OwnerIndex;
+              this.modalPunk.v1.wrapped = false;
+            }
+            if (v2OwnerIndex == w2Index) {
+              this.modalPunk.v2.ownerIndex = w2OwnerIndex;
+              this.modalPunk.v2.wrapped = true;
+            } else {
+              this.modalPunk.v2.ownerIndex = v2OwnerIndex;
+              this.modalPunk.v2.wrapped = false;
+            }
+            this.modalPunk.attributes = this.punkAttributes[punkId];
             this.$bvModal.show('modal-punk');
           },
 
