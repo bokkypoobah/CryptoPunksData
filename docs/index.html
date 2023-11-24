@@ -72,6 +72,10 @@
             </b-card-text>
           </b-card>
 
+          <b-modal id="modal-punk" hide-footer size="lg">
+            {{ modalPunk.punkId }}
+          </b-modal>
+
           <b-modal id="modal-tx-details" hide-footer size="lg">
             <template #modal-title>
               <font size="-1">Tx {{ modalTxDetails.item.txHash }}</font>
@@ -934,6 +938,10 @@
           tokens: {},
           events: {},
 
+          modalPunk: {
+            punkId: null,
+          },
+
           modalTxDetails: {
             item: null,
             tx: null,
@@ -1495,6 +1503,8 @@
 
           showModalPunk(punkId) {
             console.log(moment().format("HH:mm:ss") + " showModalPunk - punkId: " + punkId);
+            this.modalPunk.punkId = punkId;
+            this.$bvModal.show('modal-punk');
           },
 
           async syncCryptoPunksData(devMode) {
