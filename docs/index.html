@@ -1922,7 +1922,6 @@
                   exchangeRate = this.exchangeRates[yyyymmdd];
                 }
                 lastDate = yyyymmdd;
-                // console.log("yyyymmdd: " + yyyymmdd + " " + exchangeRate);
               }
               const txIndexes = combined[blockNumber];
               for (const txIndex of Object.keys(txIndexes).sort((a, b) => parseInt(a) - parseInt(b))) {
