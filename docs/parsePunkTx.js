@@ -13,7 +13,7 @@ function parsePunkTx(txHashIndex, events, addressToIndex, exchangeRate) {
     cryptoPunksDeployerIndex = addressToIndex[CRYPTOPUNKSDEPLOYER];
   }
 
-  if (myCounter++ < 10) {
+  if (myCounter++ < 5) {
     console.log("  " + txHashIndex + ": " + JSON.stringify(events));
   }
 
