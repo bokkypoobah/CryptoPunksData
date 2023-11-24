@@ -1534,8 +1534,6 @@
             //    w2 event Unpaused(address account);
             //    w2 event ProxyRegistered(address user, address proxy);
             const CONFIRMATIONS = 100;
-            // console.log(moment().format("HH:mm:ss") + " syncCryptoPunksEvents - chainId: " + this.chainId);
-
             let indexToAddress = [];
             let addressToIndex = {};
             const indexToAddressDataItems = await db.cache.where("objectName").equals(this.chainId + "_indexToAddress").toArray();
@@ -1561,7 +1559,6 @@
               }
             }
             for (const process of this.contracts) {
-              // console.log(moment().format("HH:mm:ss") + " Processing: " + process.name);
               const contract = new ethers.Contract(process.address, process.abi, provider);
               if (!(process.address in addressToIndex)) {
                 addressToIndex[process.address] = indexToAddress.length;
@@ -1758,8 +1755,6 @@
               if (eventsDataItems.length == 1) {
                 const storedLatestBlockNumber = eventsDataItems[0].object.latestBlockNumber;
                 events = eventsDataItems[0].object.events;
-                // console.log(moment().format("HH:mm:ss") + " syncCryptoPunksEvents - storedLatestBlockNumber: " + storedLatestBlockNumber);
-                // console.log(moment().format("HH:mm:ss") + " syncCryptoPunksEvents - events: " + JSON.stringify(events).substring(0, 1000));
                 if (!devMode) {
                   Object.keys(events).forEach(function (key) {
                     const confirmations = storedLatestBlockNumber - key;
@@ -1788,15 +1783,12 @@
                 }).catch(function(error) {
                   console.log("error: " + error);
                 });
-                // console.log(moment().format("HH:mm:ss") + " syncCryptoPunksEvents - events: " + JSON.stringify(events));
                 await db.cache.put({ objectName: this.chainId + "_" + process.address + "_events", object: { latestBlockNumber, events } }).then (function() {
                 }).catch(function(error) {
                   console.log("error: " + error);
                 });
               }
             }
-            // console.log(moment().format("HH:mm:ss") + " syncCryptoPunksEvents - indexToTxHash: " + JSON.stringify(indexToTxHash));
-            // console.log(moment().format("HH:mm:ss") + " syncCryptoPunksEvents - txHashToIndex: " + JSON.stringify(txHashToIndex));
           },
 
           async loadBlockTimestamps(db) {
@@ -2127,7 +2119,6 @@
 
           async syncENSNames(db, provider) {
             const ensReverseRecordsContract = new ethers.Contract(ENSREVERSERECORDSADDRESS, ENSREVERSERECORDSABI, provider);
-
             let indexToAddress = [];
             let addressToIndex = {};
             const indexToAddressDataItems = await db.cache.where("objectName").equals(this.chainId + "_indexToAddress").toArray();
@@ -2137,12 +2128,10 @@
                 addressToIndex[address] = index;
               }
             }
-
             const addresses = indexToAddress;
             this.sync.completed = 0;
             this.sync.total = addresses.length;
             this.sync.section = 'ENS Names';
-
             const MAXBATCHSIZE = 1000;
             let batchSize = MAXBATCHSIZE;
             let completed = 0;
@@ -2182,7 +2171,6 @@
             for (const [address, name] of Object.entries(CUSTOMNAMES)) {
               Vue.set(this.indexToName, addressToIndex[address], name);
             }
-
             // console.log("this.indexToName: " + JSON.stringify(this.indexToName, null, 2));
             await db.cache.put({ objectName: CHAINID_MAINNET + "_indexToName", object: this.indexToName }).then (function() {
             }).catch(function(error) {
