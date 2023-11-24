@@ -1061,7 +1061,7 @@
             { value: 1, text: 'UTC Time' },
           ],
           db: {
-            name: "cryptopunksdata088j",
+            name: "cryptopunksdata088k",
             version: 1,
             schemaDefinition: {
               cache: '&objectName',
@@ -1269,11 +1269,10 @@
             }
 
             for (const tx of this.txs) {
-              const timestamp = this.blockTimestamps[tx[0]] || "(unknown)";
               let include = true;
               if (selectedContractFilter) {
                 include = false;
-                for (let contractIndex of tx[5]) {
+                for (let contractIndex of tx[6]) {
                   if (selectedContractFilter.includes(contractIndex)) {
                     include = true;
                     break;
@@ -1282,20 +1281,20 @@
               }
               if (include && filteredIds) {
                 include = false;
-                const punkId = tx[4] && tx[4][3] && parseInt(tx[4][3]);
+                const punkId = tx[5] && tx[5][3] && parseInt(tx[5][3]);
                 if (punkId in filteredIds) {
                   include = true;
                 }
               }
               if (include && ownerIndexMap) {
                 include = false;
-                const [txType, fromIndex, toIndex] = [tx[4][0], tx[4][1], tx[4][2]];
+                const [txType, fromIndex, toIndex] = [tx[5][0], tx[5][1], tx[5][2]];
                 if ((txType >= 3 && (fromIndex in ownerIndexMap)) || (txType != 4 && (toIndex in ownerIndexMap))) {
                   include = true;
                 }
               }
               if (include) {
-                results.push([ timestamp, ...tx ]);
+                results.push(tx);
               }
             }
             console.log(moment().format("HH:mm:ss") + " filteredActivity - results: " + JSON.stringify(results.slice(0, 10)) + ", ...");
@@ -2063,7 +2062,7 @@
                 if (txSummary) {
                   for (const [index, summary] of txSummary.entries()) {
                     // TODO: Get rid of punkIdList
-                    txs.push([ parseInt(blockNumber), parseInt(txIndex), index, txHashIndex, summary, contractIndexList, punkIdList, events ]);
+                    txs.push([ timestamp, parseInt(blockNumber), parseInt(txIndex), index, txHashIndex, summary, contractIndexList, punkIdList, events ]);
                   }
                 }
               }
