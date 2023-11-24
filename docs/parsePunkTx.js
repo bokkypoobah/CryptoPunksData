@@ -17,40 +17,6 @@ function parsePunkTx(txHashIndex, events, addressToIndex, exchangeRate) {
     console.log("  " + txHashIndex + ": " + JSON.stringify(events));
   }
 
-  // indexToEventTypes: [
-  //   "Assign", // 0
-  //   "Transfer", // 1
-  //   "PunkTransfer", // 2
-  //   "PunkOffered", // 3
-  //   "PunkNoLongerForSale", // 4
-  //   "PunkBidEntered", // 5
-  //   "PunkBidWithdrawn", // 6
-  //   "PunkBought", // 7
-  //   "Approval", // 8
-  //   "ApprovalForAll", // 9
-  //   "OwnershipTransferred", // 10
-  //   "ProxyRegistered", // 11
-  // ],
-
-  // indexToTransactionTypes: [
-  //   "Reserve", // 0
-  //   "Claim", // 1
-  //   "Airdrop", // 2
-  //   "Transfer", // 3
-  //   "Offer", // 4
-  //   "RemoveOffer", // 5
-  //   "Purchase", // 6
-  //   "Bid", // 7
-  //   "RemoveBid", // 8
-  //   "AcceptBid", // 9
-  //   "Wrap", // 10
-  //   "Unwrap", // 11
-  //   "Approval", // 12
-  //   "ApprovalForAll", // 13
-  //   "OwnershipTransferred", // 14
-  //   "ProxyRegistered", // 15
-  // ],
-
   const eventsLength = events.length;
   if (eventsLength > 0) {
     const firstEvent = events[0];
