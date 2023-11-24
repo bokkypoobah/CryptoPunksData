@@ -462,12 +462,15 @@
                       </b-link>
                     </template>
                     <template #cell(v1Owner)="data">
-                      <b-link v-if="data.item.v1.ownerIndex && !data.item.v1.wrapped" :href="'https://etherscan.io/address/' + indexToAddress[data.item.v1.ownerIndex]" v-b-popover.hover.bottom="'View owner in etherscan.io'" target="_blank">
+                      <b-link v-if="data.item.v1.ownerIndex" @click="showModalAddress(data.item.v1.ownerIndex);" v-b-popover.hover.bottom="'Click for details'" target="_blank">
+                        {{ ensOrAddress(data.item.v1.ownerIndex, 16) }}
+                      </b-link>
+                      <!-- <b-link v-if="data.item.v1.ownerIndex && !data.item.v1.wrapped" :href="'https://etherscan.io/address/' + indexToAddress[data.item.v1.ownerIndex]" v-b-popover.hover.bottom="'View owner in etherscan.io'" target="_blank">
                         {{ ensOrAddress(data.item.v1.ownerIndex, 16) }}
                       </b-link>
                       <b-link v-if="data.item.v1.ownerIndex && data.item.v1.wrapped" :href="'https://etherscan.io/address/' + indexToAddress[data.item.v1.ownerIndex]" v-b-popover.hover.bottom="'View owner in etherscan.io'" target="_blank">
                         {{ '[' + ensOrAddress(data.item.v1.ownerIndex, 16) + ']' }}
-                      </b-link>
+                      </b-link> -->
                     </template>
                     <template #cell(v1Wrapped)="data">
                       <font size="-1">
@@ -475,12 +478,15 @@
                       </font>
                     </template>
                     <template #cell(v2Owner)="data">
-                      <b-link v-if="data.item.v2.ownerIndex && !data.item.v2.wrapped" :href="'https://etherscan.io/address/' + indexToAddress[data.item.v2.ownerIndex]" v-b-popover.hover.bottom="'View owner in etherscan.io'" target="_blank">
+                      <b-link v-if="data.item.v2.ownerIndex" @click="showModalAddress(data.item.v2.ownerIndex);" v-b-popover.hover.bottom="'Click for details'" target="_blank">
+                        {{ ensOrAddress(data.item.v2.ownerIndex, 16) }}
+                      </b-link>
+                      <!-- <b-link v-if="data.item.v2.ownerIndex && !data.item.v2.wrapped" :href="'https://etherscan.io/address/' + indexToAddress[data.item.v2.ownerIndex]" v-b-popover.hover.bottom="'View owner in etherscan.io'" target="_blank">
                         {{ ensOrAddress(data.item.v2.ownerIndex, 16) }}
                       </b-link>
                       <b-link v-if="data.item.v2.ownerIndex && data.item.v2.wrapped" :href="'https://etherscan.io/address/' + indexToAddress[data.item.v2.ownerIndex]" v-b-popover.hover.bottom="'View owner in etherscan.io'" target="_blank">
                         {{ '[' + ensOrAddress(data.item.v2.ownerIndex, 16) + ']' }}
-                      </b-link>
+                      </b-link> -->
                     </template>
                     <template #cell(v2Wrapped)="data">
                       <font size="-1">
@@ -1082,7 +1088,9 @@
           },
 
           modalAddress: {
+            addressIndex: null,
             address: null,
+            name: null,
           },
 
           modalTxDetails: {
@@ -1673,8 +1681,11 @@
             this.$bvModal.show('modal-punk');
           },
 
-          showModalAddress(address) {
-            console.log(moment().format("HH:mm:ss") + " showModalAddress");
+          showModalAddress(addressIndex) {
+            this.modalAddress.addressIndex = addressIndex;
+            this.modalAddress.address = this.indexToAddress[addressIndex];
+            this.modalAddress.name = this.indexToName[addressIndex] || "null";
+            console.log(moment().format("HH:mm:ss") + " showModalAddress: " + addressIndex + " => " + JSON.stringify(this.modalAddress));
             this.$bvModal.show('modal-address');
           },
 
