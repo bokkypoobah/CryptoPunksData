@@ -72,6 +72,7 @@
             </b-card-text>
           </b-card>
 
+          <!-- MODALPUNK -->
           <b-modal id="modal-punk" hide-footer size="lg">
             <template #modal-title>
               <font size="-1">Punk {{ modalPunk.punkId }}</font>
@@ -133,6 +134,70 @@
                 </font>
               </b-form-group>
             </b-form-group>
+          </b-modal>
+
+          <!-- MODALADDRESS -->
+          <b-modal id="modal-address" hide-footer size="lg">
+            <template #modal-title>
+              <font size="-1">Address {{ modalAddress.address }}</font>
+            </template>
+            <!-- <b-form-group label-cols-lg="2" label="Punk" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
+              <b-form-group label="Id:" label-for="punk-punkid" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <font size="-1">
+                  <b-link label-for="punk-punkid" :href="'https://cryptopunks.app/cryptopunks/details/' + modalPunk.punkId" v-b-popover.hover.bottom="'punkId. Click to view in cryptopunks.app'" target="_blank">{{ modalPunk.punkId }}</b-link>
+                </font>
+              </b-form-group>
+              <b-form-group label="Image:" label-for="punk-image" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <b-img-lazy width="100%" :src="'images/punks/punk' + ('' + modalPunk.punkId).toString().padStart(4, '0') + '.png'" style="background-color: #638596"/>
+              </b-form-group>
+              <b-form-group label="Attributes:" label-for="punk-attributes" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <span v-for="(attribute, attributeIndex) in modalPunk.attributes" v-bind:key="attributeIndex">
+                  <b-badge size="sm" pill variant="light" v-b-popover.hover.bottom="slugToTitle(attribute.trait_type)" class="mr-1">{{ slugToTitle(attribute.value) }}</b-badge>
+                </span>
+              </b-form-group>
+            </b-form-group>
+            <b-form-group label-cols-lg="2" label="V1" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
+              <b-form-group label="Owner:" label-for="punk-v1owner" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <font size="-1">
+                  <b-link label-for="punk-v1owner" :href="'https://etherscan.io/address/' + indexToAddress[modalPunk.v1.ownerIndex]" v-b-popover.hover.bottom="'v1 Owner. Click to view in etherscan.io'" target="_blank">
+                    {{ ensOrAddress(indexToAddress[modalPunk.v1.ownerIndex], 42) }}
+                  </b-link>
+                </font>
+              </b-form-group>
+              <b-form-group label="Wrapped:" label-for="punk-v1wrapped" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <font size="-1">
+                  <span v-if="modalPunk.v1.wrapped">
+                    <b-link label-for="punk-v1wrapped" :href="'https://opensea.io/assets/ethereum/0x282bdd42f4eb70e7a9d9f40c8fea0825b7f68c5d/' + modalPunk.punkId" v-b-popover.hover.bottom="'Wrapped v1. Click to view in opensea.io'" target="_blank">
+                      Yes
+                    </b-link>
+                  </span>
+                  <span v-else>
+                    No
+                  </span>
+                </font>
+              </b-form-group>
+            </b-form-group>
+            <b-form-group label-cols-lg="2" label="V2" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
+              <b-form-group label="Owner:" label-for="punk-v2owner" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <font size="-1">
+                  <b-link label-for="punk-v2owner" :href="'https://etherscan.io/address/' + indexToAddress[modalPunk.v2.ownerIndex]" v-b-popover.hover.bottom="'v2 Owner. Click to view in etherscan.io'" target="_blank">
+                    {{ ensOrAddress(indexToAddress[modalPunk.v2.ownerIndex], 42) }}
+                  </b-link>
+                </font>
+              </b-form-group>
+              <b-form-group label="Wrapped:" label-for="punk-v2wrapped" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <font size="-1">
+                  <span v-if="modalPunk.v2.wrapped">
+                    <b-link label-for="punk-v2wrapped" :href="'https://opensea.io/assets/ethereum/0xb7f7f6c52f2e2fdb1963eab30438024864c313f6/' + modalPunk.punkId" v-b-popover.hover.bottom="'Wrapped v2. Click to view in opensea.io'" target="_blank">
+                      Yes
+                    </b-link>
+                  </span>
+                  <span v-else>
+                    No
+                  </span>
+                </font>
+              </b-form-group>
+            </b-form-group> -->
           </b-modal>
 
           <b-modal id="modal-tx-details" hide-footer size="lg">
@@ -229,7 +294,7 @@
           </b-modal>
 
           <b-card class="m-0 p-0 border-0" body-class="m-1 p-0">
-            <!-- 0:Toolbar -->
+            <!-- TOOLBAR -->
             <b-card-text v-if="coinbase" class="m-0 p-0">
               <div class="d-flex flex-wrap m-0 p-0">
                 <div class="mt-0">
@@ -346,9 +411,8 @@
                   </b-card>
                 </b-col>
 
-                <!-- 0:Home -->
                 <b-col class="m-0 p-0">
-
+                  <!-- ?:INFO -->
                   <b-card v-if="settings.showInfo || coinbase == null" no-body class="my-1 p-1">
                     <b-card-body class="mt-1 p-1">
                       <h4>Welcome</h4>
@@ -385,6 +449,7 @@
                     </b-card-body>
                   </b-card>
 
+                  <!-- 0:PUNKS -->
                   <b-table v-if="settings.tabIndex == 0 && !settings.showInfo" small fixed striped responsive hover :fields="punksFields" :items="pagedFilteredSortedPunks" show-empty empty-html="Click Sync above to retrieve punk history" head-variant="light" class="mx-0 my-1">
                     <template #cell(punkId)="data">
                       <b-link @click="showModalPunk(data.item.punkId);" v-b-popover.hover.bottom="'Click for details'">
@@ -404,6 +469,11 @@
                         {{ '[' + ensOrAddress(data.item.v1.ownerIndex, 16) + ']' }}
                       </b-link>
                     </template>
+                    <template #cell(v1Wrapped)="data">
+                      <font size="-1">
+                        <b-badge v-if="data.item.v1.wrapped" size="sm" pill variant="light">Wrapped</b-badge>
+                      </font>
+                    </template>
                     <template #cell(v2Owner)="data">
                       <b-link v-if="data.item.v2.ownerIndex && !data.item.v2.wrapped" :href="'https://etherscan.io/address/' + indexToAddress[data.item.v2.ownerIndex]" v-b-popover.hover.bottom="'View owner in etherscan.io'" target="_blank">
                         {{ ensOrAddress(data.item.v2.ownerIndex, 16) }}
@@ -412,6 +482,11 @@
                         {{ '[' + ensOrAddress(data.item.v2.ownerIndex, 16) + ']' }}
                       </b-link>
                     </template>
+                    <template #cell(v2Wrapped)="data">
+                      <font size="-1">
+                        <b-badge v-if="data.item.v2.wrapped" size="sm" pill variant="light">Wrapped</b-badge>
+                      </font>
+                    </template>
                     <template #cell(attribute)="data">
                       <span v-for="(attribute, attributeIndex) in data.item.attributes" v-bind:key="attributeIndex">
                         <b-badge size="sm" pill variant="light" v-b-popover.hover.bottom="slugToTitle(attribute.trait_type)" class="mr-1">{{ slugToTitle(attribute.value) }}</b-badge>
@@ -419,6 +494,7 @@
                     </template>
                   </b-table>
 
+                  <!-- 1:ACTIVITY -->
                   <b-table v-if="settings.tabIndex == 1 && !settings.showInfo" small fixed striped responsive hover :fields="activityFields" :items="pagedFilteredSortedActivity" show-empty empty-html="Click Sync above to retrieve punk history" head-variant="light" class="mx-0 my-1">
                     <template #head(timestamp)="data">
                       When
@@ -824,6 +900,7 @@
                     </template>
                   </b-table>
 
+                  <!-- 2:OWNERS -->
                   <b-table v-if="settings.tabIndex == 2 && !settings.showInfo" small fixed striped responsive hover :fields="ownersFields" :items="pagedFilteredSortedOwners" show-empty empty-html="Click Sync above to retrieve punk history" head-variant="light" class="mx-0 my-1">
                     <template #cell(number)="data">
                       {{ parseInt(data.index) + ((settings.ownersTable.currentPage - 1) * settings.ownersTable.pageSize) + 1 }}
@@ -1004,6 +1081,10 @@
             attributes: {},
           },
 
+          modalAddress: {
+            address: null,
+          },
+
           modalTxDetails: {
             item: null,
             tx: null,
@@ -1050,10 +1131,12 @@
           ],
           punksFields: [
             { key: 'punkId', label: 'PunkId', sortable: false, thStyle: 'width: 15%;', thClass: 'text-right', tdClass: 'text-right' },
-            { key: 'image', label: 'Image', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
-            { key: 'v1Owner', label: 'v1 Owner', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
-            { key: 'v2Owner', label: 'v2 Owner', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
-            { key: 'attribute', label: 'Attributes', sortable: false, thStyle: 'width: 25%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'image', label: 'Image', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'v1Owner', label: 'v1', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'v1Wrapped', label: '', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'v2Owner', label: 'v2', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'v2Wrapped', label: '', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'attribute', label: 'Attributes', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
           ],
           activityFields: [
             { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
@@ -1588,6 +1671,11 @@
             }
             this.modalPunk.attributes = this.punkAttributes[punkId];
             this.$bvModal.show('modal-punk');
+          },
+
+          showModalAddress(address) {
+            console.log(moment().format("HH:mm:ss") + " showModalAddress");
+            this.$bvModal.show('modal-address');
           },
 
           async syncCryptoPunksData(devMode) {
