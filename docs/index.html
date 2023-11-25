@@ -80,7 +80,7 @@
             <b-form-group label-cols-lg="2" label="Punk" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
               <b-form-group label="Id:" label-for="punk-punkid" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                 <font size="-1">
-                  <b-link label-for="punk-punkid" :href="'https://cryptopunks.app/cryptopunks/details/' + modalPunk.punkId" v-b-popover.hover.bottom="'punkId. Click to view in cryptopunks.app'" target="_blank">{{ modalPunk.punkId }}</b-link>
+                  <b-button size="sm" variant="link" label-for="punk-punkid" :href="'https://cryptopunks.app/cryptopunks/details/' + modalPunk.punkId" v-b-popover.hover.bottom="'punkId. Click to view in cryptopunks.app'" target="_blank">{{ modalPunk.punkId }}</b-button>
                 </font>
               </b-form-group>
               <b-form-group label="Image:" label-for="punk-image" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
@@ -95,17 +95,17 @@
             <b-form-group label-cols-lg="2" label="V1" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
               <b-form-group label="Owner:" label-for="punk-v1owner" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                 <font size="-1">
-                  <b-link label-for="punk-v1owner" :href="'https://etherscan.io/address/' + indexToAddress[modalPunk.v1.ownerIndex]" v-b-popover.hover.bottom="'v1 Owner. Click to view in etherscan.io'" target="_blank">
+                  <b-button size="sm" variant="link" label-for="punk-v1owner" :href="'https://etherscan.io/address/' + indexToAddress[modalPunk.v1.ownerIndex]" v-b-popover.hover.bottom="'v1 Owner. Click to view in etherscan.io'" target="_blank">
                     {{ ensOrAddress(indexToAddress[modalPunk.v1.ownerIndex], 42) }}
-                  </b-link>
+                  </b-button>
                 </font>
               </b-form-group>
               <b-form-group label="Wrapped:" label-for="punk-v1wrapped" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                 <font size="-1">
                   <span v-if="modalPunk.v1.wrapped">
-                    <b-link label-for="punk-v1wrapped" :href="'https://opensea.io/assets/ethereum/0x282bdd42f4eb70e7a9d9f40c8fea0825b7f68c5d/' + modalPunk.punkId" v-b-popover.hover.bottom="'Wrapped v1. Click to view in opensea.io'" target="_blank">
+                    <b-button size="sm" variant="link" label-for="punk-v1wrapped" :href="'https://opensea.io/assets/ethereum/0x282bdd42f4eb70e7a9d9f40c8fea0825b7f68c5d/' + modalPunk.punkId" v-b-popover.hover.bottom="'Wrapped v1. Click to view in opensea.io'" target="_blank">
                       Yes
-                    </b-link>
+                    </b-button>
                   </span>
                   <span v-else>
                     No
@@ -116,17 +116,17 @@
             <b-form-group label-cols-lg="2" label="V2" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
               <b-form-group label="Owner:" label-for="punk-v2owner" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                 <font size="-1">
-                  <b-link label-for="punk-v2owner" :href="'https://etherscan.io/address/' + indexToAddress[modalPunk.v2.ownerIndex]" v-b-popover.hover.bottom="'v2 Owner. Click to view in etherscan.io'" target="_blank">
+                  <b-button size="sm" variant="link" label-for="punk-v2owner" :href="'https://etherscan.io/address/' + indexToAddress[modalPunk.v2.ownerIndex]" v-b-popover.hover.bottom="'v2 Owner. Click to view in etherscan.io'" target="_blank">
                     {{ ensOrAddress(indexToAddress[modalPunk.v2.ownerIndex], 42) }}
-                  </b-link>
+                  </b-button>
                 </font>
               </b-form-group>
               <b-form-group label="Wrapped:" label-for="punk-v2wrapped" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                 <font size="-1">
                   <span v-if="modalPunk.v2.wrapped">
-                    <b-link label-for="punk-v2wrapped" :href="'https://opensea.io/assets/ethereum/0xb7f7f6c52f2e2fdb1963eab30438024864c313f6/' + modalPunk.punkId" v-b-popover.hover.bottom="'Wrapped v2. Click to view in opensea.io'" target="_blank">
+                    <b-button size="sm" variant="link" label-for="punk-v2wrapped" :href="'https://opensea.io/assets/ethereum/0xb7f7f6c52f2e2fdb1963eab30438024864c313f6/' + modalPunk.punkId" v-b-popover.hover.bottom="'Wrapped v2. Click to view in opensea.io'" target="_blank">
                       Yes
-                    </b-link>
+                    </b-button>
                   </span>
                   <span v-else>
                     No
@@ -140,76 +140,20 @@
           <b-modal id="modal-address" hide-footer size="lg">
             <template #modal-title>
               <font size="-1">Address {{ modalAddress.address }}</font>
+              <b-button size="sm" @click="copyToClipboard(modalAddress.address);" variant="link" class="m-0 p-0" v-b-popover.hover.top="'Copy to clipboard'"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
             </template>
             <b-form-group label-cols-lg="2" label="Address" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
               <b-form-group label="Address:" label-for="address-address" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                 <font size="-1">
-                  <b-link label-for="address-address" :href="'https://etherscan.io/address/' + modalAddress.address" v-b-popover.hover.bottom="'address. Click to view in etherscan.io'" target="_blank">{{ modalAddress.address }}</b-link>
+                  <b-button size="sm" variant="link" label-for="address-address" :href="'https://etherscan.io/address/' + modalAddress.address" v-b-popover.hover.bottom="'address. Click to view in etherscan.io'" target="_blank">{{ modalAddress.address }}</b-button>
                 </font>
               </b-form-group>
               <b-form-group v-if="modalAddress.name" label="Name:" label-for="address-name" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                 <font size="-1">
-                  <b-link label-for="address-address" :href="'https://etherscan.io/address/' + modalAddress.address" v-b-popover.hover.bottom="'address. Click to view in etherscan.io'" target="_blank">{{ modalAddress.name }}</b-link>                  
+                  <b-button size="sm" variant="link" label-for="address-address" :href="'https://etherscan.io/address/' + modalAddress.address" v-b-popover.hover.bottom="'ENS name or configured name. Click to view in etherscan.io'" target="_blank">{{ modalAddress.name }}</b-button>
                 </font>
               </b-form-group>
             </b-form-group>
-            <!-- <b-form-group label-cols-lg="2" label="Punk" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
-              <b-form-group label="Id:" label-for="punk-punkid" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                <font size="-1">
-                  <b-link label-for="punk-punkid" :href="'https://cryptopunks.app/cryptopunks/details/' + modalPunk.punkId" v-b-popover.hover.bottom="'punkId. Click to view in cryptopunks.app'" target="_blank">{{ modalPunk.punkId }}</b-link>
-                </font>
-              </b-form-group>
-              <b-form-group label="Image:" label-for="punk-image" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                <b-img-lazy width="100%" :src="'images/punks/punk' + ('' + modalPunk.punkId).toString().padStart(4, '0') + '.png'" style="background-color: #638596"/>
-              </b-form-group>
-              <b-form-group label="Attributes:" label-for="punk-attributes" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                <span v-for="(attribute, attributeIndex) in modalPunk.attributes" v-bind:key="attributeIndex">
-                  <b-badge size="sm" pill variant="light" v-b-popover.hover.bottom="slugToTitle(attribute.trait_type)" class="mr-1">{{ slugToTitle(attribute.value) }}</b-badge>
-                </span>
-              </b-form-group>
-            </b-form-group>
-            <b-form-group label-cols-lg="2" label="V1" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
-              <b-form-group label="Owner:" label-for="punk-v1owner" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                <font size="-1">
-                  <b-link label-for="punk-v1owner" :href="'https://etherscan.io/address/' + indexToAddress[modalPunk.v1.ownerIndex]" v-b-popover.hover.bottom="'v1 Owner. Click to view in etherscan.io'" target="_blank">
-                    {{ ensOrAddress(indexToAddress[modalPunk.v1.ownerIndex], 42) }}
-                  </b-link>
-                </font>
-              </b-form-group>
-              <b-form-group label="Wrapped:" label-for="punk-v1wrapped" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                <font size="-1">
-                  <span v-if="modalPunk.v1.wrapped">
-                    <b-link label-for="punk-v1wrapped" :href="'https://opensea.io/assets/ethereum/0x282bdd42f4eb70e7a9d9f40c8fea0825b7f68c5d/' + modalPunk.punkId" v-b-popover.hover.bottom="'Wrapped v1. Click to view in opensea.io'" target="_blank">
-                      Yes
-                    </b-link>
-                  </span>
-                  <span v-else>
-                    No
-                  </span>
-                </font>
-              </b-form-group>
-            </b-form-group>
-            <b-form-group label-cols-lg="2" label="V2" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
-              <b-form-group label="Owner:" label-for="punk-v2owner" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                <font size="-1">
-                  <b-link label-for="punk-v2owner" :href="'https://etherscan.io/address/' + indexToAddress[modalPunk.v2.ownerIndex]" v-b-popover.hover.bottom="'v2 Owner. Click to view in etherscan.io'" target="_blank">
-                    {{ ensOrAddress(indexToAddress[modalPunk.v2.ownerIndex], 42) }}
-                  </b-link>
-                </font>
-              </b-form-group>
-              <b-form-group label="Wrapped:" label-for="punk-v2wrapped" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                <font size="-1">
-                  <span v-if="modalPunk.v2.wrapped">
-                    <b-link label-for="punk-v2wrapped" :href="'https://opensea.io/assets/ethereum/0xb7f7f6c52f2e2fdb1963eab30438024864c313f6/' + modalPunk.punkId" v-b-popover.hover.bottom="'Wrapped v2. Click to view in opensea.io'" target="_blank">
-                      Yes
-                    </b-link>
-                  </span>
-                  <span v-else>
-                    No
-                  </span>
-                </font>
-              </b-form-group>
-            </b-form-group> -->
           </b-modal>
 
           <b-modal id="modal-tx-details" hide-footer size="lg">
