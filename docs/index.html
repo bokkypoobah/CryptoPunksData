@@ -1061,6 +1061,7 @@
             tx: null,
             txReceipt: null,
             timestamp: null,
+            exchangeRate: null,
           },
 
           modalTxDetails: {
@@ -1703,6 +1704,8 @@
             };
             const block = await provider.getBlock(this.modalTx.tx.blockNumber);
             this.modalTx.timestamp = block.timestamp;
+            const yyyymmdd = moment.unix(block.timestamp).utc().format("YYYYMMDD");
+            this.modalTx.exchangeRate = this.exchangeRates[yyyymmdd];
             console.log(moment().format("HH:mm:ss") + " showModalTx: " + txHashIndex + " => " + JSON.stringify(this.modalTx, null, 2));
           },
 
