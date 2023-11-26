@@ -24,6 +24,7 @@
     <script src="deploymentData.js"></script>
     <script src="punkAttributes.js"></script>
     <script src="parsePunkTx.js"></script>
+    <script src="txinfo.js"></script>
     <script src="txparser.js"></script>
 
     <link rel="apple-touch-icon" sizes="57x57" href="images/apple-icon-57x57.png">
@@ -1708,54 +1709,9 @@
           },
 
           async showModalTx(txHashIndex) {
-            this.$bvModal.show('modal-tx');
-            this.modalTx.txHashIndex = txHashIndex;
-            this.modalTx.txHash = this.indexToTxHash[txHashIndex];
             const provider = new ethers.providers.Web3Provider(window.ethereum);
-            const tx = await provider.getTransaction(this.modalTx.txHash);
-            this.modalTx.tx = {
-              hash: tx.hash,
-              type: tx.type,
-              blockHash: tx.blockHash,
-              blockNumber: tx.blockNumber,
-              transactionIndex: tx.transactionIndex,
-              from: tx.from,
-              gasPrice: ethers.BigNumber.from(tx.gasPrice).toString(),
-              gasLimit: ethers.BigNumber.from(tx.gasLimit).toString(),
-              to: tx.to,
-              value: ethers.BigNumber.from(tx.value).toString(),
-              nonce: tx.nonce,
-              data: tx.to && tx.data || null, // Remove contract creation data to reduce memory footprint
-              // r: tx.r,
-              // s: tx.s,
-              // v: tx.v,
-              chainId: tx.chainId,
-            };
-            const txReceipt = await provider.getTransactionReceipt(this.modalTx.txHash);
-            this.modalTx.txReceipt = {
-              to: txReceipt.to,
-              from: txReceipt.from,
-              contractAddress: txReceipt.contractAddress,
-              transactionIndex: txReceipt.transactionIndex,
-              gasUsed: ethers.BigNumber.from(txReceipt.gasUsed).toString(),
-              blockHash: txReceipt.blockHash,
-              // transactionHash: txReceipt.transactionHash,
-              logs: txReceipt.logs,
-              blockNumber: txReceipt.blockNumber,
-              // confirmations: txReceipt.confirmations,
-              cumulativeGasUsed: ethers.BigNumber.from(txReceipt.cumulativeGasUsed).toString(),
-              effectiveGasPrice: ethers.BigNumber.from(txReceipt.effectiveGasPrice).toString(),
-              status: txReceipt.status,
-              type: txReceipt.type,
-              // byzantium: txReceipt.byzantium,
-            };
-            const block = await provider.getBlock(this.modalTx.tx.blockNumber);
-            this.modalTx.timestamp = block.timestamp;
-            const yyyymmdd = moment.unix(block.timestamp).utc().format("YYYYMMDD");
-            this.modalTx.exchangeRate = this.exchangeRates[yyyymmdd];
-            const gasUsed = ethers.BigNumber.from(this.modalTx.txReceipt.gasUsed);
-            this.modalTx.txFee = ethers.utils.formatEther(gasUsed.mul(this.modalTx.txReceipt.effectiveGasPrice).toString());
-            this.modalTx.txFeeInReportingCurrency = (parseFloat(this.modalTx.txFee) * this.modalTx.exchangeRate).toFixed(2);
+            this.$bvModal.show('modal-tx');
+            this.modalTx = await getTxInfo({ txHashIndex, txHash: this.indexToTxHash[txHashIndex] }, provider, this.exchangeRates);
             console.log(moment().format("HH:mm:ss") + " showModalTx: " + txHashIndex + " => " + JSON.stringify(this.modalTx, null, 2));
           },
 
