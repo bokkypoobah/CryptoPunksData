@@ -156,6 +156,21 @@
             </b-form-group>
           </b-modal>
 
+          <!-- MODALTX -->
+          <b-modal id="modal-tx" hide-footer size="lg">
+            <template #modal-title>
+              <font size="-1">Tx {{ modalTx.txHash }}</font>
+              <b-button size="sm" @click="copyToClipboard(modalTx.txHash);" variant="link" class="m-0 p-0" v-b-popover.hover.top="'Copy to clipboard'"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+            </template>
+            <b-form-group label-cols-lg="2" label="Tx" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
+              <b-form-group label="Hash:" label-for="tx-txhash" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <font size="-1">
+                  <b-button size="sm" variant="link" label-for="tx-txhash" :href="'https://etherscan.io/tx/' + modalTx.txHash" v-b-popover.hover.bottom="'address. Click to view in etherscan.io'" target="_blank">{{ modalTx.txHash }}</b-button>
+                </font>
+              </b-form-group>
+            </b-form-group>
+          </b-modal>
+
           <b-modal id="modal-tx-details" hide-footer size="lg">
             <template #modal-title>
               <font size="-1">Tx {{ modalTxDetails.item.txHash }}</font>
@@ -454,11 +469,11 @@
                     </template>
                     <template #cell(timestamp)="data">
                       <font size="-1">
-                        <b-link :href="'https://etherscan.io/tx/' + indexToTxHash[data.item[4]]" v-b-popover.hover.bottom="'View tx in etherscan.io'" target="_blank">
+                        <b-link @click="showModalTx(data.item[4]);" v-b-popover.hover.bottom="'Click for details'" target="_blank">
                           {{ formatTimestamp(data.item[0]) }}
                         </b-link>
                         <!-- <font size="-2">
-                          <b-link @click="showModalTxDetails(data.item);">🔍</b-link>
+                          <b-link @click="showModalTx(data.item[4]);">🔍</b-link>
                         </font> -->
                       </font>
                       <br />
@@ -1035,6 +1050,14 @@
             addressIndex: null,
             address: null,
             name: null,
+          },
+
+          modalTx: {
+            txHashIndex: null,
+            txHash: null,
+            tx: null,
+            txReceipt: null,
+            timestamp: null,
           },
 
           modalTxDetails: {
@@ -1631,6 +1654,53 @@
             this.modalAddress.name = this.indexToName[addressIndex] || null;
             console.log(moment().format("HH:mm:ss") + " showModalAddress: " + addressIndex + " => " + JSON.stringify(this.modalAddress));
             this.$bvModal.show('modal-address');
+          },
+
+          async showModalTx(txHashIndex) {
+            this.modalTx.txHashIndex = txHashIndex;
+            this.modalTx.txHash = this.indexToTxHash[txHashIndex];
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const tx = await provider.getTransaction(this.modalTx.txHash);
+            this.modalTx.tx = {
+              hash: tx.hash,
+              type: tx.type,
+              blockHash: tx.blockHash,
+              blockNumber: tx.blockNumber,
+              transactionIndex: tx.transactionIndex,
+              from: tx.from,
+              gasPrice: ethers.BigNumber.from(tx.gasPrice).toString(),
+              gasLimit: ethers.BigNumber.from(tx.gasLimit).toString(),
+              to: tx.to,
+              value: ethers.BigNumber.from(tx.value).toString(),
+              nonce: tx.nonce,
+              data: tx.to && tx.data || null, // Remove contract creation data to reduce memory footprint
+              // r: tx.r,
+              // s: tx.s,
+              // v: tx.v,
+              chainId: tx.chainId,
+            };
+            const txReceipt = await provider.getTransactionReceipt(this.modalTx.txHash);
+            this.modalTx.txReceipt = {
+              to: txReceipt.to,
+              from: txReceipt.from,
+              contractAddress: txReceipt.contractAddress,
+              transactionIndex: txReceipt.transactionIndex,
+              gasUsed: ethers.BigNumber.from(txReceipt.gasUsed).toString(),
+              blockHash: txReceipt.blockHash,
+              // transactionHash: txReceipt.transactionHash,
+              logs: txReceipt.logs,
+              blockNumber: txReceipt.blockNumber,
+              // confirmations: txReceipt.confirmations,
+              cumulativeGasUsed: ethers.BigNumber.from(txReceipt.cumulativeGasUsed).toString(),
+              effectiveGasPrice: ethers.BigNumber.from(txReceipt.effectiveGasPrice).toString(),
+              status: txReceipt.status,
+              type: txReceipt.type,
+              // byzantium: txReceipt.byzantium,
+            };
+            const block = await provider.getBlock(this.modalTx.tx.blockNumber);
+            this.modalTx.timestamp = block.timestamp;
+            console.log(moment().format("HH:mm:ss") + " showModalTx: " + txHashIndex + " => " + JSON.stringify(this.modalTx, null, 2));
+            this.$bvModal.show('modal-tx');
           },
 
           async syncCryptoPunksData(devMode) {
@@ -2563,7 +2633,7 @@
               window.ethereum.on('accountsChanged', handleAccountsChanged);
               async function handleNewBlock(blockNumber) {
                 // console.log(moment().format("HH:mm:ss") + " handleNewBlock - New Block #" + blockNumber);
-                const block = await provider.getBlock(blockNumber);
+                const block = await provider.getBlock("latest");
                 t.blockNumber = blockNumber;
                 t.timestamp = block.timestamp;
                 await t.processNewBlock(blockNumber);
