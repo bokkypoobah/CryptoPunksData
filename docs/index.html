@@ -174,7 +174,7 @@
                   <b-button size="sm" variant="link" label-for="tx-blocknumber" :href="'https://etherscan.io/block/' + modalTx.tx.blockNumber" v-b-popover.hover.bottom="'Click to view in etherscan.io'" target="_blank">{{ modalTx.tx.blockNumber }}</b-button>
                 </font>
               </b-form-group>
-              <b-form-group v-if="modalTx.tx && modalTx.tx.transactionIndex" label="Trans. Index:" label-for="tx-txindex" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-form-group v-if="modalTx.tx && modalTx.tx.transactionIndex" label="Tx Index:" label-for="tx-txindex" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                 <font size="-1">
                   <b-button size="sm" variant="invisible" label-for="tx-txindex"> {{ modalTx.tx.transactionIndex }}</b-button>
                 </font>
@@ -194,6 +194,11 @@
                   <b-button size="sm" variant="link" label-for="tx-to" :href="'https://etherscan.io/address/' + modalTx.tx.to" v-b-popover.hover.bottom="'Click to view in etherscan.io'" target="_blank">{{ ensOrAddress(modalTx.tx.to, 42) }}</b-button>
                 </font>
               </b-form-group>
+              <b-form-group v-if="modalTx.tx && modalTx.tx.value" label="Value:" label-for="tx-value" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <font size="-1">
+                  <b-button size="sm" variant="invisible" label-for="tx-value">{{ formatETH(modalTx.tx.value, 0) }}</b-button><font size="-2">Ξ, {{ settings.reportingCurrency }} {{ commify2(modalTx.valueInReportingCurrency) }} @ {{ modalTx.exchangeRate }}</font>
+                </font>
+              </b-form-group>
               <b-form-group v-if="modalTx.tx && modalTx.tx.gasLimit" label="Gas Limit:" label-for="tx-gaslimit" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                 <font size="-1">
                   <b-button size="sm" variant="invisible" label-for="tx-gaslimit">{{ commify0(modalTx.tx.gasLimit) }}</b-button>
@@ -204,14 +209,9 @@
                   <b-button size="sm" variant="invisible" label-for="tx-gasused">{{ commify0(modalTx.txReceipt.gasUsed) }}</b-button>
                 </font>
               </b-form-group>
-              <b-form-group v-if="modalTx.txFee" label="Tx Fee (ETH):" label-for="tx-txfee" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-form-group v-if="modalTx.txFee" label="Tx Fee:" label-for="tx-txfee" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                 <font size="-1">
-                  <b-button size="sm" variant="invisible" label-for="tx-txfee">{{ modalTx.txFee }}<font size="-2">Ξ</font></b-button>
-                </font>
-              </b-form-group>
-              <b-form-group v-if="modalTx.txFeeInReportingCurrency" :label="'Tx Fee (' + settings.reportingCurrency + '):'" label-for="tx-txfeeinreportingcurrency" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                <font size="-1">
-                  <b-button size="sm" variant="invisible" label-for="tx-txfeeinreportingcurrency">{{ modalTx.txFeeInReportingCurrency }} <font size="-2">@ {{ modalTx.exchangeRate }}</font></b-button>
+                  <b-button size="sm" variant="invisible" label-for="tx-txfee">{{ formatETH(modalTx.txFee, 0) }}</b-button><font size="-2">Ξ, {{ settings.reportingCurrency }} {{ commify2(modalTx.txFeeInReportingCurrency) }} @ {{ modalTx.exchangeRate }}</font>
                 </font>
               </b-form-group>
             </b-form-group>

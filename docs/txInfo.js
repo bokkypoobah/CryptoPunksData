@@ -42,8 +42,9 @@ async function getTxInfo(data, provider, exchangeRates) {
   const yyyymmdd = moment.unix(block.timestamp).utc().format("YYYYMMDD");
   data.exchangeRate = exchangeRates[yyyymmdd];
   const gasUsed = ethers.BigNumber.from(data.txReceipt.gasUsed);
-  data.txFee = ethers.utils.formatEther(gasUsed.mul(data.txReceipt.effectiveGasPrice).toString());
-  data.txFeeInReportingCurrency = (parseFloat(data.txFee) * data.exchangeRate).toFixed(2);
+  data.txFee = gasUsed.mul(data.txReceipt.effectiveGasPrice).toString();
+  data.txFeeInReportingCurrency = (parseFloat(ethers.utils.formatEther(data.txFee)) * data.exchangeRate).toFixed(2);
+  data.valueInReportingCurrency = (parseFloat(ethers.utils.formatEther(data.tx.value)) * data.exchangeRate).toFixed(2);
   console.log("getTxInfo - END: " + JSON.stringify(data));
   return data;
 }
