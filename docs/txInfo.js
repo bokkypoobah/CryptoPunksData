@@ -57,6 +57,23 @@ async function getTxInfo(data, provider, exchangeRates) {
     data.functionCall = { name: decodedData.functionFragment.name, parameters };
   }
 
+  const logs = [];
+  for (const event of data.txReceipt.logs) {
+    if (event.address == CRYPTOPUNKSV2ADDRESS) {
+      const interface = new ethers.utils.Interface(CRYPTOPUNKSV2ABI);
+      const logData = interface.parseLog(event);
+      const name = logData.eventFragment.name;
+      const fields = [];
+      for (let i in logData.eventFragment.inputs) {
+        const inp = logData.eventFragment.inputs[i];
+        fields.push({ field: inp.name, type: inp.type, value: logData.args[i].toString() })
+      }
+      logs.push({ name, fields });
+    }
+  }
+  data.logs = logs;
+
   console.log("getTxInfo - END: " + JSON.stringify(data));
+
   return data;
 }
