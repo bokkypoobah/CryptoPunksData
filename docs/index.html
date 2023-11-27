@@ -202,7 +202,7 @@
               <b-form-group v-if="modalTx.functionCall" label="" label-for="tx-functioncallparameters" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                 <!-- <b-table small fixed striped sticky-header="200px" :fields="punkAttributesFields" :items="punkAttribute.attributeList" head-variant="light"> -->
                 <font size="-2">
-                  <b-table small fixed striped sticky-header="200px" :fields="functionCallParametersFields" :items="modalTx.functionCall.parameters" head-variant="light">
+                  <b-table small fixed striped :fields="functionCallParametersFields" :items="modalTx.functionCall.parameters" head-variant="light">
                     <template #cell(value)="data">
                       <span v-if="data.item.type == 'address'">
                         <b-link :href="'https://etherscan.io/address/' + data.item.value" v-b-popover.hover.bottom="'View in etherscan.io'" target="_blank">
@@ -242,10 +242,33 @@
                   <b-button size="sm" variant="invisible" id="tx-txfee">{{ formatETH(modalTx.txFee, 0) }}</b-button><font size="-2">Ξ, {{ settings.reportingCurrency }} {{ commify2(modalTx.txFeeInReportingCurrency) }} @ {{ modalTx.exchangeRate }}</font>
                 </font>
               </b-form-group>
+              <b-form-group v-if="modalTx.logs" label="Events:" label-for="tx-eventlogs" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <font size="-2">
+                  <b-table small fixed striped :fields="eventLogFields" :items="modalTx.logs" head-variant="light">
+                    <template #cell(fields)="data">
+                      <span v-for="(field, index) of data.item.fields">
+                        <span v-if="index != 0">
+                          ,
+                        </span>
+                        <span v-if="field.type == 'address'">
+                          {{ field.field + ' = ' }}
+                          <b-link :href="'https://etherscan.io/address/' + field.value" v-b-popover.hover.bottom="'View in etherscan.io'" target="_blank">
+                            {{ ensOrAddress(field.value, 42) }}
+                          </b-link>
+                        </span>
+                        <span v-else>
+                          {{ field.field + ' = ' + field.value.toString() }}
+                        </span>
+                      </span>
+
+                    </template>
+                  </b-table>
+                </font>
+              </b-form-group>
             </b-form-group>
-            <pre>
+            <!-- <pre>
 {{ modalTx }}
-            </pre>
+            </pre> -->
           </b-modal>
 
           <b-modal id="modal-tx-details" hide-footer size="lg">
@@ -1218,6 +1241,11 @@
             { key: 'parameter', label: 'Parameter', sortable: false, thStyle: 'width: 40%;', thClass: 'text-left', tdClass: 'text-left' },
             { key: 'type', label: 'Type', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
             { key: 'value', label: 'Value', sortable: false, thStyle: 'width: 50%;', thClass: 'text-left', tdClass: 'text-left' },
+          ],
+          eventLogFields: [
+            { key: 'logIndex', label: 'Log Index', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'fields', label: 'Fields', sortable: false, thStyle: 'width: 70%;', thClass: 'text-left', tdClass: 'text-left' },
           ],
           indexToEventTypes: [
             "Assign", // 0
