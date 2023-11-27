@@ -245,6 +245,11 @@
               <b-form-group v-if="modalTx.logs" label="Events:" label-for="tx-eventlogs" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                 <font size="-2">
                   <b-table small fixed striped :fields="eventLogFields" :items="modalTx.logs" head-variant="light">
+                    <template #cell(contract)="data">
+                      <b-link :href="'https://etherscan.io/address/' + data.item.contract" v-b-popover.hover.bottom="'View in etherscan.io'" target="_blank">
+                        {{ ensOrAddress(data.item.contract, 42) }}
+                      </b-link>
+                    </template>
                     <template #cell(fields)="data">
                       <span v-for="(field, index) of data.item.fields">
                         <span v-if="index != 0">
@@ -1244,8 +1249,9 @@
           ],
           eventLogFields: [
             { key: 'logIndex', label: 'Log Index', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'contract', label: 'Contract', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'truncate' },
             { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
-            { key: 'fields', label: 'Fields', sortable: false, thStyle: 'width: 70%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'fields', label: 'Fields', sortable: false, thStyle: 'width: 50%;', thClass: 'text-left', tdClass: 'text-left' },
           ],
           indexToEventTypes: [
             "Assign", // 0
