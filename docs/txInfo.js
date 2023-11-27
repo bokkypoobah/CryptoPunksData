@@ -45,6 +45,18 @@ async function getTxInfo(data, provider, exchangeRates) {
   data.txFee = gasUsed.mul(data.txReceipt.effectiveGasPrice).toString();
   data.txFeeInReportingCurrency = (parseFloat(ethers.utils.formatEther(data.txFee)) * data.exchangeRate).toFixed(2);
   data.valueInReportingCurrency = (parseFloat(ethers.utils.formatEther(data.tx.value)) * data.exchangeRate).toFixed(2);
+
+  if (data.tx.to == CRYPTOPUNKSV2ADDRESS) {
+    const interface = new ethers.utils.Interface(CRYPTOPUNKSV2ABI);
+    let decodedData = interface.parseTransaction({ data: data.tx.data, value: data.tx.value });
+    const parameters = [];
+    for (let i = 0; i < decodedData.functionFragment.inputs.length; i++) {
+      const c = decodedData.functionFragment.inputs[i];
+      parameters.push({ parameter: c.name, type: c.type, value: decodedData.args[i].toString() })
+    }
+    data.functionCall = { name: decodedData.functionFragment.name, parameters };
+  }
+
   console.log("getTxInfo - END: " + JSON.stringify(data));
   return data;
 }

@@ -81,7 +81,7 @@
             <b-form-group label-cols-lg="2" label="Punk" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
               <b-form-group label="Id:" label-for="punk-punkid" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                 <font size="-1">
-                  <b-button size="sm" variant="link" label-for="punk-punkid" :href="'https://cryptopunks.app/cryptopunks/details/' + modalPunk.punkId" v-b-popover.hover.bottom="'punkId. Click to view in cryptopunks.app'" target="_blank">{{ modalPunk.punkId }}</b-button>
+                  <b-button size="sm" variant="link" id="punk-punkid" :href="'https://cryptopunks.app/cryptopunks/details/' + modalPunk.punkId" v-b-popover.hover.bottom="'punkId. Click to view in cryptopunks.app'" target="_blank">{{ modalPunk.punkId }}</b-button>
                 </font>
               </b-form-group>
               <b-form-group label="Image:" label-for="punk-image" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
@@ -96,7 +96,7 @@
             <b-form-group label-cols-lg="2" label="V1" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
               <b-form-group label="Owner:" label-for="punk-v1owner" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                 <font size="-1">
-                  <b-button size="sm" variant="link" label-for="punk-v1owner" :href="'https://etherscan.io/address/' + indexToAddress[modalPunk.v1.ownerIndex]" v-b-popover.hover.bottom="'v1 Owner. Click to view in etherscan.io'" target="_blank">
+                  <b-button size="sm" variant="link" id="punk-v1owner" :href="'https://etherscan.io/address/' + indexToAddress[modalPunk.v1.ownerIndex]" v-b-popover.hover.bottom="'v1 Owner. Click to view in etherscan.io'" target="_blank">
                     {{ ensOrAddress(indexToAddress[modalPunk.v1.ownerIndex], 42) }}
                   </b-button>
                 </font>
@@ -104,7 +104,7 @@
               <b-form-group label="Wrapped:" label-for="punk-v1wrapped" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                 <font size="-1">
                   <span v-if="modalPunk.v1.wrapped">
-                    <b-button size="sm" variant="link" label-for="punk-v1wrapped" :href="'https://opensea.io/assets/ethereum/0x282bdd42f4eb70e7a9d9f40c8fea0825b7f68c5d/' + modalPunk.punkId" v-b-popover.hover.bottom="'Wrapped v1. Click to view in opensea.io'" target="_blank">
+                    <b-button size="sm" variant="link" id="punk-v1wrapped" :href="'https://opensea.io/assets/ethereum/0x282bdd42f4eb70e7a9d9f40c8fea0825b7f68c5d/' + modalPunk.punkId" v-b-popover.hover.bottom="'Wrapped v1. Click to view in opensea.io'" target="_blank">
                       Yes
                     </b-button>
                   </span>
@@ -117,7 +117,7 @@
             <b-form-group label-cols-lg="2" label="V2" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
               <b-form-group label="Owner:" label-for="punk-v2owner" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                 <font size="-1">
-                  <b-button size="sm" variant="link" label-for="punk-v2owner" :href="'https://etherscan.io/address/' + indexToAddress[modalPunk.v2.ownerIndex]" v-b-popover.hover.bottom="'v2 Owner. Click to view in etherscan.io'" target="_blank">
+                  <b-button size="sm" variant="link" id="punk-v2owner" :href="'https://etherscan.io/address/' + indexToAddress[modalPunk.v2.ownerIndex]" v-b-popover.hover.bottom="'v2 Owner. Click to view in etherscan.io'" target="_blank">
                     {{ ensOrAddress(indexToAddress[modalPunk.v2.ownerIndex], 42) }}
                   </b-button>
                 </font>
@@ -125,7 +125,7 @@
               <b-form-group label="Wrapped:" label-for="punk-v2wrapped" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                 <font size="-1">
                   <span v-if="modalPunk.v2.wrapped">
-                    <b-button size="sm" variant="link" label-for="punk-v2wrapped" :href="'https://opensea.io/assets/ethereum/0xb7f7f6c52f2e2fdb1963eab30438024864c313f6/' + modalPunk.punkId" v-b-popover.hover.bottom="'Wrapped v2. Click to view in opensea.io'" target="_blank">
+                    <b-button size="sm" variant="link" id="punk-v2wrapped" :href="'https://opensea.io/assets/ethereum/0xb7f7f6c52f2e2fdb1963eab30438024864c313f6/' + modalPunk.punkId" v-b-popover.hover.bottom="'Wrapped v2. Click to view in opensea.io'" target="_blank">
                       Yes
                     </b-button>
                   </span>
@@ -146,19 +146,19 @@
             <b-form-group label-cols-lg="2" label="Address" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
               <b-form-group label="Address:" label-for="address-address" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                 <font size="-1">
-                  <b-button size="sm" variant="link" label-for="address-address" :href="'https://etherscan.io/address/' + modalAddress.address" v-b-popover.hover.bottom="'address. Click to view in etherscan.io'" target="_blank">{{ modalAddress.address }}</b-button>
+                  <b-button size="sm" variant="link" id="address-address" :href="'https://etherscan.io/address/' + modalAddress.address" v-b-popover.hover.bottom="'address. Click to view in etherscan.io'" target="_blank">{{ modalAddress.address }}</b-button>
                 </font>
               </b-form-group>
               <b-form-group v-if="modalAddress.name" label="Name:" label-for="address-name" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                 <font size="-1">
-                  <b-button size="sm" variant="link" label-for="address-address" :href="'https://etherscan.io/address/' + modalAddress.address" v-b-popover.hover.bottom="'ENS name or configured name. Click to view in etherscan.io'" target="_blank">{{ modalAddress.name }}</b-button>
+                  <b-button size="sm" variant="link" id="address-address" :href="'https://etherscan.io/address/' + modalAddress.address" v-b-popover.hover.bottom="'ENS name or configured name. Click to view in etherscan.io'" target="_blank">{{ modalAddress.name }}</b-button>
                 </font>
               </b-form-group>
             </b-form-group>
           </b-modal>
 
           <!-- MODALTX -->
-          <b-modal id="modal-tx" hide-footer size="lg">
+          <b-modal id="modal-tx" hide-footer size="xl">
             <template #modal-title>
               <font size="-1">Tx {{ modalTx.txHash }}</font>
               <b-button size="sm" @click="copyToClipboard(modalTx.txHash);" variant="link" class="m-0 p-0" v-b-popover.hover.top="'Copy to clipboard'"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
@@ -166,52 +166,80 @@
             <b-form-group label-cols-lg="2" label="Tx" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
               <b-form-group label="Hash:" label-for="tx-txhash" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                 <font size="-1">
-                  <b-button size="sm" variant="link" label-for="tx-txhash" :href="'https://etherscan.io/tx/' + modalTx.txHash" v-b-popover.hover.bottom="'Click to view in etherscan.io'" target="_blank">{{ modalTx.txHash }}</b-button>
+                  <b-button size="sm" variant="link" id="tx-txhash" :href="'https://etherscan.io/tx/' + modalTx.txHash" v-b-popover.hover.bottom="'Click to view in etherscan.io'" target="_blank">{{ modalTx.txHash }}</b-button>
                 </font>
               </b-form-group>
               <b-form-group v-if="modalTx.tx && modalTx.tx.blockNumber" label="Block Number:" label-for="tx-blocknumber" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                 <font size="-1">
-                  <b-button size="sm" variant="link" label-for="tx-blocknumber" :href="'https://etherscan.io/block/' + modalTx.tx.blockNumber" v-b-popover.hover.bottom="'Click to view in etherscan.io'" target="_blank">{{ modalTx.tx.blockNumber }}</b-button>
+                  <b-button size="sm" variant="link" id="tx-blocknumber" :href="'https://etherscan.io/block/' + modalTx.tx.blockNumber" v-b-popover.hover.bottom="'Click to view in etherscan.io'" target="_blank">{{ modalTx.tx.blockNumber }}</b-button>
                 </font>
               </b-form-group>
               <b-form-group v-if="modalTx.tx && modalTx.tx.transactionIndex" label="Tx Index:" label-for="tx-txindex" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                 <font size="-1">
-                  <b-button size="sm" variant="invisible" label-for="tx-txindex"> {{ modalTx.tx.transactionIndex }}</b-button>
+                  <b-button size="sm" variant="invisible" id="tx-txindex"> {{ modalTx.tx.transactionIndex }}</b-button>
                 </font>
               </b-form-group>
               <b-form-group v-if="modalTx.timestamp" label="Time:" label-for="tx-timestamp" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                 <font size="-1">
-                  <b-button size="sm" variant="invisible" label-for="tx-timestamp"> {{ formatTimestamp(modalTx.timestamp) }}</b-button>
+                  <b-button size="sm" variant="invisible" id="tx-timestamp"> {{ formatTimestamp(modalTx.timestamp) }}</b-button>
                 </font>
               </b-form-group>
               <b-form-group v-if="modalTx.tx && modalTx.tx.from" label="From:" label-for="tx-from" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                 <font size="-1">
-                  <b-button size="sm" variant="link" label-for="tx-from" :href="'https://etherscan.io/address/' + modalTx.tx.from" v-b-popover.hover.bottom="'Click to view in etherscan.io'" target="_blank">{{ ensOrAddress(modalTx.tx.from, 42) }}</b-button>
+                  <b-button size="sm" variant="link" id="tx-from" :href="'https://etherscan.io/address/' + modalTx.tx.from" v-b-popover.hover.bottom="'Click to view in etherscan.io'" target="_blank">{{ ensOrAddress(modalTx.tx.from, 42) }}</b-button>
                 </font>
               </b-form-group>
               <b-form-group v-if="modalTx.tx && modalTx.tx.to" label="To:" label-for="tx-to" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                 <font size="-1">
-                  <b-button size="sm" variant="link" label-for="tx-to" :href="'https://etherscan.io/address/' + modalTx.tx.to" v-b-popover.hover.bottom="'Click to view in etherscan.io'" target="_blank">{{ ensOrAddress(modalTx.tx.to, 42) }}</b-button>
+                  <b-button size="sm" variant="link" id="tx-to" :href="'https://etherscan.io/address/' + modalTx.tx.to" v-b-popover.hover.bottom="'Click to view in etherscan.io'" target="_blank">{{ ensOrAddress(modalTx.tx.to, 42) }}</b-button>
                 </font>
+              </b-form-group>
+              <b-form-group v-if="modalTx.functionCall" label="Function Call:" label-for="tx-functioncall" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <font size="-1">
+                  <b-button size="sm" variant="invisible" id="tx-functioncall">{{ modalTx.functionCall.name }}</b-button>
+                </font>
+              </b-form-group>
+              <b-form-group v-if="modalTx.functionCall" label="" label-for="tx-functioncallparameters" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <!-- <b-table small fixed striped sticky-header="200px" :fields="punkAttributesFields" :items="punkAttribute.attributeList" head-variant="light"> -->
+                <font size="-2">
+                  <b-table small fixed striped sticky-header="200px" :fields="functionCallParametersFields" :items="modalTx.functionCall.parameters" head-variant="light">
+                    <template #cell(value)="data">
+                      <span v-if="data.item.type == 'address'">
+                        <b-link :href="'https://etherscan.io/address/' + data.item.value" v-b-popover.hover.bottom="'View in etherscan.io'" target="_blank">
+                          {{ ensOrAddress(data.item.value, 42) }}
+                        </b-link>
+                      </span>
+                      <span v-else-if="['minSalePriceInWei'].includes(data.item.parameter)">
+                        {{ formatETH(data.item.value, 0) }} <font size="-2">Ξ</font>
+                      </span>
+                      <span v-else>
+                        {{ data.item.value }}
+                      </span>
+                    </template>
+                  </b-table>
+                </font>
+                <!-- <font size="-1">
+                  <b-button size="sm" variant="invisible" label-for="tx-functioncallparameters">{{ modalTx.functionCall.parameters }}</b-button>
+                </font> -->
               </b-form-group>
               <b-form-group v-if="modalTx.tx && modalTx.tx.value" label="Value:" label-for="tx-value" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                 <font size="-1">
-                  <b-button size="sm" variant="invisible" label-for="tx-value">{{ formatETH(modalTx.tx.value, 0) }}</b-button><font size="-2">Ξ, {{ settings.reportingCurrency }} {{ commify2(modalTx.valueInReportingCurrency) }} @ {{ modalTx.exchangeRate }}</font>
+                  <b-button size="sm" variant="invisible" id="tx-value">{{ formatETH(modalTx.tx.value, 0) }}</b-button><font size="-2">Ξ, {{ settings.reportingCurrency }} {{ commify2(modalTx.valueInReportingCurrency) }} @ {{ modalTx.exchangeRate }}</font>
                 </font>
               </b-form-group>
               <b-form-group v-if="modalTx.tx && modalTx.tx.gasLimit" label="Gas Limit:" label-for="tx-gaslimit" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                 <font size="-1">
-                  <b-button size="sm" variant="invisible" label-for="tx-gaslimit">{{ commify0(modalTx.tx.gasLimit) }}</b-button>
+                  <b-button size="sm" variant="invisible" id="tx-gaslimit">{{ commify0(modalTx.tx.gasLimit) }}</b-button>
                 </font>
               </b-form-group>
               <b-form-group v-if="modalTx.txReceipt && modalTx.txReceipt.gasUsed" label="Gas Used:" label-for="tx-gasused" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                 <font size="-1">
-                  <b-button size="sm" variant="invisible" label-for="tx-gasused">{{ commify0(modalTx.txReceipt.gasUsed) }}</b-button>
+                  <b-button size="sm" variant="invisible" id="tx-gasused">{{ commify0(modalTx.txReceipt.gasUsed) }}</b-button>
                 </font>
               </b-form-group>
               <b-form-group v-if="modalTx.txFee" label="Tx Fee:" label-for="tx-txfee" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                 <font size="-1">
-                  <b-button size="sm" variant="invisible" label-for="tx-txfee">{{ formatETH(modalTx.txFee, 0) }}</b-button><font size="-2">Ξ, {{ settings.reportingCurrency }} {{ commify2(modalTx.txFeeInReportingCurrency) }} @ {{ modalTx.exchangeRate }}</font>
+                  <b-button size="sm" variant="invisible" id="tx-txfee">{{ formatETH(modalTx.txFee, 0) }}</b-button><font size="-2">Ξ, {{ settings.reportingCurrency }} {{ commify2(modalTx.txFeeInReportingCurrency) }} @ {{ modalTx.exchangeRate }}</font>
                 </font>
               </b-form-group>
             </b-form-group>
@@ -1186,6 +1214,11 @@
             { key: 'attributeOption', label: 'Attribute' /*, sortable: true*/ },
             { key: 'attributeTotal', label: 'Count', /*sortable: true,*/ thStyle: 'width: 30%;', thClass: 'text-right', tdClass: 'text-right' },
           ],
+          functionCallParametersFields: [
+            { key: 'parameter', label: 'Parameter', sortable: false, thStyle: 'width: 40%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'type', label: 'Type', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'value', label: 'Value', sortable: false, thStyle: 'width: 50%;', thClass: 'text-left', tdClass: 'text-left' },
+          ],
           indexToEventTypes: [
             "Assign", // 0
             "Transfer", // 1
@@ -1483,7 +1516,7 @@
                 results.push(tx);
               }
             }
-            console.log(moment().format("HH:mm:ss") + " filteredActivity - results: " + JSON.stringify(results.slice(0, 10)) + ", ...");
+            // console.log(moment().format("HH:mm:ss") + " filteredActivity - results: " + JSON.stringify(results.slice(0, 10)) + ", ...");
             return results;
           },
           filteredSortedActivity() {
@@ -1712,7 +1745,7 @@
             const provider = new ethers.providers.Web3Provider(window.ethereum);
             this.$bvModal.show('modal-tx');
             this.modalTx = await getTxInfo({ txHashIndex, txHash: this.indexToTxHash[txHashIndex] }, provider, this.exchangeRates);
-            console.log(moment().format("HH:mm:ss") + " showModalTx: " + txHashIndex + " => " + JSON.stringify(this.modalTx, null, 2));
+            // console.log(moment().format("HH:mm:ss") + " showModalTx: " + txHashIndex + " => " + JSON.stringify(this.modalTx, null, 2));
           },
 
           async syncCryptoPunksData(devMode) {
@@ -2698,6 +2731,11 @@
             await this.loadCurrentData(db);
             db.close();
           })();
+          // (async() => {
+          //   // TODO: TESTING
+          //   await delay(4500);
+          //   await this.showModalTx(288878);
+          // })();
         },
       })
     </script>
