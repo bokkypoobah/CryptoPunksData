@@ -1847,7 +1847,7 @@
                 txHashToIndex[txHash] = index;
               }
             }
-            for (const address of [ADDRESS0, CRYPTOPUNKSV1ADDRESS, CRYPTOPUNKSV2ADDRESS, WRAPPEDCRYPTOPUNKSV1ADDRESS, WRAPPEDCRYPTOPUNKSV2ADDRESS, this.coinbase, WETHADDRESS]) {
+            for (const address of [ADDRESS0, CRYPTOPUNKSV1ADDRESS, CRYPTOPUNKSV2ADDRESS, WRAPPEDCRYPTOPUNKSV1ADDRESS, WRAPPEDCRYPTOPUNKSV2ADDRESS, this.coinbase, WETHADDRESS, BLURWETHADDRESS]) {
               if (!(address in addressToIndex)) {
                 addressToIndex[address] = indexToAddress.length;
                 indexToAddress.push(address);
