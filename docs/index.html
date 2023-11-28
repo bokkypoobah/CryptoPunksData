@@ -213,7 +213,7 @@
                         {{ formatETH(data.item.value, 0) }} <font size="-2">Ξ</font>
                       </span>
                       <span v-else>
-                        {{ data.item.value }}
+                        <b-badge pill variant="invisible" v-b-popover.hover.bottom="data.item.value">{{ data.item.value.substring(0, 42) + (data.item.value.length > 42 ? '...' : '') }}</b-badge>
                       </span>
                     </template>
                   </b-table>
@@ -252,17 +252,18 @@
                     </template>
                     <template #cell(fields)="data">
                       <span v-for="(field, index) of data.item.fields">
-                        <span v-if="index != 0">
-                          ,
-                        </span>
-                        <span v-if="field.type == 'address'">
-                          {{ field.field + ' = ' }}
+                        <span v-if="field.type == 'address'" class="m-0 p-0">
+                          {{ field.field + '=' }}
                           <b-link :href="'https://etherscan.io/address/' + field.value" v-b-popover.hover.bottom="'View in etherscan.io'" target="_blank">
-                            {{ ensOrAddress(field.value, 42) }}
+                            <b-badge pill variant="invisible">{{ ensOrAddress(field.value, 42) + '...' }}</b-badge>
                           </b-link>
                         </span>
-                        <span v-else>
-                          {{ field.field + ' = ' + field.value.toString() }}
+                        <span v-else class="m-0 p-0">
+                          {{ field.field + '=' }}
+                          <b-badge pill variant="invisible" v-b-popover.hover.bottom="field.value.toString()">{{ field.value.toString().substring(0, 42) + (field.value.toString().length > 42 ? '...' : '') }}</b-badge>
+                        </span>
+                        <span v-if="index != (data.item.fields - 1)">
+                          ,
                         </span>
                       </span>
 
