@@ -2412,7 +2412,7 @@
             this.exchangeRates = exchangeRates;
           },
 
-          async syncENSNames(db, provider) {
+          async syncENSNamesWIPNotAGoodSearch(db, provider) {
             const ensReverseRecordsContract = new ethers.Contract(ENSREVERSERECORDSADDRESS, ENSREVERSERECORDSABI, provider);
             let indexToAddress = [];
             let addressToIndex = {};
@@ -2427,13 +2427,31 @@
             this.sync.completed = 0;
             this.sync.total = addresses.length;
             this.sync.section = 'ENS Names';
-            const MAXBATCHSIZE = 1000;
+            const MAXBATCHSIZE = 2048;
 
             for (let start = 0; start < addresses.length; start += MAXBATCHSIZE) {
               const batch = addresses.slice(start, start + MAXBATCHSIZE);
               console.log("Processing: " + start.toString().padStart(5, '0') + " " + (parseInt(start) + batch.length - 1).toString().padStart(5, '0') + " " + batch[0] + " ... " + batch[batch.length - 1]);
-
+              const t = this;
+              async function getNames(from, to, batch) {
+                if (!t.sync.halt) {
+                  try {
+                    console.log("Attempting: " + (parseInt(start)+from).toString().padStart(5, '0') + " ... " + (parseInt(start)+to).toString().padStart(5, '0'));
+                    const allnames = await ensReverseRecordsContract.getNames(batch.slice(from, to));
+                  } catch (e) {
+                    if (to > from + 1) {
+                      const mid = parseInt((from + to) / 2);
+                      await getNames(from, mid, batch);
+                      await getNames(parseInt(mid) + 1, to, batch);
+                    } else {
+                      console.log("Skipping: " + (parseInt(start)+from).toString().padStart(5, '0') + " ... " + (parseInt(start)+to).toString().padStart(5, '0') + " " + batch.slice(from, to));
+                    }
+                  }
+                }
+              }
+              await getNames(0, batch.length - 1, batch);
             }
+
             // let batchSize = MAXBATCHSIZE;
             // let completed = 0;
             // let done = false;
@@ -2481,8 +2499,7 @@
             this.sync.section = null;
           },
 
-          // TODO: Delete
-          async syncENSNames_Old(db, provider) {
+          async syncENSNames(db, provider) {
             const ensReverseRecordsContract = new ethers.Contract(ENSREVERSERECORDSADDRESS, ENSREVERSERECORDSABI, provider);
             let indexToAddress = [];
             let addressToIndex = {};
