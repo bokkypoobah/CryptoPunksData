@@ -397,10 +397,10 @@
                 <div class="mt-0 flex-grow-1">
                 </div>
                 <div v-if="!sync.section" class="mt-0 pr-1">
-                  <b-button size="sm" @click="syncCryptoPunksData(false)" variant="primary" v-b-popover.hover.top="'Sync CryptoPunksData. This will take ~10 minutes initially, and ~2 minutes subsequently'">Sync</b-button>
+                  <b-button size="sm" @click="syncIt(false)" variant="primary" v-b-popover.hover.top="'Sync CryptoPunksData. This will take ~10 minutes initially, and ~2 minutes subsequently'">Sync</b-button>
                 </div>
                 <div v-if="!sync.section" class="mt-0 pr-1">
-                  <b-button size="sm" @click="syncCryptoPunksData(true)" variant="outline-primary" v-b-popover.hover.top="'Sync CryptoPunksData in Dev mode. This will take ~10 minutes initially, and ~2 minutes subsequently'">Dev</b-button>
+                  <b-button size="sm" @click="syncIt(true)" variant="outline-primary" v-b-popover.hover.top="'Sync CryptoPunksData in Dev mode. This will take ~10 minutes initially, and ~2 minutes subsequently'">Dev</b-button>
                 </div>
                 <div v-if="sync.section" class="mt-1 p-0" style="width: 300px;">
                   <b-progress height="1.5rem" :max="sync.total" show-progress :animated="!sync.section" :variant="sync.section ? 'success' : 'secondary'" v-b-popover.hover.top="'{processed blocked number}/{latest block number}. Click the button on the right to stop this process. This process can be continued later'">
@@ -1783,7 +1783,7 @@
             // console.log(moment().format("HH:mm:ss") + " showModalTx: " + txHashIndex + " => " + JSON.stringify(this.modalTx, null, 2));
           },
 
-          async syncCryptoPunksData(devMode) {
+          async syncIt(devMode) {
             const db = new Dexie(this.db.name);
             db.version(this.db.version).stores(this.db.schemaDefinition);
             const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -1794,18 +1794,22 @@
             localStorage.cryptoPunksDataChainId = network.chainId;
             const block = await provider.getBlock();
             const latestBlockNumber = block && block.number || null;
-            console.log(moment().format("HH:mm:ss") + " syncCryptoPunksData - latestBlockNumber: " + latestBlockNumber + ", chainId: " + this.chainId);
-            await this.syncCryptoPunksEvents(db, provider, latestBlockNumber, devMode);
+            console.log(moment().format("HH:mm:ss") + " syncIt - latestBlockNumber: " + latestBlockNumber + ", chainId: " + this.chainId);
+            if (!devMode) {
+              await this.syncCryptoPunksEvents(db, provider, latestBlockNumber);
+            }
             if (!devMode) {
               await this.loadBlockTimestamps(db);
             }
             if (!devMode) {
               await this.syncExchangeRates(db);
             }
-            await this.processData(db);
             if (!devMode) {
-              await this.syncENSNames(db, provider);
+              await this.processData(db);
             }
+            // if (!devMode) {
+              await this.syncENSNames(db, provider);
+            // }
             if (!devMode) {
               await this.loadCurrentData();
             }
@@ -1813,7 +1817,7 @@
             this.sync.halt = false;
           },
 
-          async syncCryptoPunksEvents(db, provider, latestBlockNumber, devMode) {
+          async syncCryptoPunksEvents(db, provider, latestBlockNumber) {
             // v1 v2 event Assign(address indexed to, uint256 punkIndex);
             // v1 v2 event Transfer(address indexed from, address indexed to, uint256 value);
             // v1 v2 event PunkTransfer(address indexed from, address indexed to, uint256 punkIndex);
@@ -2051,39 +2055,35 @@
               if (eventsDataItems.length == 1) {
                 const storedLatestBlockNumber = eventsDataItems[0].object.latestBlockNumber;
                 events = eventsDataItems[0].object.events;
-                if (!devMode) {
-                  Object.keys(events).forEach(function (key) {
-                    const confirmations = storedLatestBlockNumber - key;
-                    if (confirmations < CONFIRMATIONS) {
-                      console.log("DELETING: " + key + " => " + confirmations + " " + JSON.stringify(events[key]));
-                      delete events[key];
-                    }
-                  });
-                }
+                Object.keys(events).forEach(function (key) {
+                  const confirmations = storedLatestBlockNumber - key;
+                  if (confirmations < CONFIRMATIONS) {
+                    console.log("DELETING: " + key + " => " + confirmations + " " + JSON.stringify(events[key]));
+                    delete events[key];
+                  }
+                });
               }
               const blockNumbers = Object.keys(events).sort((a, b) => { return b - a });
               const startBlock = blockNumbers.length > 0 ? parseInt(blockNumbers[0]) + 1: process.deploymentBlockNumber;
               this.sync.total = latestBlockNumber;
               this.sync.completed = startBlock;
-              if (!devMode) {
-                await getLogs(startBlock, latestBlockNumber, processLogs, process.name);
-                Vue.set(this, "addressToIndex", addressToIndex);
-                Vue.set(this, "indexToAddress", indexToAddress);
-                await db.cache.put({ objectName: this.chainId + "_indexToAddress", object: indexToAddress }).then (function() {
-                }).catch(function(error) {
-                  console.log("error: " + error);
-                });
-                Vue.set(this, "txHashToIndex", txHashToIndex);
-                Vue.set(this, "indexToTxHash", indexToTxHash);
-                await db.cache.put({ objectName: this.chainId + "_indexToTxHash", object: indexToTxHash }).then (function() {
-                }).catch(function(error) {
-                  console.log("error: " + error);
-                });
-                await db.cache.put({ objectName: this.chainId + "_" + process.address + "_events", object: { latestBlockNumber, events } }).then (function() {
-                }).catch(function(error) {
-                  console.log("error: " + error);
-                });
-              }
+              await getLogs(startBlock, latestBlockNumber, processLogs, process.name);
+              Vue.set(this, "addressToIndex", addressToIndex);
+              Vue.set(this, "indexToAddress", indexToAddress);
+              await db.cache.put({ objectName: this.chainId + "_indexToAddress", object: indexToAddress }).then (function() {
+              }).catch(function(error) {
+                console.log("error: " + error);
+              });
+              Vue.set(this, "txHashToIndex", txHashToIndex);
+              Vue.set(this, "indexToTxHash", indexToTxHash);
+              await db.cache.put({ objectName: this.chainId + "_indexToTxHash", object: indexToTxHash }).then (function() {
+              }).catch(function(error) {
+                console.log("error: " + error);
+              });
+              await db.cache.put({ objectName: this.chainId + "_" + process.address + "_events", object: { latestBlockNumber, events } }).then (function() {
+              }).catch(function(error) {
+                console.log("error: " + error);
+              });
             }
           },
 
