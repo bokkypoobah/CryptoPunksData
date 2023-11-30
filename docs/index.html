@@ -2428,6 +2428,76 @@
             this.sync.total = addresses.length;
             this.sync.section = 'ENS Names';
             const MAXBATCHSIZE = 1000;
+
+            for (let start = 0; start < addresses.length; start += MAXBATCHSIZE) {
+              const batch = addresses.slice(start, start + MAXBATCHSIZE);
+              console.log("Processing: " + start.toString().padStart(5, '0') + " " + (parseInt(start) + batch.length - 1).toString().padStart(5, '0') + " " + batch[0] + " ... " + batch[batch.length - 1]);
+
+            }
+            // let batchSize = MAXBATCHSIZE;
+            // let completed = 0;
+            // let done = false;
+            // let start = completed;
+            // do {
+            //   let end = parseInt(start) + batchSize - 1;
+            //   if (end > addresses.length) {
+            //     end = addresses.length;
+            //   }
+            //   try {
+            //     const batch = addresses.slice(start, end + 1);
+            //     const allnames = await ensReverseRecordsContract.getNames(batch);
+            //     for (let j = 0; j < batch.length; j++) {
+            //       const account = batch[j];
+            //       const name = allnames[j];
+            //       // TODO: const normalized = normalize(account);
+            //       if (name.length > 0) {
+            //         // console.log(account + " => " + name);
+            //         Vue.set(this.indexToName, addressToIndex[account], name);
+            //       }
+            //     }
+            //     start = parseInt(end) + 1;
+            //   } catch (e) {
+            //     if (batchSize > 1) {
+            //       batchSize = parseInt(batchSize / 2);
+            //     } else {
+            //       console.log("Skipping #" + start + " " + addresses[start]);
+            //       start = parseInt(start) + 1;
+            //       batchSize = MAXBATCHSIZE;
+            //     }
+            //   }
+            //   this.sync.completed = start;
+            //   done = start > addresses.length;
+            // } while (!done);
+
+            // for (const [address, name] of Object.entries(CUSTOMNAMES)) {
+            //   Vue.set(this.indexToName, addressToIndex[address], name);
+            // }
+            // // console.log("this.indexToName: " + JSON.stringify(this.indexToName, null, 2));
+            // await db.cache.put({ objectName: CHAINID_MAINNET + "_indexToName", object: this.indexToName }).then (function() {
+            // }).catch(function(error) {
+            //   console.log("error: " + error);
+            // });
+            console.log(moment().format("HH:mm:ss") + " syncENSNames END");
+            this.sync.section = null;
+          },
+
+          // TODO: Delete
+          async syncENSNames_Old(db, provider) {
+            const ensReverseRecordsContract = new ethers.Contract(ENSREVERSERECORDSADDRESS, ENSREVERSERECORDSABI, provider);
+            let indexToAddress = [];
+            let addressToIndex = {};
+            const indexToAddressDataItems = await db.cache.where("objectName").equals(this.chainId + "_indexToAddress").toArray();
+            if (indexToAddressDataItems.length == 1) {
+              indexToAddress = indexToAddressDataItems[0].object;
+              for (const [index, address] of indexToAddress.entries()) {
+                addressToIndex[address] = index;
+              }
+            }
+            const addresses = indexToAddress;
+            this.sync.completed = 0;
+            this.sync.total = addresses.length;
+            this.sync.section = 'ENS Names';
+            const MAXBATCHSIZE = 1000;
             let batchSize = MAXBATCHSIZE;
             let completed = 0;
             let done = false;
