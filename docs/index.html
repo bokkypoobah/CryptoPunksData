@@ -189,13 +189,13 @@
               <b-form-group v-if="modalTx.tx && modalTx.tx.from" label="From:" label-for="tx-from" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                 <font size="-1">
                   <b-button size="sm" variant="link" id="tx-from" :href="'https://etherscan.io/address/' + modalTx.tx.from" v-b-popover.hover.bottom="'Click to view in etherscan.io'" target="_blank">{{ ensOrAddress(modalTx.tx.from, 42) }}</b-button>
-                  <b-button size="sm" @click="copyToClipboard(ensOrAddress(modalTx.tx.from, 42));" variant="link" class="m-0 p-0" v-b-popover.hover.top="'Copy to clipboard'"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                  <b-button size="sm" @click="copyToClipboard(modalTx.tx.from);" variant="link" class="m-0 p-0" v-b-popover.hover.top="'Copy to clipboard'"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </font>
               </b-form-group>
               <b-form-group v-if="modalTx.tx && modalTx.tx.to" label="To:" label-for="tx-to" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                 <font size="-1">
                   <b-button size="sm" variant="link" id="tx-to" :href="'https://etherscan.io/address/' + modalTx.tx.to" v-b-popover.hover.bottom="'Click to view in etherscan.io'" target="_blank">{{ ensOrAddress(modalTx.tx.to, 42) }}</b-button>
-                  <b-button size="sm" @click="copyToClipboard(ensOrAddress(modalTx.tx.to, 42));" variant="link" class="m-0 p-0" v-b-popover.hover.top="'Copy to clipboard'"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                  <b-button size="sm" @click="copyToClipboard(modalTx.tx.to);" variant="link" class="m-0 p-0" v-b-popover.hover.top="'Copy to clipboard'"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </font>
               </b-form-group>
               <b-form-group v-if="modalTx.functionCall" label="Function Call:" label-for="tx-functioncall" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
