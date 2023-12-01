@@ -2399,8 +2399,8 @@
             console.log(moment().format("HH:mm:ss") + " processData END");
           },
 
+          // TODO: Incremental sync with an overlap
           async syncExchangeRates(db) {
-            // NOTE: Rates may be EOD UTC time - may be some mismatch with local time
             console.log(moment().format("HH:mm:ss") + " syncExchangeRates - reportingCurrency: " + this.settings.reportingCurrency);
             const MAXDAYS = 2000;
             const MINDATE = moment("2017-06-09");
@@ -2434,6 +2434,7 @@
             this.exchangeRates = exchangeRates;
           },
 
+          // TODO: Refresh sync
           async syncENSNames(newAddressIndexes, db, provider) {
             const ensReverseRecordsContract = new ethers.Contract(ENSREVERSERECORDSADDRESS, ENSREVERSERECORDSABI, provider);
             let indexToAddress = [];
