@@ -170,20 +170,12 @@
                   <b-button size="sm" @click="copyToClipboard(modalTx.txHash);" variant="link" class="m-0 p-0" v-b-popover.hover.top="'Copy to clipboard'"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </font>
               </b-form-group>
-              <b-form-group v-if="modalTx.tx && modalTx.tx.blockNumber" label="Block Number:" label-for="tx-blocknumber" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-form-group label="At:" label-for="tx-timestamp" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                 <font size="-1">
-                  <b-button size="sm" variant="link" id="tx-blocknumber" :href="'https://etherscan.io/block/' + modalTx.tx.blockNumber" v-b-popover.hover.bottom="'Click to view in etherscan.io'" target="_blank">{{ modalTx.tx.blockNumber }}</b-button>
-                  <b-button size="sm" @click="copyToClipboard(modalTx.tx.blockNumber);" variant="link" class="m-0 p-0" v-b-popover.hover.top="'Copy to clipboard'"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
-                </font>
-              </b-form-group>
-              <b-form-group v-if="modalTx.tx && modalTx.tx.transactionIndex" label="Tx Index:" label-for="tx-txindex" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                <font size="-1">
-                  <b-button size="sm" variant="invisible" id="tx-txindex"> {{ modalTx.tx.transactionIndex }}</b-button>
-                </font>
-              </b-form-group>
-              <b-form-group v-if="modalTx.timestamp" label="Time:" label-for="tx-timestamp" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                <font size="-1">
-                  <b-button size="sm" variant="invisible" id="tx-timestamp"> {{ formatTimestamp(modalTx.timestamp) }}</b-button>
+                  <b-button v-if="modalTx.timestamp" size="sm" variant="invisible" id="tx-timestamp"> {{ formatTimestamp(modalTx.timestamp) }}</b-button>
+                  <!-- <b-button v-if="modalTx.tx && modalTx.tx.transactionIndex" size="sm" variant="invisible" id="tx-txindex" v-b-popover.hover.bottom="'Transaction index within the block'"> {{ modalTx.tx.transactionIndex }}</b-button> -->
+                  <b-button v-if="modalTx.tx && modalTx.tx.blockNumber" size="sm" variant="link" id="tx-blocknumber" :href="'https://etherscan.io/block/' + modalTx.tx.blockNumber" v-b-popover.hover.bottom="'Click to view block in etherscan.io'" target="_blank">{{ commify0(modalTx.tx.blockNumber) }}</b-button>
+                  <b-button v-if="modalTx.tx && modalTx.tx.blockNumber" size="sm" @click="copyToClipboard(modalTx.tx.blockNumber);" variant="link" class="m-0 p-0" v-b-popover.hover.top="'Copy to clipboard'"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </font>
               </b-form-group>
               <b-form-group v-if="modalTx.tx && modalTx.tx.from" label="From:" label-for="tx-from" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
