@@ -2158,7 +2158,6 @@
             }).catch(function(error) {
               console.log("error: " + error);
             });
-            this.sync.section = null;
           },
 
           async processData(db) {
@@ -2427,7 +2426,7 @@
               }
               toTs = moment(toTs).subtract(MAXDAYS, 'days');
             }
-            console.log(moment().format("HH:mm:ss") + " syncExchangeRates - exchangeRates: " + JSON.stringify(exchangeRates));
+            // console.log(moment().format("HH:mm:ss") + " syncExchangeRates - exchangeRates: " + JSON.stringify(exchangeRates));
             await db.cache.put({ objectName: this.chainId + "_exchangeRates", object: exchangeRates }).then (function() {
             }).catch(function(error) {
               console.log("error: " + error);
@@ -2495,7 +2494,6 @@
               console.log("error: " + error);
             });
             console.log(moment().format("HH:mm:ss") + " syncENSNames END");
-            this.sync.section = null;
           },
 
           async loadCurrentData() {
