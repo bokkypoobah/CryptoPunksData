@@ -1799,7 +1799,7 @@
               await this.syncCryptoPunksEvents(db, provider, latestBlockNumber);
             }
             if (!devMode) {
-              await this.loadBlockTimestamps(db);
+              await this.syncBlockTimestamps(db);
             }
             if (!devMode) {
               await this.syncExchangeRates(db);
@@ -2093,8 +2093,8 @@
             }
           },
 
-          async loadBlockTimestamps(db) {
-            console.log(moment().format("HH:mm:ss") + " loadBlockTimestamps");
+          async syncBlockTimestamps(db) {
+            console.log(moment().format("HH:mm:ss") + " syncBlockTimestamps");
             // TODO: Low priority - Handle blockTimestamp entries with unconfirmed blocks to handle reorgs
             const blockNumbersToProcess = [];
             for (const process of this.contracts) {
@@ -2135,7 +2135,7 @@
                 Vue.set(this.blockTimestamps, timestampItem.number, parseInt(timestampItem.timestamp));
               }
               this.sync.completed += timestamps.length;
-              console.log(moment().format("HH:mm:ss") + " loadBlockTimestamps " + this.sync.completed + " of " + blockNumbersToProcess.length);
+              console.log(moment().format("HH:mm:ss") + " syncBlockTimestamps " + this.sync.completed + " of " + blockNumbersToProcess.length);
             }
             await db.cache.put({ objectName: this.chainId + "_blockTimestamps", object: this.blockTimestamps }).then (function() {
             }).catch(function(error) {
