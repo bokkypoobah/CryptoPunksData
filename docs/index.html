@@ -1787,8 +1787,8 @@
 
           async showModalTx(txHashIndex) {
             const provider = new ethers.providers.Web3Provider(window.ethereum);
-            this.$bvModal.show('modal-tx');
             this.modalTx = await getTxInfo({ txHashIndex, txHash: this.indexToTxHash[txHashIndex] }, provider, this.exchangeRates);
+            this.$bvModal.show('modal-tx');
             // console.log(moment().format("HH:mm:ss") + " showModalTx: " + txHashIndex + " => " + JSON.stringify(this.modalTx, null, 2));
           },
 
