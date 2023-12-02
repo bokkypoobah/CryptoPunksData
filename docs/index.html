@@ -223,14 +223,12 @@
                   <b-button size="sm" variant="invisible" id="tx-value">{{ formatETH(modalTx.tx.value, 0) }}</b-button><font size="-2">Ξ, {{ settings.reportingCurrency }} {{ commify2(modalTx.valueInReportingCurrency) }} @ {{ modalTx.exchangeRate }}</font>
                 </font>
               </b-form-group>
-              <b-form-group v-if="modalTx.tx && modalTx.tx.gasLimit" label="Gas Limit:" label-for="tx-gaslimit" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-form-group label="Gas:" label-for="tx-gasused" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                 <font size="-1">
-                  <b-button size="sm" variant="invisible" id="tx-gaslimit">{{ commify0(modalTx.tx.gasLimit) }}</b-button>
-                </font>
-              </b-form-group>
-              <b-form-group v-if="modalTx.txReceipt && modalTx.txReceipt.gasUsed" label="Gas Used:" label-for="tx-gasused" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                <font size="-1">
-                  <b-button size="sm" variant="invisible" id="tx-gasused">{{ commify0(modalTx.txReceipt.gasUsed) }}</b-button>
+                  <b-button v-if="modalTx.txReceipt && modalTx.txReceipt.gasUsed" size="sm" variant="invisible" id="tx-gasused" v-b-popover.hover.bottom="'Gas used'">{{ commify0(modalTx.txReceipt.gasUsed) }}</b-button>
+                  /
+                  <b-button v-if="modalTx.tx && modalTx.tx.gasLimit" size="sm" variant="invisible" id="tx-gaslimit" v-b-popover.hover.bottom="'Gas limit'">{{ commify0(modalTx.tx.gasLimit) }}</b-button>
+                  <b-button v-if="modalTx.txReceipt && modalTx.txReceipt.gasUsed && modalTx.tx && modalTx.tx.gasLimit" size="sm" variant="invisible">{{ (modalTx.txReceipt.gasUsed/modalTx.tx.gasLimit*100).toFixed(0) + '%' }}</b-button>
                 </font>
               </b-form-group>
               <b-form-group v-if="modalTx.txFee" label="Tx Fee:" label-for="tx-txfee" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
