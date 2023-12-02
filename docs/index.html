@@ -398,10 +398,10 @@
                 <div class="mt-0 flex-grow-1">
                 </div>
                 <div v-if="!sync.section" class="mt-0 pr-1">
-                  <b-button size="sm" @click="syncIt(false)" variant="primary" v-b-popover.hover.top="'Sync CryptoPunksData. This will take ~10 minutes initially, and ~2 minutes subsequently'">Sync</b-button>
+                  <b-button size="sm" @click="syncIt(false)" variant="primary" v-b-popover.hover.top="'Sync CryptoPunks Event Logs. This will take ~10 minutes initially, and < 1 minute subsequently'">Sync</b-button>
                 </div>
                 <div v-if="!sync.section" class="mt-0 pr-1">
-                  <b-button size="sm" @click="syncIt(true)" variant="outline-primary" v-b-popover.hover.top="'Sync CryptoPunksData in Dev mode. This will take ~10 minutes initially, and ~2 minutes subsequently'">Dev</b-button>
+                  <b-button size="sm" @click="syncIt(true)" variant="outline-primary" v-b-popover.hover.top="'This will do dev things'">Dev</b-button>
                 </div>
                 <div v-if="sync.section" class="mt-1 p-0" style="width: 300px;">
                   <b-progress height="1.5rem" :max="sync.total" show-progress :animated="!sync.section" :variant="sync.section ? 'success' : 'secondary'" v-b-popover.hover.top="'{processed blocked number}/{latest block number}. Click the button on the right to stop this process. This process can be continued later'">
