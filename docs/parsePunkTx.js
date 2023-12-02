@@ -13,9 +13,9 @@ function parsePunkTx(txHashIndex, events, addressToIndex, exchangeRate) {
     cryptoPunksDeployerIndex = addressToIndex[CRYPTOPUNKSDEPLOYER];
   }
 
-  if (myCounter++ < 5) {
-    console.log("  " + txHashIndex + ": " + JSON.stringify(events));
-  }
+  // if (myCounter++ < 5) {
+  //   console.log("  " + txHashIndex + ": " + JSON.stringify(events));
+  // }
 
   const eventsLength = events.length;
   if (eventsLength > 0) {

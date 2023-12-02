@@ -2244,7 +2244,7 @@
                       }
                     }
                     if (parseInt(punkId) > 9999 || punkId.length > 5) {
-                      console.log("  v1 Invalid punkId" + " " + blockNumber + " " + txIndex + " " + txHashIndex + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
+                      console.log(moment().format("HH:mm:ss") + " processData: " + this.indexToTxHash[txHashIndex] + " - Invalid punkId" + " " + blockNumber + " " + txIndex + " " + txHashIndex + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
                     }
                     events.push([ parseInt(logIndex), contractIndex, eventType, event[2], event[3] ]);
 
@@ -2422,7 +2422,7 @@
               if (this.settings.cryptoCompareAPIKey) {
                 url = url + "&api_key=" + this.settings.cryptoCompareAPIKey;
               }
-              console.log(url);
+              console.log(moment().format("HH:mm:ss") + " syncExchangeRates - url: " + url);
               const data = await fetch(url)
                 .then(response => response.json())
                 .catch(function(e) {
