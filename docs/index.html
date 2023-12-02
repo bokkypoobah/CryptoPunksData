@@ -1466,7 +1466,7 @@
               const w1OwnerIndex = this.tokens[3] && this.tokens[3][punkId] || null;
               const w2OwnerIndex = this.tokens[4] && this.tokens[4][punkId] || null;
               let v1 = {};
-              if (v1OwnerIndex == w1Index) {
+              if (v1OwnerIndex != null && v1OwnerIndex == w1Index) {
                 v1.ownerIndex = w1OwnerIndex || 0;
                 v1.wrapped = true;
               } else {
@@ -1474,7 +1474,7 @@
                 v1.wrapped = false;
               }
               let v2 = {};
-              if (v2OwnerIndex == w2Index) {
+              if (v2OwnerIndex != null && v2OwnerIndex == w2Index) {
                 v2.ownerIndex = w2OwnerIndex;
                 v2.wrapped = true;
               } else {
