@@ -2087,7 +2087,7 @@
                 Object.keys(events).forEach(function (key) {
                   const confirmations = storedLatestBlockNumber - key;
                   if (confirmations < CONFIRMATIONS) {
-                    console.log("DELETING: " + key + " => " + confirmations + " " + JSON.stringify(events[key]));
+                    console.log(moment().format("HH:mm:ss") + " syncCryptoPunksEvents - Deleting low confirmations log events: " + key + " => " + confirmations + " " + JSON.stringify(events[key]));
                     delete events[key];
                   }
                 });
