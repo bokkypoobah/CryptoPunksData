@@ -2523,53 +2523,23 @@
           async loadCurrentData() {
             const db = new Dexie(this.db.name);
             db.version(this.db.version).stores(this.db.schemaDefinition);
-            console.log(moment().format("HH:mm:ss") + " loadCurrentData BEGIN: " + JSON.stringify(this.settings.selectedContracts));
-            const indexToAddressDataItems = await db.cache.where("objectName").equals(this.chainId + "_indexToAddress").toArray();
-            if (indexToAddressDataItems.length == 1) {
-              Vue.set(this, 'indexToAddress', indexToAddressDataItems[0].object);
-              let addressToIndex = {};
-              for (const [index, address] of this.indexToAddress.entries()) {
-                addressToIndex[address] = index;
+            for (const name of ['indexToAddress', 'indexToName', 'indexToTxHash', 'blockTimestamps', 'tokens', 'offers', 'v2Bids', 'txs', 'exchangeRates']) {
+              console.log(moment().format("HH:mm:ss") + " loadCurrentData: " + name);
+              const dataItems = await db.cache.where("objectName").equals(this.chainId + "_" + name).toArray();
+              if (dataItems.length == 1) {
+                Vue.set(this, name, dataItems[0].object);
               }
-              Vue.set(this, 'addressToIndex', addressToIndex);
             }
-            const indexToNameDataItems = await db.cache.where("objectName").equals(this.chainId + "_indexToName").toArray();
-            if (indexToNameDataItems.length == 1) {
-              Vue.set(this, 'indexToName', indexToNameDataItems[0].object);
+            let addressToIndex = {};
+            for (const [index, address] of this.indexToAddress.entries()) {
+              addressToIndex[address] = index;
             }
-            const indexToTxHashDataItems = await db.cache.where("objectName").equals(this.chainId + "_indexToTxHash").toArray();
-            if (indexToTxHashDataItems.length == 1) {
-              Vue.set(this, 'indexToTxHash', indexToTxHashDataItems[0].object);
-              let txHashToIndex = {};
-              for (const [index, address] of this.indexToTxHash.entries()) {
-                txHashToIndex[address] = index;
-              }
-              Vue.set(this, 'txHashToIndex', txHashToIndex);
+            Vue.set(this, 'addressToIndex', addressToIndex);
+            let txHashToIndex = {};
+            for (const [index, address] of this.indexToTxHash.entries()) {
+              txHashToIndex[address] = index;
             }
-            const blockTimestampsDataItems = await db.cache.where("objectName").equals(this.chainId + "_blockTimestamps").toArray();
-            if (blockTimestampsDataItems.length == 1) {
-              Vue.set(this, 'blockTimestamps', blockTimestampsDataItems[0].object);
-            }
-            const tokensDataItems = await db.cache.where("objectName").equals(this.chainId + "_tokens").toArray();
-            if (tokensDataItems.length == 1) {
-              Vue.set(this, 'tokens', tokensDataItems[0].object);
-            }
-            const offersDataItems = await db.cache.where("objectName").equals(this.chainId + "_offers").toArray();
-            if (offersDataItems.length == 1) {
-              Vue.set(this, 'offers', offersDataItems[0].object);
-            }
-            const v2BidsDataItems = await db.cache.where("objectName").equals(this.chainId + "_v2Bids").toArray();
-            if (v2BidsDataItems.length == 1) {
-              Vue.set(this, 'v2Bids', v2BidsDataItems[0].object);
-            }
-            const txsDataItems = await db.cache.where("objectName").equals(this.chainId + "_txs").toArray();
-            if (txsDataItems.length == 1) {
-              Vue.set(this, 'txs', txsDataItems[0].object);
-            }
-            const exchangeRatesDataItems = await db.cache.where("objectName").equals(this.chainId + "_exchangeRates").toArray();
-            if (exchangeRatesDataItems.length == 1) {
-              Vue.set(this, 'exchangeRates', exchangeRatesDataItems[0].object);
-            }
+            Vue.set(this, 'txHashToIndex', txHashToIndex);
             db.close();
             console.log(moment().format("HH:mm:ss") + " loadCurrentData END");
           },
