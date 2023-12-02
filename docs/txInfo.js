@@ -6,7 +6,7 @@ async function getTxInfo(data, provider, exchangeRates) {
   contracts[WRAPPEDCRYPTOPUNKSV2ADDRESS] = WRAPPEDCRYPTOPUNKSV2ABI;
   contracts[WETHADDRESS] = WETHABI;
   contracts[BLURWETHADDRESS] = BLURWETHABI;
-  // console.log("getTxInfo - contracts: " + JSON.stringify(contracts));
+  console.log("getTxInfo - contracts: " + JSON.stringify(contracts));
 
   // console.log("getTxInfo - BEGIN: " + JSON.stringify(data));
   const tx = await provider.getTransaction(data.txHash);
