@@ -60,7 +60,7 @@
             <b-nav-item size="sm" @click="settings.tabIndex = 2; saveSettings()" :active="settings.tabIndex == 2" active-class="active" v-b-popover.hover="'View Owners'">Owners</b-nav-item>
             <b-nav-item size="sm" @click="settings.tabIndex = 3; saveSettings()" :active="settings.tabIndex == 3" active-class="active" v-b-popover.hover="'Configure Settings'">Config</b-nav-item>
             <b-avatar v-if="coinbase && coinbase != ensOrAddress(coinbase)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensOrAddress(coinbase, 100)" v-b-popover.hover="'Your ENS avatar if set'"></b-avatar>
-            <b-button size="sm" variant="outline-primary" class="ml-1" @click="connectToWeb3(); processNewBlock();" v-b-popover.hover.bottom="'Click to update wallet'">{{ coinbase ? ensOrAddress(coinbase, 16) : 'Connect' }}</b-button>
+            <b-button size="sm" variant="outline-primary" class="ml-1" @click="connectToWeb3(); processNewBlock(0);" v-b-popover.hover.bottom="'Click to update wallet'">{{ coinbase ? ensOrAddress(coinbase, 16) : 'Connect' }}</b-button>
           </b-navbar-nav>
         </b-navbar>
 
@@ -2573,8 +2573,8 @@
             this.saveSettings();
           },
 
-          async processNewBlock() {
-            console.log(moment().format("HH:mm:ss") + " processNewBlock #" + this.blockNumber + " @ " + moment.unix(this.timestamp).format("YYYY-MM-DD HH:mm:ss") + " " + moment.unix(this.timestamp).fromNow());
+          async processNewBlock(blockNumber) {
+            console.log(moment().format("HH:mm:ss") + " processNewBlock #" + this.commify0(blockNumber) + ", latest #" + this.commify0(this.blockNumber) + " @ " + moment.unix(this.timestamp).format("YYYY-MM-DD HH:mm:ss") + " " + moment.unix(this.timestamp).fromNow());
           },
 
           async halt() {
@@ -2761,11 +2761,12 @@
               }
               window.ethereum.on('accountsChanged', handleAccountsChanged);
               async function handleNewBlock(blockNumber) {
-                // console.log(moment().format("HH:mm:ss") + " handleNewBlock - New Block #" + blockNumber);
-                const block = await provider.getBlock("latest");
-                t.blockNumber = blockNumber;
-                t.timestamp = block.timestamp;
-                await t.processNewBlock(blockNumber);
+                if (!t.blockNumber || blockNumber > t.blockNumber) {
+                  const block = await provider.getBlock("latest");
+                  t.blockNumber = block.number;
+                  t.timestamp = block.timestamp;
+                  await t.processNewBlock(blockNumber);
+                }
               }
               provider.on("block", handleNewBlock);
               const signer = provider.getSigner();
