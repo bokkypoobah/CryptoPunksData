@@ -226,9 +226,16 @@
               <b-form-group label="Gas:" label-for="tx-gasused" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                 <font size="-1">
                   <b-button v-if="modalTx.txReceipt && modalTx.txReceipt.gasUsed" size="sm" variant="invisible" id="tx-gasused" v-b-popover.hover.bottom="'Gas used'">{{ commify0(modalTx.txReceipt.gasUsed) }}</b-button>
-                  /
+                  <font size="-2">
+                    /
+                  </font>
                   <b-button v-if="modalTx.tx && modalTx.tx.gasLimit" size="sm" variant="invisible" id="tx-gaslimit" v-b-popover.hover.bottom="'Gas limit'">{{ commify0(modalTx.tx.gasLimit) }}</b-button>
-                  <b-button v-if="modalTx.txReceipt && modalTx.txReceipt.gasUsed && modalTx.tx && modalTx.tx.gasLimit" size="sm" variant="invisible">{{ (modalTx.txReceipt.gasUsed/modalTx.tx.gasLimit*100).toFixed(0) + '%' }}</b-button>
+                  <font v-if="modalTx.txReceipt && modalTx.txReceipt.gasUsed && modalTx.tx && modalTx.tx.gasLimit" size="-2">
+                    {{ (modalTx.txReceipt.gasUsed/modalTx.tx.gasLimit*100).toFixed(0) + '%' }}
+                  </font>
+                  <font v-if="modalTx.txReceipt && modalTx.txReceipt.effectiveGasPrice" size="-2">
+                    {{ '@ ' + formatGas(modalTx.txReceipt.effectiveGasPrice, 2) + ' gwei' }}
+                  </font>
                 </font>
               </b-form-group>
               <b-form-group v-if="modalTx.txFee" label="Tx Fee:" label-for="tx-txfee" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
@@ -2592,6 +2599,17 @@
                 return e ? ethers.utils.formatEther(e) : null;
               } else {
                 return e ? parseFloat(ethers.utils.formatEther(e)).toFixed(precision) : null;
+              }
+            } catch (err) {
+            }
+            return e.toFixed(precision);
+          },
+          formatGas(e, precision = 9) {
+            try {
+              if (precision == 0) {
+                return e ? ethers.utils.formatUnits(e, "gwei") : null;
+              } else {
+                return e ? parseFloat(ethers.utils.formatUnits(e, "gwei")).toFixed(precision) : null;
               }
             } catch (err) {
             }
