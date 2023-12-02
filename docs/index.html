@@ -1886,7 +1886,7 @@
               let newEvents = 0;
               function processLogs(fromBlock, toBlock, logs) {
                 total = parseInt(total) + logs.length;
-                console.log(moment().format("HH:mm:ss") + " " + fromBlock + " - " + toBlock + " " + logs.length + " " + total);
+                console.log(moment().format("HH:mm:ss") + " syncCryptoPunksEvents " + process.name + ": " + fromBlock + " - " + toBlock + " " + logs.length + " " + total);
                 for (const event of logs) {
                   if (!event.removed) {
                     const logData = contract.interface.parseLog(event);
@@ -2047,7 +2047,7 @@
                     } else {
                       console.log("--- UNKNOWN eventType: " + eventType + " ---");
                     }
-                    console.log(blockNumber + "." + txIndex + " " + JSON.stringify(record));
+                    console.log(moment().format("HH:mm:ss") + " syncCryptoPunksEvents " + process.name + ": " + blockNumber + "." + txIndex + " " + JSON.stringify(record));
                     if (record) {
                       const confirmations = latestBlockNumber - blockNumber;
                       if (!(blockNumber in events)) {
