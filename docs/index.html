@@ -1148,6 +1148,8 @@
           indexToName: {},
           txs: [],
           tokens: {},
+          offers: { "1": {}, "2": {} },
+          v2Bids: {},
           events: {},
 
           modalPunk: {
@@ -2407,6 +2409,16 @@
               console.log("error: " + error);
             });
             this.tokens = tokens;
+            await db.cache.put({ objectName: this.chainId + "_offers", object: offers }).then (function() {
+            }).catch(function(error) {
+              console.log("error: " + error);
+            });
+            this.offers = offers;
+            await db.cache.put({ objectName: this.chainId + "_v2Bids", object: v2Bids }).then (function() {
+            }).catch(function(error) {
+              console.log("error: " + error);
+            });
+            this.v2Bids = v2Bids;
             console.log(moment().format("HH:mm:ss") + " processData END");
           },
 
@@ -2541,6 +2553,14 @@
             const tokensDataItems = await db.cache.where("objectName").equals(this.chainId + "_tokens").toArray();
             if (tokensDataItems.length == 1) {
               Vue.set(this, 'tokens', tokensDataItems[0].object);
+            }
+            const offersDataItems = await db.cache.where("objectName").equals(this.chainId + "_offers").toArray();
+            if (offersDataItems.length == 1) {
+              Vue.set(this, 'offers', offersDataItems[0].object);
+            }
+            const v2BidsDataItems = await db.cache.where("objectName").equals(this.chainId + "_v2Bids").toArray();
+            if (v2BidsDataItems.length == 1) {
+              Vue.set(this, 'v2Bids', v2BidsDataItems[0].object);
             }
             const txsDataItems = await db.cache.where("objectName").equals(this.chainId + "_txs").toArray();
             if (txsDataItems.length == 1) {
