@@ -553,6 +553,7 @@
                       <b-link v-if="data.item.v1.ownerIndex" @click="showModalAddress(data.item.v1.ownerIndex);" v-b-popover.hover.bottom="'Click for details'" target="_blank">
                         {{ ensOrAddress(data.item.v1.ownerIndex, 16) }}
                       </b-link>
+                      {{ data.item.v1 }}
                     </template>
                     <template #cell(v1Wrapped)="data">
                       <font size="-1">
@@ -563,6 +564,7 @@
                       <b-link v-if="data.item.v2.ownerIndex" @click="showModalAddress(data.item.v2.ownerIndex);" v-b-popover.hover.bottom="'Click for details'" target="_blank">
                         {{ ensOrAddress(data.item.v2.ownerIndex, 16) }}
                       </b-link>
+                      {{ data.item.v2 }}
                     </template>
                     <template #cell(v2Wrapped)="data">
                       <font size="-1">
@@ -1475,6 +1477,7 @@
                 v1.ownerIndex = v1OwnerIndex;
                 v1.wrapped = false;
               }
+              v1.offer = this.offers[1] && this.offers[1][punkId] || null;
               let v2 = {};
               if (v2OwnerIndex != null && v2OwnerIndex == w2Index) {
                 v2.ownerIndex = w2OwnerIndex;
@@ -1483,6 +1486,8 @@
                 v2.ownerIndex = v2OwnerIndex;
                 v2.wrapped = false;
               }
+              v2.offer = this.offers[2] && this.offers[2][punkId] || null;
+              v2.bid = this.v2Bids[punkId] || null;
               if (!filteredOwners || (v1.ownerIndex in filteredOwners || v2.ownerIndex in filteredOwners)) {
                 results.push({ punkId, v1, v2, attributes });
               }
