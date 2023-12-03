@@ -461,7 +461,7 @@
                         {{ ensOrAddress(data.item.v1.ownerIndex, 16) }}
                       </b-link>
                       <span v-if="data.item.v1.offer">
-                        {{ data.item.v1.offer }}
+                        Offer: {{ data.item.v1.offer }}
                       </span>
                     </template>
                     <template #cell(v1Wrapped)="data">
@@ -474,10 +474,10 @@
                         {{ ensOrAddress(data.item.v2.ownerIndex, 16) }}
                       </b-link>
                       <span v-if="data.item.v2.offer">
-                        {{ data.item.v2.offer }}
+                        Offer: {{ data.item.v2.offer }}
                       </span>
                       <span v-if="data.item.v2.bid">
-                        {{ data.item.v2.bid }}
+                        Bid: {{ data.item.v2.bid }}
                       </span>
                     </template>
                     <template #cell(v2Wrapped)="data">
