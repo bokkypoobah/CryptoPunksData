@@ -2253,6 +2253,7 @@
                       value = v2Bids[punkId].value;
                       toOwnerIndex = v2Bids[punkId].fromOwnerIndex;
                       delete v2Bids[punkId];
+                      delete offers[contractIndex][punkId];
                     }
                     if (parseInt(punkId) < 10000) {
                       tokens[contractIndex][punkId] = toOwnerIndex;
