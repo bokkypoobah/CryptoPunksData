@@ -74,7 +74,7 @@
             </b-card-text>
           </b-card>
 
-          <!-- MODALPUNK -->
+          <!-- :MODALPUNK -->
           <b-modal id="modal-punk" hide-footer size="lg">
             <template #modal-title>
               <font size="-1">Punk {{ modalPunk.punkId }}</font>
@@ -138,7 +138,7 @@
             </b-form-group>
           </b-modal>
 
-          <!-- MODALADDRESS -->
+          <!-- :MODALADDRESS -->
           <b-modal id="modal-address" hide-footer size="lg">
             <template #modal-title>
               <font size="-1">Address {{ modalAddress.address }}</font>
@@ -158,7 +158,7 @@
             </b-form-group>
           </b-modal>
 
-          <!-- MODALTX -->
+          <!-- :MODALTX -->
           <b-modal id="modal-tx" hide-footer size="xl">
             <template #modal-title>
               <font size="-1">Tx {{ modalTx.txHash }}</font>
@@ -279,7 +279,7 @@
           </b-modal>
 
           <b-card class="m-0 p-0 border-0" body-class="m-1 p-0">
-            <!-- TOOLBAR -->
+            <!-- :TOOLBAR -->
             <b-card-text v-if="coinbase" class="m-0 p-0">
               <div class="d-flex flex-wrap m-0 p-0">
                 <div class="mt-0">
@@ -367,6 +367,7 @@
             <b-card-text class="m-0 p-0">
               <b-row class="m-0 p-0">
                 <b-col v-if="settings.showFilter" cols="2" class="m-0 p-0 border-0">
+                  <!-- :SIDEBAR -->
                   <b-card no-header no-body class="m-0 p-0 border-0">
                     <!-- <b-card-body class="m-0 p-1" style="flex-grow: 1; max-height: 3000px; overflow-y: auto;"> -->
                     <b-card-body class="m-0 mt-0 pl-0 pr-2 py-1" style="flex-grow: 1; max-height: 3000px; overflow-y: auto;">
@@ -397,7 +398,7 @@
                 </b-col>
 
                 <b-col class="m-0 p-0">
-                  <!-- ?:INFO -->
+                  <!-- :INFO -->
                   <b-card v-if="settings.showInfo || coinbase == null" no-body class="my-1 p-1">
                     <b-card-body class="mt-1 p-1">
                       <h4>Welcome</h4>
@@ -444,7 +445,7 @@
                     </b-card-body>
                   </b-card>
 
-                  <!-- 0:PUNKS -->
+                  <!-- :PUNKS -->
                   <b-table v-if="settings.tabIndex == 0 && !settings.showInfo" small fixed striped responsive hover :fields="punksFields" :items="pagedFilteredSortedPunks" show-empty empty-html="Click Sync above to retrieve punk history" head-variant="light" class="mx-0 my-1">
                     <template #cell(punkId)="data">
                       <b-link @click="showModalPunk(data.item.punkId);" v-b-popover.hover.bottom="'Click for details'">
@@ -492,7 +493,7 @@
                     </template>
                   </b-table>
 
-                  <!-- 1:ACTIVITY -->
+                  <!-- :ACTIVITY -->
                   <b-table v-if="settings.tabIndex == 1 && !settings.showInfo" small fixed striped responsive hover :fields="activityFields" :items="pagedFilteredSortedActivity" show-empty empty-html="Click Sync above to retrieve punk history" head-variant="light" class="mx-0 my-1">
                     <template #head(timestamp)="data">
                       When
@@ -898,7 +899,7 @@
                     </template>
                   </b-table>
 
-                  <!-- 2:OWNERS -->
+                  <!-- :OWNERS -->
                   <b-table v-if="settings.tabIndex == 2 && !settings.showInfo" small fixed striped responsive hover :fields="ownersFields" :items="pagedFilteredSortedOwners" show-empty empty-html="Click Sync above to retrieve punk history" head-variant="light" class="mx-0 my-1">
                     <template #cell(number)="data">
                       {{ parseInt(data.index) + ((settings.ownersTable.currentPage - 1) * settings.ownersTable.pageSize) + 1 }}
@@ -950,6 +951,7 @@
                     </template>
                   </b-table>
 
+                  <!-- :CONFIG -->
                   <b-card v-if="settings.tabIndex == 3 && !settings.showInfo" no-body no-header bg-variant="light" class="mx-0 my-1 p-1">
                     <b-card-body class="m-1 ml-0 p-1">
                       <b-form-group label-cols-lg="2" label="API Settings" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
