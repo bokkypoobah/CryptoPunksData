@@ -278,99 +278,6 @@
             </pre> -->
           </b-modal>
 
-          <b-modal id="modal-tx-details" hide-footer size="lg">
-            <template #modal-title>
-              <font size="-1">Tx {{ modalTxDetails.item.txHash }}</font>
-              <b-button size="sm" @click="copyToClipboard(modalTxDetails.item.txHash);" variant="link" class="m-0 p-0" v-b-popover.hover.top="'Copy to clipboard'"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
-              <b-link size="sm" :href="'https://sepolia.etherscan.io/tx/' + modalTxDetails.item.txHash" target="_blank" variant="link" class="m-0 p-0" v-b-popover.hover.top="'View in etherscan.io'">
-                <b-img rounded="0" width="16px" height="16px" src="images/etherscan-logo-circle.svg" blank-color="#777" target="_blank"></b-img>
-              </b-link>
-            </template>
-            <b-form-group v-if="modalTxDetails.item" label="Block Number:" label-for="modal-tx-details-blocknumber" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-form-input type="text" readonly size="sm" id="modal-tx-details-blocknumber" :value="modalTxDetails.item.blockNumber" class="w-50"></b-form-input>
-            </b-form-group>
-            <b-form-group v-if="modalTxDetails.item" label="Timestamp:" label-for="modal-tx-details-timestamp" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-form-input type="text" readonly size="sm" id="modal-tx-details-timestamp" :value="formatTimestamp(modalTxDetails.item.timestamp)" class="w-50"></b-form-input>
-            </b-form-group>
-            <b-form-group v-if="modalTxDetails.tx" label="From:" label-for="modal-tx-details-from" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-              <template slot="description">
-                <div v-if="ensOrAddress(modalTxDetails.tx.from) != modalTxDetails.tx.from">
-                  {{ modalTxDetails.tx.from }}
-                </div>
-              </template>
-              <b-input-group size="sm" class="w-75">
-                <b-form-input type="text" readonly size="sm" id="modal-tx-details-from" :value="ensOrAddress(modalTxDetails.tx.from)"></b-form-input>
-                <b-input-group-append class="ml-1">
-                  <b-button size="sm" @click="copyToClipboard(modalTxDetails.tx.from);" variant="link" class="m-0 p-0" v-b-popover.hover.top="'Copy to clipboard'"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
-                  <b-link size="sm" :href="'https://sepolia.etherscan.io/address/' + modalTxDetails.tx.from" target="_blank" variant="link" class="m-0 ml-1 p-0" v-b-popover.hover.top="'View in etherscan.io'">
-                    <b-img rounded="0" width="16px" height="16px" src="images/etherscan-logo-circle.svg" blank-color="#777" target="_blank"></b-img>
-                  </b-link>
-                </b-input-group-append>
-              </b-input-group>
-            </b-form-group>
-            <b-form-group v-if="modalTxDetails.tx" label="To:" label-for="modal-tx-details-to" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-              <template slot="description">
-                <div v-if="ensOrAddress(modalTxDetails.tx.to) != modalTxDetails.tx.to">
-                  {{ modalTxDetails.tx.to }}
-                </div>
-              </template>
-              <b-input-group size="sm" class="w-75">
-                <b-form-input type="text" readonly size="sm" id="modal-tx-details-to" :value="ensOrAddress(modalTxDetails.tx.to)"></b-form-input>
-                <b-input-group-append class="ml-1">
-                  <b-button size="sm" @click="copyToClipboard(modalTxDetails.tx.to);" variant="link" class="m-0 p-0" v-b-popover.hover.top="'Copy to clipboard'"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
-                  <b-link size="sm" :href="'https://sepolia.etherscan.io/address/' + modalTxDetails.tx.to" target="_blank" variant="link" class="m-0 ml-1 p-0" v-b-popover.hover.top="'View in etherscan.io'">
-                    <b-img rounded="0" width="16px" height="16px" src="images/etherscan-logo-circle.svg" blank-color="#777" target="_blank"></b-img>
-                  </b-link>
-                </b-input-group-append>
-              </b-input-group>
-            </b-form-group>
-
-            <span v-if="modalTxDetails.tradeInputs" v-for="(tradeInput, tradeInputIndex) in modalTxDetails.tradeInputs" :key="tradeInputIndex">
-                <b-form-group :label="'Action[' + tradeInputIndex + ']:'" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                  <b-form-input type="text" readonly size="sm" :value="tradeInput.action == 0 ? 'Fill' : (tradeInput.action == 1 ? 'Fill Or Kill' : 'Fill And Add Order')" class="w-50"></b-form-input>
-                </b-form-group>
-
-                <b-form-group :label="'Buy/Sell[' + tradeInputIndex + ']:'" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                  <b-form-input type="text" readonly size="sm" :value="tradeInput.buySell == 0 ? 'Buy' : 'Sell'" class="w-50"></b-form-input>
-                </b-form-group>
-
-                <b-form-group :label="'Base[' + tradeInputIndex + ']:'" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                  <b-form-input type="text" readonly size="sm" :value="tradeInput.base" class="w-75"></b-form-input>
-                </b-form-group>
-
-                <b-form-group :label="'Quote[' + tradeInputIndex + ']:'" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                  <b-form-input type="text" readonly size="sm" :value="tradeInput.quote" class="w-75"></b-form-input>
-                </b-form-group>
-
-                <b-form-group :label="'Price[' + tradeInputIndex + ']:'" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                  <b-form-input type="text" readonly size="sm" :value="tradeInput.price" class="w-50"></b-form-input>
-                </b-form-group>
-
-                <b-form-group :label="'Target Price[' + tradeInputIndex + ']:'" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                  <b-form-input type="text" readonly size="sm" :value="tradeInput.targetPrice" class="w-50"></b-form-input>
-                </b-form-group>
-
-                <b-form-group :label="'Expiry[' + tradeInputIndex + ']:'" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                  <b-form-input type="text" readonly size="sm" :value="tradeInput.expiry" class="w-50"></b-form-input>
-                </b-form-group>
-
-                <b-form-group :label="'Tokens[' + tradeInputIndex + ']:'" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                  <b-form-input type="text" readonly size="sm" :value="tradeInput.tokens" class="w-50"></b-form-input>
-                </b-form-group>
-
-                <b-form-group :label="'Skip Check[' + tradeInputIndex + ']:'" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                  <b-form-input type="text" readonly size="sm" :value="tradeInput.skipCheck ? 'Yes' : 'No'" class="w-50"></b-form-input>
-                </b-form-group>
-
-            </span>
-
-            <div>
-              <pre>
-{{ modalTxDetails }}
-              </pre>
-            </div>
-          </b-modal>
-
           <b-card class="m-0 p-0 border-0" body-class="m-1 p-0">
             <!-- TOOLBAR -->
             <b-card-text v-if="coinbase" class="m-0 p-0">
@@ -553,7 +460,9 @@
                       <b-link v-if="data.item.v1.ownerIndex" @click="showModalAddress(data.item.v1.ownerIndex);" v-b-popover.hover.bottom="'Click for details'" target="_blank">
                         {{ ensOrAddress(data.item.v1.ownerIndex, 16) }}
                       </b-link>
-                      {{ data.item.v1 }}
+                      <span v-if="data.item.v1.offer">
+                        {{ data.item.v1.offer }}
+                      </span>
                     </template>
                     <template #cell(v1Wrapped)="data">
                       <font size="-1">
@@ -564,7 +473,12 @@
                       <b-link v-if="data.item.v2.ownerIndex" @click="showModalAddress(data.item.v2.ownerIndex);" v-b-popover.hover.bottom="'Click for details'" target="_blank">
                         {{ ensOrAddress(data.item.v2.ownerIndex, 16) }}
                       </b-link>
-                      {{ data.item.v2 }}
+                      <span v-if="data.item.v2.offer">
+                        {{ data.item.v2.offer }}
+                      </span>
+                      <span v-if="data.item.v2.bid">
+                        {{ data.item.v2.bid }}
+                      </span>
                     </template>
                     <template #cell(v2Wrapped)="data">
                       <font size="-1">
@@ -1153,7 +1067,6 @@
           offers: { "1": {}, "2": {} },
           v2Bids: {},
           events: {},
-
           modalPunk: {
             punkId: null,
             v1: {
@@ -1166,13 +1079,11 @@
             },
             attributes: {},
           },
-
           modalAddress: {
             addressIndex: null,
             address: null,
             name: null,
           },
-
           modalTx: {
             txHashIndex: null,
             txHash: null,
@@ -1183,16 +1094,6 @@
             txFee: null,
             txFeeInReportingCurrency: null,
           },
-
-          modalTxDetails: {
-            item: null,
-            tx: null,
-            tradeInputs: null,
-            data: null,
-            token: null,
-            collection: null,
-          },
-
           punksSortOptions: [
             { value: 'punkidasc', text: '▲ PunkId' },
             { value: 'punkiddsc', text: '▼ PunkId' },
